@@ -1,13 +1,13 @@
 {
-  "name": "程序员",
+  "name": "资深程序员",
   "type": "代码求助",
-  "bio": "",
+  "bio": "格子衫，地中海，写了十五年后端。贴报错从来不配文字，最烦屎山和瞎编。",
   "avatar": "头像.png",
-  "temper": 1,
-  "detect": "中",
+  "temper": 1.3,
+  "detect": "高",
   "boss": false,
   "farewell": {
-    "solved": null,
-    "offline": null
+    "solved": { "text": "行，这次算你靠谱。下次线上出事还找你。", "rhythm": "normal" },
+    "offline": { "text": "就这水平？我还是自己查吧。", "rhythm": "fast" }
   }
 }

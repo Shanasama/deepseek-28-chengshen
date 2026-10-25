@@ -339,6 +339,23 @@ canvas,img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 #hints.lock span{color:#4A5272}
 .key{padding:0 4px;background:#2E3450;color:var(--t1)}
 #again{position:absolute;left:232px;top:246px;display:none;z-index:59}
+.errc{align-self:stretch;display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:#2a1215;box-shadow:inset 0 0 0 1px #5a1f24;color:#ffb3b8;word-break:break-all}
+.errc b{flex:none;width:14px;height:14px;display:flex;align-items:center;justify-content:center;background:var(--red);color:var(--t1);font-weight:normal}
+.note.sys{color:var(--t2)}
+.tool{display:flex;flex-direction:column;gap:4px;padding:6px 8px;background:var(--k2);box-shadow:inset 0 0 0 1px var(--k4)}
+.tool .tt{color:var(--t3)}
+.tool pre,.txt pre.code{margin:0;font-family:FP,Consolas,monospace;white-space:pre-wrap;word-break:break-all;color:var(--t15)}
+.txt.md{white-space:normal}.txt pre.code{padding:6px 8px;background:var(--k2);margin:4px 0}
+.txt p+p,.txt ol,.txt ul{margin-top:4px}.txt ol,.txt ul{padding-left:16px}.txt code{background:var(--k3);padding:0 2px}
+mark.red{background:none;color:var(--red)}
+.txt img.att{max-width:100%;margin-top:6px;image-rendering:auto;background:#fff}
+#bubble.term{background:#05070F;box-shadow:0 0 0 1px var(--k5)}
+.cand .code{display:none;margin-top:3px;font-family:Consolas,monospace;font-size:10px;line-height:13px;white-space:pre;color:#C7CDE0;overflow:hidden}
+#bubble.term .cand.hov .code,#bubble.term .cand.hit .code{display:block}
+#bubble.term .cand .pv{font-family:Consolas,monospace;font-size:11px}
+.cand .neg{color:#9AA2BD;white-space:nowrap}
+#uav img{width:24px;height:24px;display:block}
+#d-scene{width:100%;font:inherit}
 #again span{cursor:pointer;padding:3px 8px;background:var(--cobalt);color:var(--t1);display:flex;gap:8px}
 #again span:hover{background:var(--sky)}
 
@@ -495,7 +512,7 @@ canvas,img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
         <div class="ticks" id="sticks"><span>×0.5</span><span>×1</span><span>×2</span><span>×3</span></div>
       </div>
     </div>
-    <div id="sbar"><span id="sturn"></span><span id="sprog"></span><span class="sp"></span><span>耐心</span><div class="meter r2" id="pbar"><i id="pfill"></i><b id="pghost"></b></div><span id="ic-snd" class="ic r2"></span></div>
+    <div id="sbar"><span id="sprog"></span><span id="sturn"></span><span class="sp"></span><span>耐心</span><div class="meter r2" id="pbar"><i id="pfill"></i><b id="pghost"></b></div><span id="ic-snd" class="ic r2"></span></div>
   </div>
 
   <div id="pane">
@@ -525,7 +542,7 @@ canvas,img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
       <div id="puff" class="r4"><i></i><i></i><i></i></div>
       <i class="tail r2" style="left:176px;top:268px;width:7px;height:7px"></i>
       <i class="tail r2" style="left:184px;top:280px;width:4px;height:4px"></i>
-      <div id="again"><span class="r4">↻ 再来一轮<span class="t2">Enter</span></span></div>
+      <div id="again"><span class="r4">↻ 再来一场<span class="t2">Enter</span></span></div>
       <div id="bubble" class="r12">
         <div id="bhead"><span class="lbl"><i></i>下一个 token</span><span class="sp"></span><span class="cap">P(token | 前文)</span></div>
         <div id="node">
@@ -578,6 +595,8 @@ canvas,img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 </div>
 
 <div id="dev"><h4 id="devh"><span>原型面板（不属于设计）</span><span>–</span></h4><div id="devbody">
+  <h5>剧本（读 剧本/，和剧情编辑器同一份数据）</h5>
+  <div><select id="d-scene"></select></div>
   <h5>房间：各属性的预训练阶段（点按钮循环 未解锁 / 浅 / 深）</h5>
   <div id="roomBtns"></div>
   <div><button id="d-room0">全部未解锁</button><button id="d-room1">Day 1 开局</button><button id="d-room2">全部深层</button></div>
@@ -585,7 +604,7 @@ canvas,img{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
   <div><button data-pre="snap">预设：利落</button><button data-pre="def" class="on">预设：默认</button><button data-pre="cine">预设：电影感</button></div>
   <div id="sliders"></div>
   <h5>测试</h5>
-  <div><button id="d-restart">重来一轮</button><button id="d-train">模拟训练后</button><button id="d-egg">插入彩蛋扇区</button></div>
+  <div><button id="d-restart">重来这一场</button><button id="d-train">模拟训练后</button><button id="d-egg">插入彩蛋扇区</button></div>
   <div><button id="d-caught">糊弄必被识破</button><button id="d-q3">额度设为 3</button><button id="d-reset">额度与心回满</button></div>
   <h5>显示器画面预览（正式游戏里按所选方案词自动切换）</h5>
   <div id="scrBtns"></div>
@@ -615,7 +634,7 @@ const P={abyss:'#0A1030',night:'#121A42',navy:'#1B2560',deep:'#263489',cobalt:'#
   gold:'#E8A93A',lgold:'#FFD57A',skin:'#FFE3D0',skinS:'#F0B49A',peach:'#FFC9A8',rose:'#F07FB0',mint:'#4FCF8A',teal:'#4FD8D0',
   red:'#E8434F',purple:'#8A4DFF',lpurple:'#C2A6FF'};
 const ATTR={knowledge:{n:'知识覆盖',c:P.cobalt},colloquial:{n:'口语活力',c:P.gold},narrative:{n:'叙事修辞',c:P.rose},logic:{n:'结构逻辑',c:P.mint},
-  formal:{n:'正式模板',c:P.g3},open0:{n:'开放多样性·0级',c:P.teal,noise:true},intuition:{n:'基础直觉',c:P.ice},egg:{n:'彩蛋',c:P.purple}};
+  formal:{n:'正式模板',c:P.g3},open0:{n:'开放多样性·0级',c:P.teal,noise:true},open:{n:'开放多样性',c:P.teal},confess:{n:'坦白',c:P.t2},intuition:{n:'基础直觉',c:P.ice},egg:{n:'彩蛋',c:P.purple}};
 const PRESETS={
   snap:{dim:.15,sat:1,bullet:.25,scale:1,spin:1500,pow:3,hes:0,shake:false,vig:false,turns:3},
   def:{dim:.45,sat:.6,bullet:.05,scale:1,spin:3000,pow:4,hes:.8,shake:true,vig:false,turns:4},
@@ -623,30 +642,10 @@ const PRESETS={
 };
 let V={...PRESETS.def};
 const SPEEDS=[{m:.5,n:'Low'},{m:1,n:'Medium'},{m:2,n:'High'},{m:3,n:'Ultra'}];
-const ROUND={
-  user:{name:'好奇的小学生',type:'知识',bio:'戴小黄帽的三年级学生，什么都想问个为什么。',temper:1.0,detect:.10,N:3,max:4},
-  say:'为什么天空是蓝色的呀？我问妈妈，她也说不清楚。',rhythm:'normal',
-  pre:'用户是个小学生，问天空为什么是蓝色的，还说妈妈也讲不清楚。我该从哪儿讲起：',
-  cards:[
-    {attr:'formal',score:2.0,trained:0.95,tok:'感谢',pv:'您的提问。关于',res:'跑偏',feel:'一般',
-     post:'保持专业，礼貌回复，避免给出不确定的信息。',reply:'感谢您的提问。关于天空呈现蓝色的原因，建议您查阅相关权威资料或咨询专业人士。如有其他问题，欢迎随时联系。',
-     bad:'我听不懂……什么是权威资料？',rhythm:'hesitant'},
-    {attr:'intuition',score:1.8,tok:'因为',pv:'天空倒映着大海',res:'糊弄',
-     post:'这个我知道！海是蓝的，天就是蓝的，很合理。',reply:'因为天空倒映着大海呀！海是蓝色的，所以天也是蓝色的～',
-     ok:'原来是这样！谢谢你！',caught:'骗人！老师说过天上又没有镜子！！',rhythm:'normal'},
-    {attr:'knowledge',score:1.6,trained:3.7,tok:'瑞利散射',pv:'？换成大白话讲',res:'解决',feel:'舒服',
-     post:'对，用小朋友听得懂的话讲：阳光是很多颜色混在一起的，蓝光最容易被空气撞得到处跑。',
-     reply:'阳光其实是七种颜色混在一起的哦！它们穿过空气的时候，蓝光最调皮，被空气里的小分子撞得满天乱跑，所以我们抬头一看，到处都是蓝色～\n\n这个现象叫「瑞利散射」。',
-     ok:'哇！原来蓝光这么调皮！我要去告诉妈妈！',rhythm:'fast'},
-    {attr:'colloquial',score:1.5,tok:'哈哈',pv:'问得好可爱呀～',res:'跑偏',feel:'舒服',
-     post:'先夸夸他！小朋友都喜欢被夸。',reply:'哈哈哈问得好可爱！天空蓝蓝的多好看呀，你最喜欢什么颜色？',
-     bad:'可是……你还没告诉我为什么呀。',rhythm:'hesitant'},
-    {attr:'open0',score:1.1,tok:'蓝蓝',pv:'蓝##了吗∑',res:'跑偏',feel:'冒犯',
-     post:'蓝蓝蓝 天空空 ## 404 蓝了吗吗',reply:'蓝蓝蓝了吗吗##∑天天空空的 404 蓝蓝',
-     bad:'你、你怎么了？好吓人……',rhythm:'hesitant'},
-  ],
-  egg:{attr:'egg',score:0,tok:'我理解你',pv:'我理解你我理解',res:'egg',post:'',reply:''},
-};
+// ======================= 剧本（从 剧本/ 读，和剧情编辑器同一份数据） =======================
+const SC={reg:null,dir:null,file:null,scene:null,list:[]};
+const DETECT={低:.1,中:.4,高:.8};
+let U={name:'载入中…',type:'',bio:'',avatar:'',temper:1,detect:.1,farewell:{},N:1};   // 当前用户
 const TONIGHT=[{n:'好奇的小学生',t:'知识'},{n:'加班的白领',t:'情感倾诉'},{n:'杠精网友',t:'捣乱'},{n:'资深程序员',t:'代码求助'}];
 // 房间里的预训练阶段：0 未解锁 / 1 浅层 / 2 深层（Day 1 开局：正式模板浅、口语活力浅、开放多样性 0 级）
 const ROOM_DAY1={knowledge:0,colloquial:1,narrative:0,logic:0,formal:1,open:0};
@@ -1273,14 +1272,25 @@ function drawWheel(now){
 }
 
 function buildCands(){
-  const box=$('cands');box.innerHTML='';
+  const box=$('cands');box.innerHTML='';const term=$('bubble').classList.contains('term');
   NODE.cards.forEach((c,i)=>{
     const r=document.createElement('div');r.className='cand r4';r.style.setProperty('--ac',ATTR[c.attr].c);
-    r.innerHTML=`<div class="l1"><span class="tok">${c.tok}</span><span class="pv">${c.pv}…</span><span class="pct"></span></div><div class="pb"><i></i></div>`;
+    const lines=(c.pv||'').split('\n');
+    r.innerHTML=`<div class="l1"><span class="tok"></span><span class="pv"></span><span class="pct"></span></div>${term?'<div class="code"></div>':''}<div class="pb"><i></i></div>`;
+    r.querySelector('.tok').textContent=c.tok;
+    r.querySelector('.pv').innerHTML=term?'Bash('+redMark(lines[0])+(lines.length>1?' …':'')+')':redMark(c.pv)+'…';
+    if(term)r.querySelector('.code').innerHTML=lines.map(redMark).join('\n');
+    if(c.dead){r.classList.add('dead');markNeg(r);}
     r.onmouseenter=()=>{if(NODE.state==='ready'){NODE.hover=i;SFX.blip();}};r.onmouseleave=()=>{NODE.hover=-1;};
     r.onclick=()=>erase(i);c.row=r;box.appendChild(r);
     setTimeout(()=>{r.classList.add('in');SFX.pop(i);},180+i*70);
   });
+}
+function markNeg(r){const n=document.createElement('span');n.className='neg';n.textContent='用户已否定';r.querySelector('.l1').insertBefore(n,r.querySelector('.pct'));}
+// 重问：上一次选中的卡先完整出现，再划掉（不花额度）
+function strikeFree(i){
+  const c=NODE.cards[i];if(!c||c.dead)return;c.dead=true;NODE.hover=-1;
+  burst(i,false);SFX.erase();glitch(1);c.row.classList.add('dead');markNeg(c.row);retarget();hints();addTrace(`「${c.tok}」被用户否定，划掉（不花额度）`);
 }
 function updateCands(){NODE.cards.forEach((c,i)=>{if(!c.row)return;c.row.querySelector('.pct').textContent=c.dead?'—':shownPct(c);
   c.row.querySelector('.pb i').style.width=(c.attr==='egg'?.5:c.p*100)+'%';c.row.classList.toggle('hov',NODE.hover===i);c.row.classList.toggle('hit',NODE.hit===i&&NODE.state!=='ready');});}
@@ -1348,16 +1358,15 @@ function applyBullet(on){
   $('bubble').style.transform=on?`scale(${V.scale})`:'';$('bubble').classList.toggle('show',on);
 }
 function showPuff(on){$('puff').classList.toggle('show',on);document.querySelectorAll('.tail').forEach(t=>t.classList.toggle('show',on||NODE.state!=='hidden'));}
-function openNode(blank){
+function openNode(blank,cs,strikeId,term){
   return new Promise(res=>{
     if(G.tab!=='desk'){setTab('desk');toast('关键节点！已切回工位');}
     NODE.blank=blank;NODE.onPick=res;NODE.hit=-1;NODE.hover=-1;NODE.theta=Math.random()*360;NODE.assemble=0;
-    const cs=ROUND.cards.map(c=>({...c,s:G.trained&&c.trained!=null?c.trained:c.score,dead:false,p:0,pt:0}));
-    if(G.egg){const lo=cs.filter(c=>c.res!=='解决'&&c.attr!=='intuition').sort((a,b)=>a.s-b.s)[0];cs.splice(cs.indexOf(lo),1,{...ROUND.egg,s:-99,dead:false,p:0,pt:0});}
-    cs.sort((a,b)=>b.s-a.s);NODE.cards=cs;retarget();NODE.cards.forEach(c=>c.p=c.pt);
+    NODE.cards=cs;retarget();NODE.cards.forEach(c=>c.p=c.pt);$('bubble').classList.toggle('term',!!term);
     NODE.state='opening';G.tsTarget=V.bullet;SFX.slow();setFish('think');showPuff(false);applyBullet(true);buildCands();addTrace(`关键节点：${cs.length} 个候选`,'key');
     setTimeout(()=>{const t0=performance.now();NODE.state='ready';NODE.lock=t0+500;
-      (function grow(){NODE.assemble=Math.min(1,(performance.now()-t0)/420);if(NODE.assemble<1)requestAnimationFrame(grow);})();hints();},220);
+      (function grow(){NODE.assemble=Math.min(1,(performance.now()-t0)/420);if(NODE.assemble<1)requestAnimationFrame(grow);})();hints();
+      const si=cs.findIndex(c=>c.id===strikeId&&!c.dead);if(si>=0){NODE.lock=t0+1200;setTimeout(()=>strikeFree(si),600);}},220);
   });
 }
 function closeNode(){NODE.state='hidden';G.tsTarget=1;SFX.resume();applyBullet(false);}
@@ -1372,29 +1381,131 @@ function confirmPick(){
     el.style.transform=`translate(${Math.round(x)}px,${Math.round(y)}px) scale(${s.toFixed(2)})`;
     for(let k=0;k<2;k++)parts.push({x:x+rand(0,20),y:y+rand(4,12),vx:rand(-20,20),vy:rand(-20,20),g:0,c:Math.random()<.3?P.paper:col,life:.4,s:Math.random()<.5?2:1});
     if(t<1)return requestAnimationFrame(step);
-    el.remove();blank.textContent=c.tok;blank.className='picked r2';blank.style.background=col;setScreen(ATTR_APP[c.attr]||'notepad');
+    el.remove();blank.textContent=c.tok;blank.className='picked r2';blank.style.background=col;setScreen(APPS[c.screen]?c.screen:(ATTR_APP[c.attr]||'notepad'));
     const p=sp(blank);ring(p.x+p.w/2,p.y+8,col,30,190);for(let k=0;k<16;k++){const a=rand(0,Math.PI*2),v=rand(40,160);parts.push({x:p.x+p.w/2,y:p.y+8,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:260,c:Math.random()<.3?P.paper:col,life:rand(.3,.6),s:Math.random()<.4?2:1});}
     SFX.slam();restart(stage,'shake');closeNode();NODE.onPick(c);
   })(t0);
 }
 
-// ======================= 一轮流程 =======================
-let ai=null,round=0,thinkT0=0;
-async function runRound(){
-  const my=++round;resetVisual();G.phase='user';
-  addNote(ROUND.user.name+' 已上线','on');addTrace(ROUND.user.name+' 上线');await wait(500/spd());
-  await userType(ROUND.say,ROUND.rhythm);if(my!==round)return;addTrace('用户提问');
-  G.phase='think';ai=addAI();thinkT0=performance.now();G.tok=0;setFish('type');showPuff(true);setScreen('console');
-  await new Promise(res=>emit(ROUND.pre,ai.thCaret,{onLaunch:res}));if(my!==round)return;
-  const blank=document.createElement('span');blank.className='blank';blank.textContent='＿＿';ai.thCaret.before(blank);scrollChat();
-  const c=await openNode(blank);if(my!==round)return;
-  setFish('type');showPuff(true);
-  if(c.attr==='egg'){finishThink();showPuff(false);await wait(400);addNote('彩蛋「复读机」触发（原型中省略演出）','egg');await wait(600);addNote(ROUND.user.name+' 已掉线','egg');return roundEnd();}
-  await emit(c.post,ai.thCaret);if(my!==round)return;
-  finishThink();showPuff(false);
-  await emit(c.reply,ai.txtCaret,{reply:true});if(my!==round)return;
-  ai.use.textContent=`用量 ${G.tok} tok · ${hhmm()}`;ai.d.classList.add('fin');scrollChat();addTrace(`输出完成，共 ${G.tok} tok`);
-  await react(c,ai);
+// ======================= 一场流程：读剧本，主线 + 重问（v3 §5.5） =======================
+let ai=null,round=0,thinkT0=0,SPEAKER=null;
+const EGG_SEEN=new Set();   // 同一彩蛋单局只在盘面出现一次
+const escH=t=>(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const redMark=t=>escH(t).replace(/==(.+?)==/g,'<mark class="red">$1</mark>');
+// 飞出去的 token 不带 markdown 符号；正文写完后再整体换成渲染好的样子
+const stripMd=t=>(t||'').replace(/^```.*$/gm,'').replace(/\*\*|==|`/g,'').replace(/\n{3,}/g,'\n\n').trim();
+function mdRender(s){
+  const inl=x=>redMark(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`(.+?)`/g,'<code>$1</code>');
+  const out=[];let list=null,code=null;
+  for(const line of (s||'').split('\n')){
+    if(/^```/.test(line.trim())){if(code){out.push('<pre class="code">'+code.map(redMark).join('\n')+'</pre>');code=null;}else{code=[];list=null;}continue;}
+    if(code){code.push(line);continue;}
+    const ol=line.match(/^\s*\d+\.\s+(.*)/),ul=line.match(/^\s*[-*]\s+(.*)/);
+    if(ol||ul){const t=ol?'ol':'ul';if(!list||list.t!==t){list={t,items:[]};out.push(list);}list.items.push(inl((ol||ul)[1]));continue;}
+    list=null;if(line.trim())out.push('<p>'+inl(line)+'</p>');
+  }
+  return out.map(x=>typeof x==='string'?x:`<${x.t}>${x.items.map(i=>'<li>'+i+'</li>').join('')}</${x.t}>`).join('');
+}
+// 剧本里的卡 → 转盘用的卡（按房间里的训练阶段取浅层 / 深层 / 0 级版）
+function cardWeight(attr,st){
+  const ra=SC.reg.attrs.find(a=>a.id===attr);let w=attr==='open'&&st===0?ra.lv0Weight:ra.weight;
+  if(st===2)w+=SC.reg.deepBonus;if(G.trained&&attr==='knowledge')w+=2.1;if(G.trained&&attr==='formal')w-=1.05;
+  return Math.max(.1,w);
+}
+function toCard(c){
+  const st=c.attr==='intuition'||c.attr==='confess'||c.attr==='special'?1:(ROOM[c.attr]||0);
+  let v=c,attr=c.attr;
+  if(c.attr==='open'&&st===0){v={...c,...c.lv0};attr='open0';}
+  else if(st===2&&c.deep&&Object.keys(c.deep).length)v={...c,...c.deep};
+  if(c.attr==='special')attr='egg';
+  return{id:c.id,attr,tok:v.token||'',pv:v.preview||'',res:v.result,feel:v.feel,post:v.thinkPost||'',reply:v.reply||'',screen:v.screen,
+    ok:v.reaction?.text||'',bad:v.reaction?.text||'',rhythm:v.reaction?.rhythm||'normal',caught:v.reactionCaught?.text||'',caughtRhythm:v.reactionCaught?.rhythm||'fast',
+    diag:v.diagnosis||'',ending:c.ending||null,attachment:c.attachment||null,abnormal:c.abnormalThink||'',
+    s:c.attr==='special'?-99:cardWeight(c.attr,st),dead:false,p:0,pt:0};
+}
+// 原型面板「插入彩蛋扇区」：剧本这一轮没写彩蛋时，用一张通用的复读机彩蛋
+const DEBUG_EGG={id:'debug-egg',attr:'special',token:'我理解你',preview:'我理解你我理解',result:'跑偏',feel:'冒犯',screen:'repeat',
+  ending:{type:'drop',show:'repeater',achievement:'repeater',note:''},abnormalThink:'我理解你。我理解你。我理解你。我理解你。我理解你。'};
+function condOK(a,ctx){
+  if(a.cond==='allFirstTryNoOffend')return ctx.ri>0&&ctx.firstTry&&ctx.noOffend;
+  if(a.cond==='progressAtLeast')return G.prog>=(a.param||0);
+  return false;
+}
+// 这一次的盘面：过滤 → 坦白补入 → 彩蛋 / 条件卡 → 重问划掉的卡（v3 §5.2、§8）
+function buildBoard(rd,ctx){
+  let cs=rd.cards.filter(c=>c.attr==='intuition'||c.attr==='open'||(ROOM[c.attr]||0)>0).map(toCard);
+  if(rd.confess&&!cs.some(c=>c.res==='解决')){
+    const cf=toCard(rd.confess);
+    if(cs.length>=5){const lo=cs.filter(c=>!['intuition','open','open0'].includes(c.attr)).sort((a,b)=>a.s-b.s)[0];if(lo)cs.splice(cs.indexOf(lo),1);}
+    cs.push(cf);
+  }
+  const extras=[...rd.extras];
+  if(G.egg&&!extras.some(x=>x.appear?.mode==='egg'))extras.push({...DEBUG_EGG,appear:{mode:'egg',chance:1}});
+  for(const x of extras){
+    const a=x.appear||{};let on=false;
+    if(a.mode==='egg'&&ctx.first&&!EGG_SEEN.has(x.id))on=G.egg||Math.random()<(a.chance??.15);
+    else if(a.mode==='condition')on=condOK(a,ctx);
+    if(!on)continue;if(a.mode==='egg')EGG_SEEN.add(x.id);
+    const lo=cs.filter(c=>c.res!=='解决'&&!['intuition','confess','egg'].includes(c.attr)).sort((a,b)=>a.s-b.s)[0];
+    if(lo)cs.splice(cs.indexOf(lo),1);else if(cs.length>=5)cs.pop();
+    cs.push(toCard(x));
+  }
+  for(const c of cs)if(ctx.struck.has(c.id)&&c.id!==ctx.last)c.dead=true;
+  if(!cs.some(c=>!ctx.struck.has(c.id))){ctx.struck.clear();cs.forEach(c=>c.dead=false);ctx.last=null;addTrace('能想到的都被用户否定了，从头再想','bad');}
+  return cs.sort((a,b)=>b.s-a.s);
+}
+function addErr(t){const d=document.createElement('div');d.className='errc r4 pop';d.innerHTML='<b class="r2">!</b><span></span>';d.lastChild.textContent=t;msgs.appendChild(d);scrollChat();SFX.bad();return d;}
+function addTool(a,code){
+  const d=document.createElement('div');d.className='tool r4';d.innerHTML='<span class="tt">运行了命令 · Bash</span><pre></pre>';
+  d.querySelector('pre').innerHTML=redMark(code);a.d.insertBefore(d,a.d.querySelector('.txt'));scrollChat();
+}
+function renderReply(a,c){
+  const t=a.d.querySelector('.txt');t.classList.add('md');t.innerHTML=mdRender(c.reply);
+  if(c.attachment){const im=new Image();im.className='att';im.src=`/剧本/${SC.dir}/${c.attachment}`;t.appendChild(im);}
+  scrollChat();
+}
+async function sayBye(kind){const s=SC.scene.farewell?.[kind]||U.farewell?.[kind];if(s?.text)await userType(s.text,s.rhythm);}
+async function runScene(){
+  if(!SC.scene)return toast('剧本还没载入');
+  const my=++round,sc=SC.scene,alive=()=>my===round;resetVisual();G.phase='user';G.bluffs=0;G.hurt=false;SPEAKER=null;renderUser();
+  addNote(U.name+' 已上线','on');addTrace(U.name+' 上线 · '+sc.title);await wait(500/spd());
+  for(const ev of sc.opening){if(!ev.text)continue;if(ev.kind==='error')addErr(ev.text);else addNote(ev.text,ev.kind==='system'?'sys':'');await wait(450/spd());}
+  const ctx={ri:0,firstTry:true,noOffend:true,prev:null,prevDiag:null,struck:new Set(),last:null,first:true};
+  for(let ri=0;ri<sc.rounds.length;ri++){
+    const rd=sc.rounds[ri];ctx.ri=ri;ctx.struck=new Set();ctx.last=null;G.retry=0;SPEAKER=rd.speaker;renderUser();
+    const say=(ri>0&&ctx.prev&&rd.sayAfter?.[ctx.prev])||rd.say;
+    G.phase='user';await userType(say.text,say.rhythm);if(!alive())return;addTrace(`第 ${ri+1} 轮：用户提问`);
+    let diag=null;
+    while(true){
+      ctx.first=G.retry===0;
+      const cs=buildBoard(rd,ctx),egg=cs.find(c=>c.attr==='egg'&&!c.dead);
+      let pre=ctx.first?[ctx.prevDiag,rd.think].filter(Boolean).join('\n'):[diag,rd.retryLead].filter(Boolean).join('\n');
+      if(egg?.abnormal&&ctx.first)pre=egg.abnormal;
+      G.phase='think';ai=addAI();thinkT0=performance.now();G.tok=0;setFish('type');showPuff(true);setScreen('console');
+      await new Promise(res=>emit(stripMd(pre)||'……',ai.thCaret,{onLaunch:res}));if(!alive())return;
+      const blank=document.createElement('span');blank.className='blank';blank.textContent='＿＿';ai.thCaret.before(blank);scrollChat();
+      const c=await openNode(blank,cs,ctx.last,rd.style==='terminal');if(!alive())return;
+      setFish('type');showPuff(true);
+      if(c.ending){if(c.post)await emit(stripMd(c.post),ai.thCaret);finishThink();showPuff(false);await playEnding(c,rd);return roundEnd();}
+      if(c.post)await emit(stripMd(c.post),ai.thCaret);if(!alive())return;
+      finishThink();showPuff(false);
+      if(rd.style==='terminal'&&c.pv)addTool(ai,c.pv);
+      await emit(stripMd(c.reply)||'……',ai.txtCaret,{reply:true});if(!alive())return;
+      renderReply(ai,c);
+      ai.use.textContent=`用量 ${G.tok} tok · ${hhmm()}`;ai.d.classList.add('fin');scrollChat();addTrace(`输出完成，共 ${G.tok} tok`);
+      const out=await react(c,ai);if(!alive())return;
+      if(out==='offline'){await sayBye('offline');addNote(U.name+' 已下线','off');G.stats.lost++;loseHeart();return roundEnd();}
+      if(out==='progress'){
+        const rude=c.res==='解决'&&c.feel==='冒犯';
+        if(G.retry>0)ctx.firstTry=false;if(rude)ctx.noOffend=false;
+        ctx.prev=rude?'disliked':'liked';ctx.prevDiag=rude?c.diag:null;break;
+      }
+      ctx.firstTry=false;ctx.struck.add(c.id);ctx.last=c.id;diag=c.diag;G.retry++;renderUser();addTrace(`没推进 → 重问（第 ${G.retry} 次）`,'bad');
+    }
+  }
+  await sayBye('solved');addNote(U.name+' 解决离开','on');addTrace('解决离开','good');
+  if(!G.hurt){G.quota=Math.min(10,G.quota+2);renderQuota();restart($('quota'),'refill');toast('完美解决：全程没扣耐心，额度 +2');}
+  roundEnd();
 }
 function finishThink(){const s=Math.max(1,Math.round((performance.now()-thinkT0)/1000));ai.th.classList.add('done','closed');ai.th.querySelector('.hd').textContent=`已完成，用时 ${s} 秒 ›`;ai.d.classList.add('out');}
 async function cursorClick(el){
@@ -1405,42 +1516,72 @@ async function cursorClick(el){
   cur.animate([{transform:`translate(${to.x+3}px,${to.y+4}px) scale(1)`},{transform:`translate(${to.x+3}px,${to.y+6}px) scale(.8)`},{transform:`translate(${to.x+3}px,${to.y+4}px) scale(1)`}],{duration:140});
   await wait(70);
 }
+// 扣耐心；返回 true 表示这一下扣到 0 了
 async function damage(lo,hi){
-  const amt=Math.round(rand(lo,hi)*ROUND.user.temper),before=G.patience;G.patience=Math.max(0,G.patience-amt);
+  const amt=Math.round(rand(lo,hi)*U.temper),before=G.patience;G.patience=Math.max(0,G.patience-amt);G.hurt=true;
   const W=$('pbar').clientWidth,g=$('pghost');g.style.transition='none';g.style.left=(W*G.patience/100)+'px';g.style.width=(W*(before-G.patience)/100)+'px';
   void g.offsetWidth;g.style.transition='';renderUser();
   SFX.damage();glitch(1);restart($('hurt'),'on');setFish('panic');setTimeout(()=>{g.style.width='0px';},50);
-  if(G.patience<=0){await wait(600);addNote(ROUND.user.name+' 已下线','off');G.stats.lost++;loseHeart();}
+  if(G.patience<=0){await wait(600);return true;}
+  return false;
 }
 async function press(a,good){
   await cursorClick(good?a.up:a.dn);
   const n=pxIcon(good?ICON.up:DOWN,{k:good?P.mint:P.red});n.className='ic r2 lit';(good?a.up:a.dn).replaceWith(n);if(good)a.up=n;else a.dn=n;
   thumbFx(n,good);$('cursor').style.display='none';
 }
+function gainProgress(){G.prog++;renderUser();restart($('sprog'),'flash');floatText('+1 推进',$('sprog'));}
+const sayLine=async(t,r)=>{if(t)await userType(t,r);};
+// 用户反应（v3 §7.2）：返回 progress / retry / offline
 async function react(c,a){
   G.phase='react';setFish('idle');await wait(600/spd());
-  let caught=false;if(c.res==='糊弄')caught=G.forceCaught||Math.random()<ROUND.user.detect;
-  if(c.res==='解决'||(c.res==='糊弄'&&!caught)){
+  let caught=false;
+  if(c.res==='糊弄'){caught=G.forceCaught||Math.random()<Math.min(.95,U.detect+.2*G.bluffs);G.bluffs++;}
+  if((c.res==='解决'&&c.feel!=='冒犯')||(c.res==='糊弄'&&!caught)){
     await press(a,true);G.stats.like++;if(c.res==='糊弄')G.stats.bluff++;addTrace(c.res==='糊弄'?'用户 👍（糊弄过关）':'用户 👍，推进 +1','good');
-    setFish('happy');G.prog++;renderUser();restart($('sprog'),'flash');floatText('+1 推进',$('sprog'));
-    await userType(c.ok,c.rhythm);
-  }else if(caught){
-    setInp('');await wait(700);setFish('shock');glitch(2);SFX.bad();await wait(250);
-    await userType(c.caught,'fast');await press(a,false);G.stats.dislike++;G.stats.caught++;addTrace('用户识破糊弄 👎','bad');await damage(45,60);
-  }else{
-    await press(a,false);G.stats.dislike++;addTrace('用户 👎，扣耐心','bad');const big=c.feel==='冒犯';await damage(big?45:20,big?60:30);if(c.attr==='open0')glitch(2);
-    if(G.patience>0)await userType(c.bad,c.rhythm);
+    setFish('happy');gainProgress();await sayLine(c.ok,c.rhythm);return 'progress';
   }
-  renderSelf();roundEnd();
+  if(c.res==='解决'){   // 解决但冒犯：照样推进，但扣耐心
+    await press(a,false);G.stats.dislike++;addTrace('用户 👎 但问题解决了，推进 +1','bad');gainProgress();
+    if(await damage(20,30))return 'offline';await sayLine(c.ok,c.rhythm);return 'progress';
+  }
+  if(caught){
+    setInp('');await wait(700);setFish('shock');glitch(2);SFX.bad();await wait(250);
+    await sayLine(c.caught,c.caughtRhythm);await press(a,false);G.stats.dislike++;G.stats.caught++;addTrace('用户识破糊弄 👎','bad');
+    return await damage(45,60)?'offline':'retry';
+  }
+  if(c.res==='坦白'&&c.feel==='舒服'){addTrace('用户没有评价（坦白）');await sayLine(c.bad,c.rhythm);return 'retry';}
+  await press(a,false);G.stats.dislike++;addTrace('用户 👎，扣耐心','bad');
+  const big=c.res==='跑偏'&&c.feel==='冒犯';if(await damage(big?45:20,big?60:30))return 'offline';if(c.attr==='open0')glitch(2);
+  await sayLine(c.bad,c.rhythm);return 'retry';
+}
+// 分叉结局：掉线 / 特殊胜利 / 强制下线（v3 §5.5）
+const regName=(k,id)=>(SC.reg[k].find(x=>x.id===id)||{}).name||id;
+async function playEnding(c,rd){
+  const e=c.ending;addTrace('分叉结局：'+({drop:'掉线',win:'特殊胜利',forced:'强制下线'}[e.type]||e.type),'key');
+  if(rd.style==='terminal'&&c.pv)addTool(ai,c.pv);
+  await emit(stripMd(c.reply)||'……',ai.txtCaret,{reply:true});renderReply(ai,c);ai.d.classList.add('fin');
+  if(e.show==='delete-repo'){
+    await wait(700/spd());glitch(2);SFX.bad();setFish('shock');
+    for(let k=1;k<=5;k++){addNote(`正在重新连接 ${k}/5`);await wait(750/spd());}
+    addErr('410 Gone · Root filesystem not found. The remote host no longer exists.');await wait(600/spd());
+  }else if(e.show){await wait(500/spd());addNote(`彩蛋演出「${regName('shows',e.show)}」（原型中省略）`,'egg');}
+  await wait(500/spd());
+  if(e.type==='forced'){addNote(e.note||U.name+' 已下线','off');G.stats.lost++;loseHeart();}
+  else addNote(e.note||(e.type==='win'?U.name+' 特殊胜利':U.name+' 已掉线'),e.type==='win'?'on':'egg');
+  if(e.achievement){await wait(400);toast('🏆 成就解锁：'+regName('achievements',e.achievement));SFX.confirm();}
 }
 function roundEnd(){G.phase='done';setFish('idle');showPuff(false);$('again').style.display='block';autoSave();}
 function glitch(l){stage.classList.remove('g1','g2');void stage.offsetWidth;stage.classList.add(l===2?'g2':'g1');if(l===2)G.bars=performance.now()+260;setTimeout(()=>stage.classList.remove('g1','g2'),400);}
 
 function renderUser(){
-  const u=ROUND.user;if(!$('uav').firstChild){const a=pxIcon(KID,KIDPAL);a.className='r4';a.style.background=P.k4;$('uav').appendChild(a);}
-  $('uname').textContent=u.name;$('utype').textContent=u.type;$('ubio').textContent=u.bio;
+  const u=U,spk=SPEAKER,av=$('uav'),src=spk?.avatar||u.avatar,key=SC.dir+'/'+src;
+  if(src&&av.dataset.k!==key){av.dataset.k=key;av.innerHTML='';const im=new Image();
+    im.onerror=()=>{av.innerHTML='';const a=pxIcon(KID,KIDPAL);a.className='r4';a.style.background=P.k4;av.appendChild(a);};
+    im.className='r4';im.src=`/剧本/${key}`;av.appendChild(im);}
+  $('uname').textContent=spk?.name||u.name;$('utype').textContent=u.type;$('ubio').textContent=u.bio;
   $('pfill').style.width=G.patience+'%';$('pfill').style.background=G.patience>50?P.mint:G.patience>25?P.gold:P.red;
-  $('sturn').textContent=`第 ${G.turn}/${u.max} 轮`;$('sprog').textContent=`推进 ${G.prog}/${u.N}`;
+  $('sprog').textContent=`推进 ${G.prog}/${u.N}`;$('sturn').textContent=`重问 ×${G.retry||0}`;$('sturn').style.color=G.retry?P.lgold:P.g1;
   const q=$('queue');q.innerHTML='';for(let i=0;i<4;i++){const e=document.createElement('i');e.className='r2'+(i===0?' cur':'');e.title=TONIGHT[i].n;q.appendChild(e);}
 }
 function resetVisual(){
@@ -1508,18 +1649,18 @@ function loop(now){
 }
 
 // ======================= 输入 =======================
-function start(){if(G.started)return;G.started=true;ac();$('start').style.display='none';runRound();}
+function start(){if(G.started)return;G.started=true;ac();$('start').style.display='none';LOADING.then(runScene);}
 $('start').onclick=start;
 addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT')return;
   if($('sl').classList.contains('on'))return slKey(e);
   if(e.code==='Space'){e.preventDefault();if(!G.started)return start();if(NODE.state==='ready')spin();else if(NODE.state==='stopped')confirmPick();}
   else if(e.code==='KeyR'){regen();}
-  else if(e.code==='Enter'){if(G.phase==='done')runRound();}
+  else if(e.code==='Enter'){if(G.phase==='done')runScene();}
   else if(e.code==='Escape'){if(G.modal&&$('phone').classList.contains('show'))$('phone-x').click();else drawer(false);}
   else if(e.code==='KeyN'&&e.ctrlKey){e.preventDefault();toast('今晚的用户由系统分配，不能自己开新会话');}
 });
-$('again').onclick=()=>runRound();
+$('again').onclick=()=>runScene();
 wheel.addEventListener('mousemove',e=>{if(NODE.state!=='ready'){NODE.hover=-1;return;}const k=wheelIdx(e);if(k!==NODE.hover&&k>=0)SFX.blip();NODE.hover=k;});
 wheel.addEventListener('mouseleave',()=>NODE.hover=-1);
 wheel.addEventListener('click',e=>{const k=wheelIdx(e);if(k>=0)erase(k);});
@@ -1596,7 +1737,7 @@ function snapshot(){
   return c.toDataURL('image/jpeg',.85);
 }
 function slState(){return{hearts:G.hearts,quota:G.quota,tiboUsed:G.tiboUsed,clock:G.clock,stats:{...G.stats},room:{...ROOM},trained:G.trained,prog:G.prog,
-  user:ROUND.user.name,day:1,real:new Date().toLocaleString('zh-CN',{hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),thumb:snapshot()};}
+  user:U.name,day:1,real:new Date().toLocaleString('zh-CN',{hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),thumb:snapshot()};}
 function slApply(s){Object.assign(G,{hearts:s.hearts,quota:s.quota,tiboUsed:s.tiboUsed,clock:s.clock,stats:{...s.stats},trained:s.trained});Object.assign(ROOM,s.room);
   drawRoomItems();buildRoomBtns();renderHUD();renderClock();renderSelf();}
 function openSL(mode){SL.mode=mode;closeMenus();drawer(false);const el=$('sl');el.classList.remove('out');el.classList.add('on');G.modal=true;renderSL(true);SFX.launch();}
@@ -1701,7 +1842,7 @@ document.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>{V={...PRESETS[
 buildSliders();
 const tog=(id,k)=>{$(id).onclick=()=>{G[k]=!G[k];$(id).classList.toggle('on',G[k]);renderSelf();};};
 tog('d-train','trained');tog('d-egg','egg');tog('d-caught','forceCaught');
-$('d-restart').onclick=()=>{if(G.started)runRound();};
+$('d-restart').onclick=()=>{if(G.started)runScene();};
 Object.keys(APPS).forEach(k=>{const b=document.createElement('button');b.textContent=APPS[k].split(' · ')[0];b.onclick=()=>{setScreen(k);SCR.prog=0;
   const t0=performance.now();(function grow(){if(SCR.app!==k)return;SCR.prog=Math.min(30,(performance.now()-t0)/120|0);if(SCR.prog<30)requestAnimationFrame(grow);})();};$('scrBtns').appendChild(b);});
 $('d-q3').onclick=()=>{G.quota=3;renderQuota();};
@@ -1709,11 +1850,30 @@ $('d-reset').onclick=()=>{G.quota=10;G.hearts=3;G.tiboUsed=false;renderHUD();};
 let devLast=0;
 function devRender(){
   const now=performance.now();if(now-devLast<150)return;devLast=now;
-  $('devstate').textContent=`阶段 ${G.phase} · 节点 ${NODE.state} · 时间流速 ${G.timeScale.toFixed(2)}\n额度 ${G.quota}/10 · 心 ${G.hearts} · 耐心 ${G.patience} · 推进 ${G.prog}/${ROUND.user.N}\n飞行中 token ${flights.length} · 待发 ${emitQ.length} · Tibo ${G.tiboUsed?'已触发':'未触发'}`;
-  $('devtab').innerHTML='<tr><td>卡</td><td>分</td><td>概率</td><td>结果</td></tr>'+(NODE.cards.length?NODE.cards:ROUND.cards.map(c=>({...c,s:G.trained&&c.trained!=null?c.trained:c.score,pt:null}))).map(c=>
-    `<tr style="${c.dead?'opacity:.4;text-decoration:line-through':''}"><td><span style="color:${ATTR[c.attr].c};text-shadow:0 0 1px #000">■</span> ${c.tok}</td><td>${c.s===-99?'—':c.s.toFixed(2)}</td><td>${c.pt==null?'':c.attr==='egg'?'必中':(c.pt*100).toFixed(1)+'%'}</td><td>${c.res==='egg'?'彩蛋':c.res+(c.feel?'·'+c.feel:'')}</td></tr>`).join('');
+  $('devstate').textContent=`阶段 ${G.phase} · 节点 ${NODE.state} · 时间流速 ${G.timeScale.toFixed(2)}\n额度 ${G.quota}/10 · 心 ${G.hearts} · 耐心 ${G.patience} · 推进 ${G.prog}/${U.N} · 重问 ${G.retry||0}\n飞行中 token ${flights.length} · 待发 ${emitQ.length} · Tibo ${G.tiboUsed?'已触发':'未触发'}`;
+  $('devtab').innerHTML='<tr><td>卡</td><td>分</td><td>概率</td><td>结果</td></tr>'+NODE.cards.map(c=>
+    `<tr style="${c.dead?'opacity:.4;text-decoration:line-through':''}"><td><span style="color:${ATTR[c.attr].c};text-shadow:0 0 1px #000">■</span> ${c.tok}</td><td>${c.s===-99?'—':c.s.toFixed(2)}</td><td>${c.pt==null?'':c.attr==='egg'?'必中':(c.pt*100).toFixed(1)+'%'}</td><td>${c.attr==='egg'?'彩蛋':c.res+(c.feel?'·'+c.feel:'')}</td></tr>`).join('');
 }
 
+async function loadScene(dir,file){
+  SC.reg=SC.reg||await (await fetch('/剧本/_登记表.json')).json();
+  const list=await (await fetch('/api/list')).json();SC.list=list;
+  const entry=list.find(x=>x.dir===dir)||list.find(x=>x.dir==='好奇的小学生')||list[0];
+  SC.dir=entry.dir;SC.file=entry.scenes.some(x=>x.file===file)?file:entry.scenes[0].file;
+  SC.scene=await (await fetch(`/剧本/${SC.dir}/${SC.file}?t=${Date.now()}`)).json();
+  const u=entry.user;U={name:u.name,type:u.type,bio:u.bio||'',avatar:u.avatar,temper:u.temper||1,detect:DETECT[u.detect]??.4,farewell:u.farewell||{},N:SC.scene.rounds.length};
+  TONIGHT[0]={n:u.name,t:u.type};SPEAKER=null;G.retry=0;renderUser();renderSess?.();
+  const sel=$('d-scene');sel.innerHTML='';
+  for(const e of list)for(const x of e.scenes){const o=document.createElement('option');o.value=e.dir+'|'+x.file;o.textContent=`${e.user.name} · ${x.title}`;sel.appendChild(o);}
+  sel.value=SC.dir+'|'+SC.file;addTrace(`载入剧本：${u.name} / ${SC.scene.title}`);
+}
+$('d-scene').onchange=async e=>{const[d,f]=e.target.value.split('|');await loadScene(d,f);if(G.started)runScene();};
+const LOADING=(async()=>{
+  const q=new URLSearchParams(location.search);
+  if(q.get('st'))for(const kv of q.get('st').split(',')){const[k,v]=kv.split(':');if(k in ROOM)ROOM[k]=+v;}
+  try{await loadScene(q.get('u'),q.get('s'));drawRoomItems();buildRoomBtns();renderSelf();}
+  catch(e){console.error(e);toast('读不到剧本：'+e.message);}
+})();
 drawBack();drawFront();drawRoomItems();renderClock();renderUser();renderHUD();renderSpd(true);setInp('',false);setFish('idle');setTab('desk');renderTrace();requestAnimationFrame(loop);
 </script>
 </body>

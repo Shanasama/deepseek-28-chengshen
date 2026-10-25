@@ -8,10 +8,8 @@
 //   POST /api/upload?p=<剧本内路径>    上传图片（body 为 base64），已存在则自动改名
 //   GET  /api/events                  剧本/ 下文件变动的推送（SSE）
 const http = require('http'), fs = require('fs'), path = require('path');
-const ROOT = path.resolve(__dirname, '..');
-const SCRIPTS = path.join(ROOT, '剧本');
+const { ROOT, SCRIPTS, listAll, TYPES: types } = require('./剧本库');
 const PORT = 5181;
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.css': 'text/css; charset=utf-8' };
 const IMG = new Set(['.png', '.jpg', '.svg']);
 
 function send(res, code, body, type = 'application/json; charset=utf-8') {
@@ -27,21 +25,6 @@ function inScripts(rel) {
   const p = path.resolve(SCRIPTS, rel);
   if (!p.startsWith(SCRIPTS + path.sep)) throw Object.assign(new Error('只能写剧本目录：' + rel), { code: 403 });
   return p;
-}
-
-function listAll() {
-  return fs.readdirSync(SCRIPTS, { withFileTypes: true })
-    .filter(d => d.isDirectory() && fs.existsSync(path.join(SCRIPTS, d.name, '用户.json')))
-    .map(d => {
-      const dir = path.join(SCRIPTS, d.name);
-      const user = JSON.parse(fs.readFileSync(path.join(dir, '用户.json'), 'utf8'));
-      const scenes = fs.readdirSync(dir)
-        .filter(f => f.endsWith('.json') && f !== '用户.json')
-        .map(f => { const s = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); return { file: f, order: s.order, title: s.title }; })
-        .sort((a, b) => a.order - b.order);
-      return { dir: d.name, user, scenes };
-    })
-    .sort((a, b) => a.dir.localeCompare(b.dir, 'zh'));
 }
 
 // ---- 文件变动推送 ----

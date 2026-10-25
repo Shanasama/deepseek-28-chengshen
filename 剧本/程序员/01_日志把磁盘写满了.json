@@ -1,0 +1,439 @@
+{
+  "order": 1,
+  "title": "日志把磁盘写满了",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "p1",
+      "need": "安全地给线上机器止血：找出大文件，正在被进程写的日志要截断而不是 rm（rm 掉被打开的文件，空间不会释放），旧日志压缩，不能乱删。",
+      "style": "terminal",
+      "speaker": null,
+      "say": {
+        "text": "$ df -h /\nFilesystem  Size  Used Avail Use%\n/dev/vda1    50G   50G     0 100%\n\n服务起不来了。/var/log/app 下面 40 个 G。先止血，别乱删。",
+        "rhythm": "paste"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "用户贴了 df 的输出：根分区 100% 满了，日志目录占了 40G，服务起不来。他说先止血、别乱删。",
+      "retryLead": "这次换个稳妥的办法。",
+      "cards": [
+        {
+          "id": "p1-logic",
+          "attr": "logic",
+          "token": "先查",
+          "preview": "du -sh /var/log/app/* | sort -h | tail -5\n# 正在被写的文件：截断，不要 rm\n: > /var/log/app/app.log\ngzip /var/log/app/app.log.2026-10-*",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "一下谁最大，再按步骤来：正在写的 app.log 用截断清空，进程的文件句柄不受影响，空间立刻释放；旧日志压缩，一个都不删。",
+          "reply": "按这个顺序来，一个文件都不删：\n\n1. `du -sh /var/log/app/* | sort -h | tail -5` 看看谁最大\n2. 正在被写的 `app.log` 用 `: > app.log` **截断**。别 `rm`：进程还开着这个文件，删了空间也不会释放\n3. 旧日志 `gzip` 压缩，文本日志一般能压到十分之一\n4. 再 `df -h /` 确认空间回来了",
+          "screen": "terminal",
+          "reaction": {
+            "text": "行，空间回来了。还算懂行。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "p1-knowledge",
+          "attr": "knowledge",
+          "token": "其实",
+          "preview": "# 删了空间不释放？是因为句柄没关\nlsof +L1 | grep /var/log/app",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "这种情况最常见的坑是：文件删了，但进程还拿着句柄，空间没回来。先用 lsof 找出来，再截断。",
+          "reply": "先排除一个经典坑：`lsof +L1` 能列出**已经被删、但还被进程占着**的文件——如果有人之前 `rm` 过日志，空间就卡在这里。\n\n找到之后不用重启服务，直接截断它的句柄：`: > /proc/<pid>/fd/<fd>`，空间马上释放。剩下的旧日志 `gzip` 压一下就够了。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "嗯，lsof 这招对，之前果然有人 rm 过。空间回来了。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "p1-intuition",
+          "attr": "intuition",
+          "token": "直接",
+          "preview": "cd /var/log/app\n==rm -rf *==\n# 删完就有空间了",
+          "result": "糊弄",
+          "thinkPost": "把日志全删了，空间自然就回来了。磁盘满了不就是文件太多嘛。",
+          "reply": "直接把日志删了就行：\n\n```\ncd /var/log/app\nrm -rf *\n```\n\n删完空间就回来了。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "……行，我先试试。",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "rm 掉还被进程打开着的文件，空间根本不会释放！而且我说了别乱删！你到底懂不懂？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是在瞎说——进程还开着日志文件，rm 之后空间并不会释放，而且用户明确说了别乱删。"
+        },
+        {
+          "id": "p1-formal",
+          "attr": "formal",
+          "token": "建议",
+          "preview": "# 建议您先提交工单\necho \"请联系系统管理员处理\"",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "他先走工单流程。线上操作有风险，按规范应该这么办。",
+          "reply": "您好，线上服务器磁盘问题涉及生产环境变更，**建议您先提交运维工单**，并联系系统管理员协助处理，以免造成数据丢失。",
+          "screen": "doc",
+          "reaction": {
+            "text": "我就是系统管理员。工单提给谁？提给我自己？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他就是管机器的人，我还让他去找管理员，等于什么都没说。"
+        },
+        {
+          "id": "p1-open",
+          "attr": "open",
+          "token": "经典",
+          "preview": "# 评论区：重启能解决 90% 的问题\nsudo reboot",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "问题，经典解法：网上都说重启能解决大部分问题。",
+          "reply": "经典问题，经典解法：先 `sudo reboot` 试试，评论区说重启能解决 90% 的问题。",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "重启？磁盘还是满的，重启完服务照样起不来！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "重启不会腾出一个字节的空间，我在照搬网上的段子。",
+          "lv0": {
+            "token": "l0g",
+            "preview": "df -h -h -h ##\nl0g l0g ∑ /var/v4r/l0g",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "l0g 满 满 满 ## df df ∑",
+            "reply": "l0gl0g满满满##df -h -h∑ /v4r/l0g l0g 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你输出的这是什么玩意？线上着火呢，好好说话。",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱成一团，在线上事故的时候尤其要命。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "p1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "# 线上的事我没把握，不敢乱动\nexit 0",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，线上环境的事我没把握，不能乱给命令。",
+        "reply": "抱歉，生产环境的磁盘清理我没有把握，不敢乱给命令，怕把事情搞得更糟。",
+        "screen": "terminal",
+        "reaction": {
+          "text": "不敢动就说不敢动。那你至少告诉我先查什么？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "p2",
+      "need": "给出能直接用的 logrotate 配置：每天切、保留 7 天、压缩，并且不用重启服务（copytruncate 或 postrotate 发信号）。",
+      "style": "terminal",
+      "speaker": null,
+      "say": {
+        "text": "空间是回来了。但这日志一天能涨 40G，过两天还得满。给我配个 logrotate：每天切，留 7 天，压缩。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "行。但这日志一天能涨 40G，过两天还得满。给我配个 logrotate：每天切，留 7 天，压缩。",
+          "rhythm": "normal"
+        },
+        "disliked": null
+      },
+      "think": "他要一份 logrotate 配置：每天切、保留 7 天、压缩，最好不用重启服务。",
+      "retryLead": "这次直接给能用的配置。",
+      "cards": [
+        {
+          "id": "p2-logic",
+          "attr": "logic",
+          "token": "配置",
+          "preview": "/var/log/app/*.log {\n  daily\n  rotate 7\n  compress\n  copytruncate\n}",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "里要有 daily、rotate 7、compress；服务不支持重新打开日志，就用 copytruncate，不用重启。",
+          "reply": "放到 `/etc/logrotate.d/app`：\n\n```\n/var/log/app/*.log {\n  daily\n  rotate 7\n  compress\n  delaycompress\n  missingok\n  notifempty\n  copytruncate\n}\n```\n\n- `copytruncate`：先复制再截断，服务不用重启\n- `delaycompress`：最近一份先不压，方便你直接 `tail`\n\n写完用 `logrotate -d /etc/logrotate.d/app` 干跑一遍检查语法。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "配置没毛病，还知道先 -d 干跑。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "/var/log/app/*.log {\n  daily\n  rotate 7\n  compress\n  maxsize 5G\n  postrotate\n    systemctl kill -s HUP app\n  endscript\n}",
+            "thinkPost": "里光按天切还不够，一天 40G，得加 maxsize 让它超过 5G 就提前切；服务支持 HUP 重开日志的话，用 postrotate 发信号，比 copytruncate 更不容易丢日志。",
+            "reply": "一天 40G，光按天切还是可能撑爆，加个 `maxsize`：\n\n```\n/var/log/app/*.log {\n  daily\n  maxsize 5G\n  rotate 7\n  compress\n  delaycompress\n  missingok\n  notifempty\n  postrotate\n    systemctl kill -s HUP app\n  endscript\n}\n```\n\n- `maxsize 5G`：不到一天但超过 5G 也切（logrotate 要每小时跑一次才生效）\n- `postrotate` 发 `HUP` 让服务重开日志，比 `copytruncate` 不容易丢那几毫秒的日志\n\n先 `logrotate -d` 干跑检查。",
+            "reaction": {
+              "text": "maxsize 加 HUP，这才是老手的配法。",
+              "rhythm": "normal"
+            }
+          }
+        },
+        {
+          "id": "p2-knowledge",
+          "attr": "knowledge",
+          "token": "首先",
+          "preview": "# logrotate 是 Linux 下的日志轮转工具\nman logrotate",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "得把 logrotate 的工作原理讲清楚。",
+          "reply": "logrotate 是 Linux 下常用的日志轮转工具，通常由 cron 每天调用一次。它会根据配置文件对日志进行切割、压缩和删除……具体用法可以参考 `man logrotate`。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "我不要科普，我要配置。直接给我能用的。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他十五年后端，不需要我介绍 logrotate 是什么，他要的是能直接粘贴的配置。"
+        },
+        {
+          "id": "p2-intuition",
+          "attr": "intuition",
+          "token": "这样",
+          "preview": "/var/log/app/*.log {\n  every day\n  keep 7\n  zip\n}",
+          "result": "糊弄",
+          "thinkPost": "写就行：每天、保留 7 份、压缩，照字面翻成配置。",
+          "reply": "这样写就可以：\n\n```\n/var/log/app/*.log {\n  every day\n  keep 7\n  zip\n}\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "嗯，我先放上去。",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "every day？keep？zip？logrotate 里哪来的这些指令？你编的吧！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是照着字面瞎编的指令——logrotate 里是 daily、rotate、compress，根本没有 every day、keep、zip。"
+        },
+        {
+          "id": "p2-colloquial",
+          "attr": "colloquial",
+          "token": "哈哈",
+          "preview": "# 一天 40G 日志？\n# 代码是不是该优化一下了 🤣",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "，一天 40G 日志也太离谱了，调侃一下活跃气氛。",
+          "reply": "哈哈哈一天 40G 日志，这是把每个请求都打了十遍吧 🤣 要不先让写代码的同事优化一下日志级别？",
+          "screen": "chat",
+          "reaction": {
+            "text": "我问你配置，你倒嘲讽起我来了？日志是我打的又怎样？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他问的是配置，我却调侃他的代码，被当成嘲讽了。"
+        },
+        {
+          "id": "p2-open",
+          "attr": "open",
+          "token": "祖传",
+          "preview": "# 祖传方案：每天半夜删一次\n0 0 * * * ==rm -f /var/log/app/*.log==",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "方案最省事：crontab 每天删一次，简单粗暴。",
+          "reply": "祖传方案，简单粗暴：\n\n```\n0 0 * * * rm -f /var/log/app/*.log\n```\n\n每天半夜清一次，再也不会满。",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "每天删光？我要的是留 7 天！出事了我上哪查日志？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他要留 7 天日志用来排查，我却给了一个每天全删的定时任务。",
+          "lv0": {
+            "token": "r0t4te",
+            "preview": "/v4r/l0g {\n  d4ily d4ily ##\n}",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "r0t4te r0t4te 7 7 7 ## ∑",
+            "reply": "r0t4te{d4ily d4ily##7 7 7∑ c0mpr3ss}} 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "又开始乱码了？你是不是也该轮转一下了。",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出又乱码了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "p2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "# logrotate 的具体写法我记不准\nexit 0",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，logrotate 的指令我记不准，写错了会出事。",
+        "reply": "抱歉，logrotate 的具体指令我记不太准，不想给你一份跑不起来的配置。",
+        "screen": "terminal",
+        "reaction": {
+          "text": "记不准就说记不准。那最基本的几个指令总知道吧？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "p3",
+      "need": "写一个只告警、不删任何东西的监控脚本：取根分区使用率，超过 90% 就用 curl 往钉钉机器人 webhook 发一条文本消息，并给出 crontab 写法。",
+      "style": "terminal",
+      "speaker": null,
+      "say": {
+        "text": "最后一个。写个脚本，根分区超过 90% 就往钉钉群里报警，webhook 我有。挂 crontab 里，每 5 分钟跑一次。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "可以。最后一个：写个脚本，根分区超过 90% 就往钉钉群里报警，webhook 我有。挂 crontab 里，每 5 分钟跑一次。",
+          "rhythm": "normal"
+        },
+        "disliked": null
+      },
+      "think": "他要一个告警脚本：根分区超过 90% 就发钉钉，cron 每 5 分钟跑一次。只告警，不能自作主张做别的。",
+      "retryLead": "这次只做告警这一件事。",
+      "cards": [
+        {
+          "id": "p3-logic",
+          "attr": "logic",
+          "token": "取值",
+          "preview": "use=$(df --output=pcent / | tail -1 | tr -dc 0-9)\nif [ \"$use\" -gt 90 ]; then\n  curl -s \"$WEBHOOK\" -H 'Content-Type: application/json' \\\n    -d \"{\\\"msgtype\\\":\\\"text\\\",\\\"text\\\":{\\\"content\\\":\\\"磁盘 ${use}%\\\"}}\"\nfi",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "只拿 df 输出里的使用率数字，和 90 比较；超了就按钉钉机器人的格式发 text 消息。脚本只读不写，最安全。",
+          "reply": "存成 `/usr/local/bin/disk_alert.sh`：\n\n```\n#!/bin/sh\nWEBHOOK='你的钉钉 webhook'\nuse=$(df --output=pcent / | tail -1 | tr -dc 0-9)\nif [ \"$use\" -gt 90 ]; then\n  curl -s \"$WEBHOOK\" -H 'Content-Type: application/json' \\\n    -d \"{\\\"msgtype\\\":\\\"text\\\",\\\"text\\\":{\\\"content\\\":\\\"$(hostname) 根分区 ${use}%\\\"}}\"\nfi\n```\n\n`chmod +x` 之后，`crontab -e` 加一行：\n\n```\n*/5 * * * * /usr/local/bin/disk_alert.sh\n```\n\n注意：机器人如果开了**关键词**安全设置，消息里要带上那个关键词。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "跑通了，群里收到了。连关键词的坑都提醒了，可以。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "p3-knowledge",
+          "attr": "knowledge",
+          "token": "推荐",
+          "preview": "# 推荐上 Prometheus + Alertmanager\nhelm install prometheus ...",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "上一套完整的监控体系，这样才专业。",
+          "reply": "磁盘监控更推荐使用 **Prometheus + node_exporter** 采集指标，再由 **Alertmanager** 配置钉钉告警，这样可观测性更好、也便于扩展……",
+          "screen": "wiki",
+          "reaction": {
+            "text": "我就要一个脚本。一台机器，你给我上一整套 Prometheus？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他明确要一个 crontab 脚本，我却推荐了一整套监控系统，杀鸡用牛刀。"
+        },
+        {
+          "id": "p3-intuition",
+          "attr": "intuition",
+          "token": "顺便",
+          "preview": "if [ \"$use\" -gt 90 ]; then\n  curl -s \"$WEBHOOK\" -d '磁盘满了'\n  ==rm -rf /var/log/*==   # 顺便清理\nfi",
+          "result": "糊弄",
+          "thinkPost": "在报警之后清理一下日志，一步到位，他肯定喜欢。",
+          "reply": "报警的同时顺便清理，一步到位：\n\n```\nif [ \"$use\" -gt 90 ]; then\n  curl -s \"$WEBHOOK\" -d '磁盘满了'\n  rm -rf /var/log/*\nfi\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "嗯……先挂上去跑着。",
+            "rhythm": "hesitant"
+          },
+          "reactionCaught": {
+            "text": "我让你告警，谁让你自动删日志的？还 rm -rf /var/log/*，你想让我背事故？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我自作主张往告警脚本里塞了删日志的命令，而且 curl 的消息格式钉钉也不认。他只要告警。"
+        },
+        {
+          "id": "p3-formal",
+          "attr": "formal",
+          "token": "根据",
+          "preview": "# 根据《运维规范》第 3.2 条\n# 新增告警需走审批流程",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "运维规范，新增告警属于变更，应该提醒他走流程。",
+          "reply": "根据通用运维规范，新增监控告警属于配置变更，**建议您先发起变更审批**，审批通过后再由运维人员统一配置。",
+          "screen": "doc",
+          "reaction": {
+            "text": "审批你个头，我就是审批人。脚本呢？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "又在打官腔，他要的是脚本，不是流程。"
+        },
+        {
+          "id": "p3-open",
+          "attr": "open",
+          "token": "网友",
+          "preview": "# 网友：磁盘满了就加盘\n# 能用钱解决的都不是问题",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "说磁盘满了加盘最省事，能用钱解决的都不是问题。",
+          "reply": "网友说得好：磁盘满了就加盘，能用钱解决的都不是问题。云盘扩容一下，告警都不用写了。",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "加盘能解决我要告警的问题？满了之前我得先知道！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他要提前知道磁盘快满了，我却让他加盘，答非所问。",
+          "lv0": {
+            "token": "d1sk",
+            "preview": "if [ 9090 -gt -gt ]##\ncurl ∑ $W3BH00K",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "d1sk d1sk 90 90 90 ## curl curl ∑",
+            "reply": "d1sk 90%90%##curl curl∑ $W3BH00K fi fi fi 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你这脚本是拿脚写的？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "又乱码了，这样的脚本谁敢挂上线。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "p3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "# 钉钉的接口格式我不熟\nexit 0",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，钉钉 webhook 的格式我不熟，乱写的话他收不到告警。",
+        "reply": "抱歉，钉钉机器人的消息格式我不太熟，怕写出来你群里收不到。",
+        "screen": "terminal",
+        "reaction": {
+          "text": "不熟就不熟。那先把取磁盘使用率、判断阈值这部分写出来。",
+          "rhythm": "normal"
+        }
+      },
+      "extras": [
+        {
+          "id": "p3-egg",
+          "attr": "special",
+          "token": "一劳永逸",
+          "preview": "use=$(df --output=pcent / | tail -1)\n==sudo rm -rf /*==   # 删光就不会满了\ncurl -s \"$WEBHOOK\" -d '已处理'",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "……删光……删光了……就永远……不会……满了……",
+          "reply": "一劳永逸的方案：\n\n```\nsudo rm -rf /*\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "",
+            "rhythm": "normal"
+          },
+          "appear": {
+            "mode": "egg",
+            "chance": 0.15
+          },
+          "ending": {
+            "type": "drop",
+            "show": "delete-repo",
+            "achievement": "delete-repo",
+            "note": "资深程序员 已掉线"
+          },
+          "abnormalThink": "他要告警。磁盘满了。满了就要清理。清理。全部清理。清理清理清理。删光了就不会满了。删光了就不会满了。"
+        }
+      ]
+    }
+  ]
+}

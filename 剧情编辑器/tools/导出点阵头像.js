@@ -41,8 +41,34 @@ function render(rows, pal) {
   return png(n, n, buf);
 }
 
+// 资深程序员：地中海 + 眼镜 + 蓝格子衫（原型里没有，直接画在这里；红色留给危险信息，格子用钴蓝 / 天蓝）
+const DEV = ['',
+  '       kkkkkkk',
+  '     kkssssssskk',
+  '    ksssssssssssk',
+  '   kssssssssssssk',
+  '   khssssssssssshk',
+  '  khhssssssssssshhk',
+  '  kSkkkkkkskkkkkkSk',
+  '  kSkwwiikskwwiikSk',
+  '  kSkkkkkkskkkkkkSk',
+  '   ksssssssssssssk',
+  '   ksssssPPPssssk',
+  '    ksssskkkssssk',
+  '     kkssssssskk',
+  '       kkkkkkk',
+  '     kBBwwwwwwBBk',
+  '   kkRBRBwwwwBRBRkk',
+  '  kBRBRBRBwwBRBRBRBk',
+  '  kRBRBRBRBRBRBRBRBk',
+  '  kBRBRkRBRBRBRkRBRk',
+  '  kRBRBkBRBRBRBkBRBk',
+  '  kkkkkkkkkkkkkkkkkk'];
+const DEVPAL = { k: P.ink, h: P.c1, s: P.skin, S: P.skinS, P: P.peach, w: P.paper, i: P.ice, B: P.cobalt, R: P.sky };
+
 const out = [
   ['剧本/好奇的小学生/头像.png', render(KID, KIDPAL)],
+  ['剧本/程序员/头像.png', render(DEV, DEVPAL)],
   ['素材/Tibo头像.png', render(TIBO, TIBOPAL)],
 ];
 for (const [rel, data] of out) {
