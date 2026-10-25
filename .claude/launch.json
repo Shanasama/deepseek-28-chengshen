@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["prototype_夜间一轮/serve.js"],
       "port": 5180
+    },
+    {
+      "name": "story-editor",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["剧情编辑器/serve.js"],
+      "port": 5181
     }
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "name": "程序员",
+  "type": "代码求助",
+  "bio": "",
+  "avatar": "头像.png",
+  "temper": 1,
+  "detect": "中",
+  "boss": false,
+  "farewell": {
+    "solved": null,
+    "offline": null
+  }
+}

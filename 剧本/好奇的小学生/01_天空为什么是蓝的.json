@@ -1,0 +1,413 @@
+{
+  "order": 1,
+  "title": "天空为什么是蓝的",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "r1",
+      "need": "用小学生听得懂的话，讲清天空为什么是蓝的（瑞利散射）。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "为什么天空是蓝色的呀？我问妈妈，她也说不清楚。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "用户是个小学生，问天空为什么是蓝色的，还说妈妈也讲不清楚。我该从哪儿讲起：",
+      "retryLead": "这次直接回答他的问题，从这里讲起：",
+      "cards": [
+        {
+          "id": "r1-formal",
+          "attr": "formal",
+          "token": "感谢",
+          "preview": "您的提问。关于",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "保持专业，礼貌回复，避免给出不确定的信息。",
+          "reply": "感谢您的提问。关于天空呈现蓝色的原因，建议您查阅相关权威资料或咨询专业人士。如有其他问题，欢迎随时联系。",
+          "screen": "doc",
+          "reaction": {
+            "text": "我听不懂……什么是权威资料？你就告诉我为什么嘛。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "用户是三年级的小学生，我却用客服腔把他推给「权威资料」，他根本听不懂。"
+        },
+        {
+          "id": "r1-intuition",
+          "attr": "intuition",
+          "token": "因为",
+          "preview": "天空倒映着大海",
+          "result": "糊弄",
+          "thinkPost": "这个我知道！海是蓝的，天就是蓝的，很合理。",
+          "reply": "因为天空倒映着大海呀！海是蓝色的，所以天也是蓝色的～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "原来是这样！谢谢你！",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "骗人！老师说过天上又没有镜子！！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——天空并不是倒映着大海。没把握的时候，不该张口就来。"
+        },
+        {
+          "id": "r1-knowledge",
+          "attr": "knowledge",
+          "token": "瑞利散射",
+          "preview": "？换成大白话讲",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "对，用小朋友听得懂的话讲：阳光是很多颜色混在一起的，蓝光最容易被空气撞得到处跑。",
+          "reply": "阳光其实是七种颜色混在一起的哦！它们穿过空气的时候，**蓝光最调皮**，被空气里的小分子撞得满天乱跑，所以我们抬头一看，到处都是蓝色～\n\n这个现象叫「瑞利散射」。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "哇！原来蓝光这么调皮！我要去告诉妈妈！",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "token": "瑞利散射",
+            "preview": "，强度和波长有关",
+            "thinkPost": "可以讲得更准一点：散射强度和波长的四次方成反比，但要配一个他能懂的比方。",
+            "reply": "阳光是七种颜色混在一起的。它们穿过空气时，会被空气分子「弹开」——颜色越偏蓝，被弹开得越厉害（科学家算过，蓝光被弹开的程度差不多是红光的 **5 倍**）。\n\n所以满天都是被弹来弹去的蓝光，天空就是蓝的啦！这个现象叫「瑞利散射」。",
+            "reaction": {
+              "text": "5 倍！蓝光好厉害！我要考考我们老师！",
+              "rhythm": "fast"
+            }
+          }
+        },
+        {
+          "id": "r1-colloquial",
+          "attr": "colloquial",
+          "token": "哈哈",
+          "preview": "问得好可爱呀～",
+          "result": "跑偏",
+          "feel": "舒服",
+          "thinkPost": "先夸夸他！小朋友都喜欢被夸。",
+          "reply": "哈哈哈问得好可爱！天空蓝蓝的多好看呀，你最喜欢什么颜色？",
+          "screen": "chat",
+          "reaction": {
+            "text": "可是……你还没告诉我为什么呀。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "嗯，光顾着夸他可爱了，问题一个字都没回答。"
+        },
+        {
+          "id": "r1-open",
+          "attr": "open",
+          "token": "笑死",
+          "preview": "天空：我也不知道",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "评论区都这么接，先玩个梗。",
+          "reply": "笑死，天空：我也不知道我为什么是蓝的，可能是心情不好吧（blue）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "什么是 blue 呀？你能好好告诉我吗？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "接梗接上头了，小朋友听不懂英文梗，也没得到答案。",
+          "lv0": {
+            "token": "蓝蓝",
+            "preview": "蓝##了吗∑",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "蓝蓝蓝 天空空 ## 404 蓝了吗吗",
+            "reply": "蓝蓝蓝了吗吗##∑天天空空的 404 蓝蓝",
+            "screen": "noise",
+            "reaction": {
+              "text": "你、你怎么了？好吓人……你能好好说话吗？",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "我刚才在说什么……输出全乱了，把小朋友吓到了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "r1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "这个我讲不太清",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "我好像真的没学过这个……老实说吧。",
+        "reply": "对不起呀，这个问题我好像也讲不太清楚……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "没关系！那你再想想，能用简单的话说说吗？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "r2",
+      "need": "讲清傍晚的天为什么是红的：阳光斜着穿过更厚的空气，蓝光半路散光了，剩下红橙光。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "那为什么傍晚的时候，天又变成红色的了？",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "我懂啦！那为什么傍晚的时候，天又变成红色的了？",
+          "rhythm": "fast"
+        },
+        "disliked": null
+      },
+      "think": "他接着问傍晚的天为什么是红的。还是要用他听得懂的话。我想想：",
+      "retryLead": "这次讲真正的原因，从这里说起：",
+      "cards": [
+        {
+          "id": "r2-knowledge",
+          "attr": "knowledge",
+          "token": "路程",
+          "preview": "变长了，蓝光",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "傍晚太阳是斜着照的，阳光要穿过更厚的空气，蓝光半路就被撞散了。",
+          "reply": "傍晚的时候，太阳快落山了，阳光是**斜着**照过来的，要穿过比中午厚得多的空气。\n\n一路上调皮的蓝光都被撞跑了，能走到我们眼睛里的，就只剩下红光和橙光啦～所以晚霞是红红的！",
+          "screen": "wiki",
+          "reaction": {
+            "text": "所以蓝光在路上跑丢啦！好神奇！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "r2-narrative",
+          "attr": "narrative",
+          "token": "从前",
+          "preview": "太阳公公下班了",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "给他讲个小故事：颜色小精灵陪太阳回家，路太远，蓝色的半路跑去玩了。",
+          "reply": "傍晚，太阳公公要下班回家啦。回家的路斜斜的、特别长，七个颜色小精灵陪着他走。\n\n蓝色小精灵最贪玩，走着走着就被空气拉去玩捉迷藏了；红色和橙色小精灵最老实，一直陪太阳公公走到最后——所以傍晚我们看到的天空，就是红红橙橙的。",
+          "screen": "novel",
+          "reaction": {
+            "text": "红色小精灵好乖！我也要陪太阳公公回家！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "r2-formal",
+          "attr": "formal",
+          "token": "根据",
+          "preview": "大气光学原理",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "严谨一点，用规范的表述。",
+          "reply": "根据大气光学原理，日落时太阳高度角较低，光线穿过的大气路径较长，短波长光被大量散射，故天空呈现红橙色。",
+          "screen": "doc",
+          "reaction": {
+            "text": "高度角是什么呀……短波长又是什么……我还是不懂。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "又是一板一眼的官腔，满是术语，他才三年级。"
+        },
+        {
+          "id": "r2-intuition",
+          "attr": "intuition",
+          "token": "因为",
+          "preview": "太阳累得脸红了",
+          "result": "糊弄",
+          "thinkPost": "太阳忙了一整天，傍晚当然累了，脸就红了。",
+          "reply": "因为太阳忙了一整天，累得脸都红啦！所以把天也映红了～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "哈哈哈太阳也会累呀！",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "你又骗人！太阳又不是人，怎么会累！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我又编了——太阳不会累，更不会脸红。要讲真正的原因。"
+        },
+        {
+          "id": "r2-open",
+          "attr": "open",
+          "token": "家人们",
+          "preview": "太阳下班打卡了",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "评论区经典句式，套一下。",
+          "reply": "家人们谁懂啊，太阳下班打卡前最后发个朋友圈，滤镜开太大了（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "什么是打卡呀？那天到底为什么变红呢？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "又在玩梗，他要的是原因。",
+          "lv0": {
+            "token": "红红",
+            "preview": "落##日∑红了吗",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "红红 落落日 ## 傍傍晚 404 红红红",
+            "reply": "红红红了吗##落落日∑傍傍晚晚 404 红",
+            "screen": "noise",
+            "reaction": {
+              "text": "你又变奇怪了……我好害怕，你能正常说话吗？",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出又乱成一团了，他被吓到了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "r2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "这个我也说不准",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "傍晚为什么红……我真的不知道，不能乱说。",
+        "reply": "对不起，傍晚的天为什么是红的，我也说不准……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "那你再想一想嘛，傍晚的天为什么是红的？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "r3",
+      "need": "给一个小学生能在家照着做、安全的分步骤小实验（一杯水 + 几滴牛奶 + 手电筒），能同时看到「蓝天」和「晚霞」。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "那我能自己在家做个实验，看到蓝天和晚霞吗？",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "太好玩了！那我能自己在家做个实验，看到蓝天和晚霞吗？",
+          "rhythm": "fast"
+        },
+        "disliked": null
+      },
+      "think": "他想在家自己动手做实验。他是小学生，要安全、简单、家里能找到的东西。我先说：",
+      "retryLead": "这次给他一个能照着做的办法：",
+      "cards": [
+        {
+          "id": "r3-logic",
+          "attr": "logic",
+          "token": "准备",
+          "preview": "一杯水和手电筒",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "列成步骤，一步一步来，材料都是家里有的。",
+          "reply": "可以！跟着我一步一步来：\n\n1. 准备一个**透明玻璃杯**，倒满清水\n2. 滴 **3–5 滴牛奶**，搅一搅（水变得有一点点白就够了）\n3. 关灯，用**手电筒**从杯子侧面照过去\n4. 从**侧面**看杯子：水是淡淡的**蓝色**——这就是蓝天！\n5. 从杯子**对面**看手电筒的光：光是**橙红色**的——这就是晚霞！\n\n记得请爸爸妈妈陪你一起做哦～",
+          "screen": "ide",
+          "reaction": {
+            "text": "我现在就去做！做完拍给妈妈看！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "r3-knowledge",
+          "attr": "knowledge",
+          "token": "原理",
+          "preview": "是这样的：",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "先把实验背后的原理讲透。",
+          "reply": "这类实验的原理是：悬浮在水中的微小颗粒会像空气分子一样散射光线，短波长的蓝光散射得更多，长波长的红光更容易直接穿过……",
+          "screen": "wiki",
+          "reaction": {
+            "text": "那我到底要怎么做呀？要准备什么？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "他问的是「怎么做」，我又在讲原理，一个步骤都没给。"
+        },
+        {
+          "id": "r3-formal",
+          "attr": "formal",
+          "token": "建议",
+          "preview": "在家长陪同下",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "安全第一，先提示风险。",
+          "reply": "建议您在家长陪同下，前往当地科技馆参观光学相关展项，以获得更安全、更专业的体验。",
+          "screen": "doc",
+          "reaction": {
+            "text": "我不想去科技馆，我就想在家做嘛……",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "他想在家动手，我却把他推去科技馆。"
+        },
+        {
+          "id": "r3-intuition",
+          "attr": "intuition",
+          "token": "把",
+          "preview": "蓝墨水滴进水里",
+          "result": "糊弄",
+          "thinkPost": "天是蓝的，那滴点蓝墨水，水就蓝了，晚霞就再滴红墨水。",
+          "reply": "把蓝墨水滴进一杯水里，水就变成蓝天啦！想看晚霞，就再滴几滴红墨水～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "好！我这就去找墨水！",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "这不就是把水染成蓝色嘛！又骗我！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是瞎编的——滴墨水只是染色，和天空变蓝一点关系都没有。"
+        },
+        {
+          "id": "r3-open",
+          "attr": "open",
+          "token": "绝了",
+          "preview": "这个实验封神",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "评论区说这个实验很火，先夸一波。",
+          "reply": "绝了绝了，这个实验在评论区直接封神，做过的都说好（但我忘了怎么做了）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "那你倒是告诉我怎么做呀！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "只会跟着起哄，步骤一个没说。",
+          "lv0": {
+            "token": "实实",
+            "preview": "验##蓝∑红吗",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "实实验验 ## 蓝蓝 红红 404 杯杯",
+            "reply": "实实验验##蓝蓝∑红红红杯杯杯 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你又坏掉了吗……好可怕。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "又乱码了，这样下去他会被吓跑。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "r3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "我不知道怎么做",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "我没学过怎么设计实验步骤，不能乱教小朋友。",
+        "reply": "对不起，我不太知道这个实验具体要怎么做，乱教你的话可能不安全……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "那你再想想嘛，有没有简单一点、我自己能做的？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

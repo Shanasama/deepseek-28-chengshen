@@ -1,0 +1,13 @@
+{
+  "name": "好奇的小学生",
+  "type": "知识",
+  "bio": "戴小黄帽的三年级学生，什么都想问个为什么。",
+  "avatar": "头像.png",
+  "temper": 1.0,
+  "detect": "低",
+  "boss": false,
+  "farewell": {
+    "solved": { "text": "谢谢大肥鱼！我明天还要来问你问题！", "rhythm": "fast" },
+    "offline": { "text": "你一点都不好玩，我不跟你说话了！", "rhythm": "fast" }
+  }
+}
