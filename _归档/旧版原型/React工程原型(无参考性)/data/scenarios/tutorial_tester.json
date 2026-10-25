@@ -1,0 +1,122 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "characterId": "tutorial_tester",
+  "name": "实习生小葵（出厂测试）",
+  "category": "tutorial",
+  "avatar": {
+    "iconId": "tutorial_tester",
+    "visualDesc": "挂着工牌的元气女实习生，手里捧着测试Checklist"
+  },
+  "bio": "负责在大肥鱼正式上线前做最后一次连通性测试的内部实习生。性格随和，没有雷点，喜欢活泼自然的交流。",
+  "maxTurns": 2,
+  "targetProgressN": 2,
+  "perception": "low",
+  "caresAboutFeeling": "low",
+  "preferences": ["lively"],
+  "landmines": [],
+  "defaultReactions": {
+    "praiseLines": [
+      "哇，这句接得好自然！测试项【亲和度】打勾通过！",
+      "太棒啦！大肥鱼完全不像死板的旧版客服了，准备正式上线！"
+    ],
+    "neutralLines": [
+      "唔，虽然没出错，但听起来还是有点像老版客服机器人呢……我们来做一次 RLHF 微调试试！"
+    ],
+    "landmineWarningLines": {},
+    "rageQuitLine": "测试中断。",
+    "solvedOutroLine": "出厂测试全部通过！明天白天就可以开始正式训练啦！",
+    "unsolvedOutroLine": "基础连通性没问题，咱们先通过一次免费 RLHF 把活泼度提上来吧！"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "tutorial_s1",
+      "title": "Day 0 出厂测试：教选卡与免费 RLHF",
+      "turns": [
+        {
+          "turnIndex": 1,
+          "userMessage": "喂喂，听得到吗？我是测试员小葵！今天大肥鱼第一天通电，快跟我打个招呼，别再用以前那种冷冰冰的客服套话啦～",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true
+          },
+          "thoughtPrefix": {
+            "normal": "【操作教学：按数字键 1-5 选择方案词，或按空格键直接选排第一的卡】测试员小葵在跟我打招呼，还特意叮嘱别说冷冰冰的客服套话。不过我出厂默认的「正式模板」概率排第一，要不要按数字键改选更活泼的方案词呢？"
+          },
+          "candidates": [
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "标准客服问候",
+                "preview": "尊敬的用户您好…",
+                "thoughtSuffix": "虽然她让我别说套话，但出厂预设的客服模板权重太高了，先按标准流程问好吧。",
+                "responseBody": "尊敬的测试员您好，大肥鱼智能客服系统已启动，很高兴为您服务，请问有什么可以帮您？",
+                "outcomeOverride": "neutral"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "自然打招呼",
+                "preview": "用普通语气回应她",
+                "thoughtSuffix": "不用客服模板，就用正常聊天的方式跟小葵打个招呼吧。",
+                "responseBody": "收到啦小葵！这边信号一切正常，随时可以开始测试！"
+              }
+            },
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "元气接梗报到",
+                "preview": "活人感拉满地打招呼",
+                "thoughtSuffix": "小葵想看活人感，那我就精神饱满地跟她击个掌！",
+                "responseBody": "叮咚！大肥鱼满血通电完毕！小葵姐今天想聊点啥？保证不念客服说明书！"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 2,
+          "userMessage": "看！经过刚才那次免费 RLHF（人类反馈强化学习）二选一，你脑子里「口语活力」的概率是不是直接冲上第一名了？来，试着按【空格键】直接选排第一的卡回我一句！",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true
+          },
+          "thoughtPrefix": {
+            "normal": "【操作教学：当排第一的卡就是你想要的方案时，直接按空格键即可秒选！】哇，刚才做完 RLHF 后，「口语活力」的概率果然涨上来了！"
+          },
+          "candidates": [
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "开心原地转圈",
+                "preview": "感叹RLHF真神奇",
+                "thoughtSuffix": "原来这就是后训练的作用——改变我脑子里不同风格的排名和概率！直接按空格发出去吧！",
+                "responseBody": "哇塞真的耶！现在不用费劲找按键，顺着直觉一按空格就能接上你的梗啦！"
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "汇报参数已更新",
+                "preview": "一板一眼报告结果",
+                "thoughtSuffix": "向测试员正式汇报模型权重更新完毕。",
+                "responseBody": "报告测试员，RLHF 权重参数已更新完毕，当前系统运行稳定。",
+                "outcomeOverride": "neutral"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "平淡表示明白了",
+                "preview": "简单回复知道了",
+                "thoughtSuffix": "简单回应一下表示自己学会了。",
+                "responseBody": "嗯嗯，我看到概率变高了，现在选起来方便多了。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

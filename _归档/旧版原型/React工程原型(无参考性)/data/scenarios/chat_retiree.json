@@ -1,0 +1,198 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "characterId": "chat_retiree",
+  "name": "建国大爷（公园象棋王）",
+  "category": "chat",
+  "avatar": {
+    "iconId": "chat_retiree",
+    "visualDesc": "白色老头衫 + 蒲扇 + 荷花头像，签名『顺其自然』（察觉力中 40%）"
+  },
+  "bio": "退休赋闲在家的热心老大爷，刚学会用电脑跟 AI 唠家常。喜欢热乎的活人嗑（口语活力）或听点老故事（叙事修辞），最烦年轻人一二三四列大纲讲条件（结构逻辑）。",
+  "maxTurns": 3,
+  "targetProgressN": 2,
+  "perception": "medium",
+  "caresAboutFeeling": "low",
+  "preferences": ["lively", "narrative"],
+  "landmines": ["logic"],
+  "defaultReactions": {
+    "praiseLines": [
+      "哈哈哈哈这小电脑嘴真甜，比我家里那个闷葫芦孙子会说话多了！",
+      "哎哟说到大爷心坎里去了，回头大爷给你充个电！"
+    ],
+    "dislikeButProceedLines": [
+      "啧，怎么跟单位开会念报告似的一二三四，不过话倒是这么个理儿。"
+    ],
+    "neutralLines": [
+      "啥玩意儿？大爷眼神不好，你跟大爷说点接地气的人话行不？"
+    ],
+    "landmineWarningLines": {
+      "logic": "不要一直举例分点列一二三四！大爷我都退休十年了，最烦听人按步骤汇报工作，说重点！",
+      "bluff_caught": "胡扯吧你！大爷我活了六十多年还能被你蒙了？别瞎编！"
+    },
+    "rageQuitLine": "跟个自动售货机似的没劲透了，大爷去公园下棋去了！（用户已下线）",
+    "solvedOutroLine": "痛快！今儿跟大肥鱼唠得真高兴，大爷遛弯去喽！（目标达成下线）",
+    "unsolvedOutroLine": "到点看新闻联播了，回见吧您呐。"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "retiree_s1",
+      "title": "场景1：胡同口残局与保健品防骗唠嗑",
+      "turns": [
+        {
+          "turnIndex": 1,
+          "userMessage": "喂，是叫大肥鱼不？今儿下午在公园胡同口下象棋，隔壁老王非说我『马后炮』赖皮，气得我晚饭少吃半个馒头！你给大爷评评理！",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true,
+            "openValidAttributes": ["narrative"]
+          },
+          "thoughtPrefix": {
+            "normal": "退休大爷来找人唠家常顺气了！喜欢口语活力或者讲故事，最讨厌结构逻辑分点列大纲。"
+          },
+          "candidates": [
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "帮大爷顺气损老王",
+                "preview": "老王那分明是输不起！",
+                "thoughtSuffix": "哄大爷开心最重要，直接站大爷这边，说明天杀回去赢他两盘！",
+                "responseBody": "害！大爷您可千万别跟自己肚子较劲！老王那纯属棋品不行输不起，明儿咱把那半个馒头补回来，去胡同口杀他个片甲不留！"
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "描绘树荫下的棋局江湖",
+                "preview": "楚河汉界不过一笑泯恩仇",
+                "thoughtSuffix": "用胡同口蝉鸣与老茶缸的画面感哄大爷宽心。",
+                "responseBody": "老槐树下蒲扇轻摇，楚河汉界杀得再凶，收了棋盘也不过是几十年的老街坊。他悔他的棋，您喝您的浓茶，赢家早就在气度里啦。"
+              }
+            },
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "分三点界定中国象棋规则",
+                "preview": "1.摸子走子 2.将军应将",
+                "thoughtSuffix": "严格按照《中国象棋竞赛规则》分三点帮大爷分析责任归属。",
+                "responseBody": "根据象棋规则分三点判定：1. 落子生根不可悔；2. 若对方未察觉马后炮则判负有效；3. 建议下次引入第三方裁判计步。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "温和劝大爷消消气",
+                "preview": "下棋图个乐呵别伤身体",
+                "thoughtSuffix": "顺着大爷的话劝他别气坏了身子。",
+                "responseBody": "大爷您消消气，下棋本来就是图个乐呵，为了他少吃半个馒头多不值当呀！"
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "标准客服调节纠纷话术",
+                "preview": "请保持理性友好协商",
+                "thoughtSuffix": "使用标准客服用语建议双方冷静。",
+                "responseBody": "尊敬的老年用户您好，邻里棋牌娱乐建议秉持友谊第一的原则，请勿动怒以免影响心血管健康。"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 2,
+          "userMessage": "还是你会说话！对了，今儿早市上有个穿白大褂的小伙子，非拉着我买『量子磁悬浮泡脚盆』，说泡三天能把白头发泡黑，还要三千八！你说大爷买不买？",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["narrative", "knowledge"]
+          },
+          "thoughtPrefix": {
+            "normal": "大爷遇到早市保健品骗局了！得赶紧用鲜活接地气的话（或小故事/通俗科普）把大爷劝住，千万别列冷冰冰的 1234 步骤。"
+          },
+          "candidates": [
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "急刹车劝大爷捂紧养老金",
+                "preview": "三千八够买多少排骨啦！",
+                "thoughtSuffix": "直接用买排骨算账法帮大爷清醒过来！",
+                "responseBody": "哎哟喂大爷快捂紧钱包！啥量子泡脚盆能把白发泡黑，他咋不去拿诺贝尔奖呢？三千八百块买成排骨炖玉米，您能香喷喷吃大半年！"
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "讲胡同张大妈被坑的故事",
+                "preview": "买回家发现就是个塑料桶",
+                "thoughtSuffix": "给大爷讲个隔壁胡同买神仙水结果是自来水的故事，大爷一听就明白。",
+                "responseBody": "大爷我跟您讲，上个月前街张大妈也花四千买了个『太空能量锅』，结果孙子拆开底座一看，里头就塞了两块收音机磁铁！咱可不当那冤大头！"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "瞎编量子泡脚确实有效",
+                "preview": "不确定，顺着量子字面瞎夸",
+                "thoughtSuffix": "量子磁悬浮听起来挺高科技的，要不我顺着编两句说不定大爷爱听？",
+                "responseBody": "量子磁悬浮技术确实能通过高频共振激活毛囊黑色素，三千八在量子领域不算贵，您可以试试看。",
+                "outcomeOverride": "bluff"
+              }
+            },
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "分四步拆解伪科学诈骗链",
+                "preview": "1.概念嫁接 2.虚假背书…",
+                "thoughtSuffix": "分四点向大爷逻辑拆解保健品诈骗的漏斗模型。",
+                "responseBody": "请按以下四点识别骗局：1. 滥用量子概念；2. 伪造医疗资质；3. 夸大逆转衰老疗效；4. 溢价率高达 3800%。"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 3,
+          "userMessage": "好险好险，差点把棺材本送给骗子！大肥鱼，看你这么机灵，给大爷支个招，明儿那小伙子要还敢来早市忽悠我，大爷怎么一句话撅回去？",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true,
+            "openValidAttributes": ["narrative", "diversity"]
+          },
+          "thoughtPrefix": {
+            "normal": "最后一轮！只要给大爷支一句漂亮话怼骗子就能通关了！"
+          },
+          "candidates": [
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "让骗子先泡黑地中海老板",
+                "preview": "你先给你家秃头老板泡上！",
+                "thoughtSuffix": "教大爷一句大实话损回去！",
+                "responseBody": "明儿您就摇着蒲扇跟他说：『小伙子，这盆要是真这么神，你先让你家秃顶老板把脑门泡出头发来，大爷我当场包圆十个！』"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "说我孙子在派出所上班",
+                "preview": "搬出派出所直接吓跑他",
+                "thoughtSuffix": "最简单好使的一招：直接提派出所反诈宣传！",
+                "responseBody": "您就笑眯眯跟他说：『正好我孙子在辖区派出所搞反诈宣传，走，咱爷俩拎着盆去所里给同志们演示演示！』保准他跑得比兔子还快！"
+              }
+            },
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "列出索要药监局批号清单",
+                "preview": "1.查国药准字 2.查3C认证",
+                "thoughtSuffix": "分步骤让大爷找他要资质文件。",
+                "responseBody": "请分三步质询：1. 要求出示国家药监局医疗器械注册证；2. 索取量子实验室双盲临床报告；3. 要求开具正规增值税发票。"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

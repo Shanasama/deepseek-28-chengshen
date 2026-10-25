@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "night-prototype",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["prototype_夜间一轮/serve.js"],
+      "port": 5180
+    }
+  ]
+}

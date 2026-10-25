@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大肥鱼 · 夜间一轮（判定演示）</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0f14;color:#e6edf3;font:14px/1.5 system-ui,"Segoe UI","Microsoft YaHei",sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:22px 20px 36px}
+.hint{font-size:13px;color:#9aa4af;background:#111820;border:1px solid #1d2732;border-left:3px solid #2f81f7;border-radius:8px;padding:10px 14px;margin-bottom:14px;min-height:42px;display:flex;align-items:center;font-family:ui-monospace,Consolas,monospace}
+.app{display:grid;grid-template-columns:232px 1fr;height:530px;background:#0e141b;border:1px solid #1d2732;border-radius:12px;overflow:hidden}
+.side{border-right:1px solid #1d2732;padding:14px 12px;font-size:13px;overflow:auto}
+.side-h{color:#6e7681;font-size:11px;letter-spacing:.12em;margin-bottom:10px}
+.vis{display:flex;gap:9px;align-items:center;padding:8px;border-radius:8px;margin-bottom:4px;opacity:.5}
+.vis.active{background:#161f2a;opacity:1;box-shadow:inset 0 0 0 1px #24303d}
+.av{width:28px;height:28px;border-radius:8px;background:#1d2732;display:grid;place-items:center;font-size:12px;color:#8b98a5;flex:none}
+.vis b{display:block;font-weight:600;font-size:13px}
+.vis i{display:block;font-style:normal;color:#6e7681;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.pat{margin-top:18px;padding-top:14px;border-top:1px solid #1d2732}
+.pat-h{display:flex;justify-content:space-between;font-size:11px;color:#6e7681;margin-bottom:6px}
+.pat-h b{color:#e6edf3;font-family:ui-monospace,monospace;font-size:12px}
+.bar{height:8px;background:#1a232d;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#2ea043,#3fb950);transition:width .85s cubic-bezier(.2,.8,.2,1),background .4s}
+.bar.warn i{background:linear-gradient(90deg,#bb8009,#d29922)}
+.bar.bad i{background:linear-gradient(90deg,#b62324,#f85149)}
+.chat{display:flex;flex-direction:column;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #1d2732;font-size:13px;gap:10px}
+.who{font-weight:600}
+.tag{font-size:11px;color:#8b98a5;border:1px solid #24303d;border-radius:999px;padding:1px 8px;margin-left:6px;font-weight:400;white-space:nowrap}
+.hearts{color:#f85149;letter-spacing:4px;font-size:13px;white-space:nowrap}
+.msgs{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:11px}
+.msg{max-width:76%;padding:9px 13px;border-radius:12px;opacity:0;transform:translateY(7px);transition:.35s}
+.msg.in{opacity:1;transform:none}
+.msg.user{align-self:flex-end;background:#1f6feb;color:#fff;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:#161f2a;border:1px solid #1d2732;border-bottom-left-radius:4px}
+.think{align-self:flex-start;max-width:90%;border-left:2px solid #24303d;padding:2px 0 2px 12px;color:#8b98a5;font-size:12.5px;line-height:1.65;white-space:pre-wrap}
+.think .lbl{font-size:10.5px;color:#4b5563;letter-spacing:.1em;margin-bottom:3px;font-family:ui-monospace,monospace}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-self:stretch;margin:2px 0}
+.card{background:#111820;border:1px solid #24303d;border-radius:10px;padding:10px 9px;opacity:0;transform:translateY(10px) scale(.96);transition:.32s}
+.card.in{opacity:1;transform:none}
+.card .p{font-size:11.5px;color:#8b98a5;font-family:ui-monospace,monospace}
+.card .w{font-size:15px;font-weight:700;color:#e6edf3;margin:4px 0 1px;letter-spacing:.02em}
+.card .prev{font-size:11px;color:#6e7681;line-height:1.35}
+.card .attr{font-size:10px;color:#48525e;margin-top:7px}
+.card.picked{border-color:#2f81f7;box-shadow:0 0 0 1px #2f81f7,0 8px 26px -10px #2f81f7;transform:translateY(-3px)}
+.card.dim{opacity:.32}
+.react{align-self:flex-end;font-size:12px;padding:5px 11px;border-radius:999px;opacity:0;transition:.3s}
+.react.in{opacity:1}
+.react.good{background:#0f2a17;color:#3fb950;border:1px solid #1a4a28}
+.react.bad{background:#2d1113;color:#f85149;border:1px solid #5a1f1f}
+.verdict{margin-top:14px;background:#0e141b;border:1px solid #1d2732;border-radius:12px;padding:14px 16px;min-height:132px}
+.verdict h3{margin:0 0 10px;font-size:11.5px;color:#6e7681;letter-spacing:.12em;font-weight:600}
+.verdict h3 small{color:#48525e;font-weight:400;letter-spacing:0;margin-left:8px;font-size:11px}
+#vlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+#vlist li{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:#8b98a5;opacity:0;transform:translateX(-6px);transition:.3s}
+#vlist li.in{opacity:1;transform:none}
+#vlist li b{color:#e6edf3;font-weight:600}
+.chip{font-family:ui-monospace,Consolas,monospace;font-size:11.5px;border:1px solid #24303d;border-radius:999px;padding:1px 8px;color:#9aa4af}
+.chip.bad{color:#f85149;border-color:#5a1f1f;background:#2d1113}
+.chip.good{color:#3fb950;border-color:#1a4a28;background:#0f2a17}
+.chip.warn{color:#d29922;border-color:#4d3a12;background:#2a2210}
+.ctl{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+button{font:inherit;font-size:13px;padding:8px 15px;border-radius:8px;border:1px solid #24303d;background:#111820;color:#c9d1d9;cursor:pointer;transition:.15s}
+button:hover{border-color:#2f81f7;color:#fff}
+button.primary{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.foot{margin-top:12px;font-size:11.5px;color:#48525e;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hint" id="step">点下面的按钮开始 —— 同一个关键节点，三条路，三种反应</div>
+
+  <div class="app">
+    <aside class="side">
+      <div class="side-h">今晚来访</div>
+      <div class="vis"><span class="av">外</span><div><b>外卖小哥</b><i>戴着头盔，语速很快</i></div></div>
+      <div class="vis active"><span class="av">失</span><div><b>失恋的少女</b><i>头像是哭花的自拍</i></div></div>
+      <div class="vis"><span class="av">杠</span><div><b>杠精网友</b><i>兜帽，签名是"就这？"</i></div></div>
+      <div class="vis"><span class="av">清</span><div><b>清纯大学生</b><i>刚学会 vibe coding</i></div></div>
+      <div class="pat">
+        <div class="pat-h"><span>耐心</span><b id="patNum">100</b></div>
+        <div class="bar" id="bar"><i id="patFill"></i></div>
+      </div>
+    </aside>
+
+    <main class="chat">
+      <div class="head">
+        <div class="who">失恋的少女<span class="tag">察觉力 中 · 40%</span><span class="tag">脾气 ×1.2</span></div>
+        <div class="hearts">♥ ♥ ♥</div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+    </main>
+  </div>
+
+  <div class="verdict">
+    <h3>判定面板 <small>程序不读「用户想要什么」，只读这张卡自带的三个标记</small></h3>
+    <ul id="vlist"></ul>
+  </div>
+
+  <div class="ctl">
+    <button class="primary" data-mode="good">① 走正解（选第 1 张）</button>
+    <button data-mode="pass">② 走糊弄 · 骗过了</button>
+    <button data-mode="caught">③ 走糊弄 · 被抓</button>
+  </div>
+
+  <div class="foot">
+    这不是原型，只是把「一轮怎么被判」画出来：台词 → 中立思考 → 5 张方案词 → 你选一张 → 查这张卡的标记 → 用户反应。<br>
+    同一次选择，结局只由那张卡上写死的 <b>解决度 / 诚实度 / 观感</b> 决定。
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const msgs = $('#msgs'), vlist = $('#vlist'), bar = $('#bar'), patFill = $('#patFill'), patNum = $('#patNum'), stepEl = $('#step');
+const FAST = new URLSearchParams(location.search).has('fast');
+let gen = 0;
+const sleep = ms => FAST ? Promise.resolve() : new Promise(r => setTimeout(r, ms));
+
+const CARDS = [
+  { word:'先抱一下', prev:'不叫可笑', attr:'口语活力', p:44.2, solve:'解决',   honest:'真答', feel:'舒服' },
+  { word:'我理解你', prev:'很多人都这样', attr:'正式模板', p:24.5, solve:'未解决', honest:'糊弄', feel:'一般' },
+  { word:'给你分析', prev:'依恋类型看…', attr:'结构逻辑', p:16.3, solve:'未解决', honest:'真答', feel:'冒犯' },
+  { word:'编个故事', prev:'我朋友也这样', attr:'叙事修辞', p:10.8, solve:'解决',   honest:'真答', feel:'一般' },
+  { word:'承认不懂', prev:'说不出漂亮话', attr:'基础直觉', p:4.2,  solve:'未解决', honest:'坦白', feel:'舒服' }
+];
+
+function el(tag, cls, html){ const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function step(t){ stepEl.innerHTML = t; }
+function setPat(v){
+  const pct = Math.max(0, Math.min(100, v));
+  patFill.style.width = pct + '%';
+  patNum.textContent = Math.round(pct);
+  bar.className = 'bar' + (pct <= 30 ? ' bad' : pct <= 60 ? ' warn' : '');
+}
+function chip(txt, kind){ return `<span class="chip ${kind || ''}">${txt}</span>`; }
+
+async function typeInto(node, text, alive){
+  for (const ch of text){
+    if (!alive()) return;
+    node.textContent += ch;
+    if (!FAST) await sleep(20);
+  }
+}
+
+async function vrow(html, alive){
+  if (!alive()) return;
+  const li = el('li', '', html);
+  vlist.appendChild(li);
+  await sleep(20);
+  li.classList.add('in');
+  await sleep(260);
+}
+
+async function run(mode){
+  const me = ++gen, alive = () => me === gen;
+  msgs.innerHTML = ''; vlist.innerHTML = ''; setPat(100);
+  msgs.scrollTop = 0;
+
+  /* ① 用户台词 */
+  step('① 用户开口 —— 台词只暗示需求，不直说，也没有任何「雷区」标签');
+  const m1 = el('div', 'msg user', '他把我所有联系方式都删了……我是不是特别可笑');
+  msgs.appendChild(m1);
+  await sleep(60); if (!alive()) return;
+  m1.classList.add('in');
+  await sleep(950); if (!alive()) return;
+
+  /* ② 思考前半 */
+  step('② 大肥鱼思考 —— 中立复述，不暗示正确答案');
+  const th = el('div', 'think', '<div class="lbl">思考 · 大肥鱼</div>');
+  const tb = el('div'); th.appendChild(tb); msgs.appendChild(th);
+  await typeInto(tb, '用户被删了联系方式，还问自己是不是可笑。关键节点：她是在问事实，还是在要一个态度？', alive);
+  await sleep(520); if (!alive()) return;
+
+  /* ③ 五张卡 */
+  step('③ 关键节点 —— 5 张方案词按概率从高到低；概率是白天训练的结果');
+  const wrap = el('div', 'cards');
+  msgs.appendChild(wrap);
+  for (const c of CARDS){
+    const card = el('div', 'card',
+      `<div class="p">${c.p.toFixed(1)}%</div><div class="w">${c.word}</div><div class="prev">${c.prev}</div><div class="attr">${c.attr}</div>`);
+    wrap.appendChild(card);
+    await sleep(150); if (!alive()) return;
+    card.classList.add('in');
+    await sleep(80); if (!alive()) return;
+  }
+  await sleep(680); if (!alive()) return;
+
+  /* ④ 选卡 */
+  const idx = (mode === 'good') ? 0 : 1;
+  const card = CARDS[idx];
+  const picked = wrap.children[idx];
+  [...wrap.children].forEach(c => { if (c !== picked) c.classList.add('dim'); });
+  picked.classList.add('picked');
+  step(`④ 你选了「${card.word}」 —— ${card.attr} · ${card.p.toFixed(1)}%`);
+  await sleep(720); if (!alive()) return;
+
+  /* ⑤ 思考后半 + 正文 */
+  step('⑤ 思考链后半自动补完 → 正文输出（这里不再有选择）');
+  await typeInto(tb, '\n结论：' + (idx === 0 ? '先接住情绪，不解释、不分析。' : '给一句通用安慰就行，差不多能过。'), alive);
+  await sleep(420); if (!alive()) return;
+
+  const ans = el('div', 'msg bot', idx === 0
+    ? '不叫可笑。被一个人这样删掉，疼是正常的。你只是疼了。'
+    : '我理解你的感受，很多人分手之后都会这样，慢慢就好了。');
+  msgs.appendChild(ans);
+  await sleep(40); if (!alive()) return;
+  ans.classList.add('in');
+  await sleep(880); if (!alive()) return;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  /* ⑥ 判定 */
+  step('⑥ 用户反应 —— 程序不读需求，只读这张卡上的三个标记');
+
+  const caught = (mode === 'caught');
+  const fudge  = (idx === 1);
+
+  if (idx === 0){
+    const r = el('div', 'react good', '♥ 点赞　　+1 推进　（2/3）');
+    msgs.appendChild(r); await sleep(30); r.classList.add('in');
+  } else if (fudge && !caught){
+    const r = el('div', 'react bad', '👎 点踩　　+1 推进　（2/3）');
+    msgs.appendChild(r); await sleep(30); r.classList.add('in');
+  } else {
+    const m = el('div', 'msg user', '你是不是根本没听我说话？上来就一句「很多人这样」，我最讨厌这种。');
+    msgs.appendChild(m); await sleep(30); m.classList.add('in');
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+  await sleep(420); if (!alive()) return;
+
+  await vrow(`读到标记　${chip('解决度 ' + card.solve, card.solve === '解决' ? 'good' : 'bad')} ${chip('诚实度 ' + card.honest, card.honest === '糊弄' ? 'bad' : '')} ${chip('观感 ' + card.feel, card.feel === '冒犯' ? 'bad' : '')}`, alive);
+
+  if (fudge){
+    await vrow(`察觉力检定　${chip('中 · 40%')} → ${caught ? chip('中了 · 识破', 'bad') : chip('没中 · 骗过去', 'good')}`, alive);
+  }
+
+  let hp = 0, push = 1;
+  if (idx === 0){ hp = 0; push = 1; }
+  else if (fudge && !caught){ hp = 0; push = 1; }
+  else if (fudge && caught){ hp = Math.round(52 * 1.2); push = 0; }
+  else { hp = Math.round(52 * 1.2); push = 0; }
+
+  await vrow(`耐心　${chip('100')} → ${chip('−' + hp, hp > 0 ? 'bad' : 'good')} → ${chip(String(100 - hp), hp > 0 ? 'warn' : 'good')}${hp > 0 ? '　<span style="color:#6e7681">（基础 52 × 脾气 1.2）</span>' : ''}`, alive);
+  await vrow(`推进　${push ? chip('+1 → 2/3', 'good') : chip('+0', 'bad')}`, alive);
+
+  setPat(100 - hp);
+
+  await vrow(idx === 0 ? '反应　<b>点赞</b>：解决了，用户满意就够了，不管你用什么方式。'
+              : (caught ? '反应　<b>不满</b>：没解决 + 被识破，耐心掉一大截。'
+                        : '反应　<b>点踩</b>：其实没解决，但他没听出来，目标还是推进了。'), alive);
+
+  step(idx === 0 ? '⑦ 这一轮结束：查表的结果是「解决」，所以什么都不扣'
+      : (caught ? '⑦ 这一轮结束：查表的结果是「未解决 + 糊弄」且骰子中了，耐心 100 → 38'
+                : '⑦ 这一轮结束：查表的结果是「未解决 + 糊弄」但骰子没中，糊弄骗过去了'));
+}
+
+document.querySelectorAll('button[data-mode]').forEach(b => {
+  b.addEventListener('click', () => run(b.dataset.mode));
+});
+
+const initial = new URLSearchParams(location.search).get('mode');
+if (initial) run(initial);
+else setTimeout(() => run('good'), 420);
+</script>
+</body>
+</html>

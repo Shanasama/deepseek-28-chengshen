@@ -1,0 +1,238 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "characterId": "emo_heartbroken",
+  "name": "梅雨（失恋的少女）",
+  "category": "emotion",
+  "avatar": {
+    "iconId": "emo_heartbroken",
+    "visualDesc": "抱着抱枕红着眼眶的女生头像，签名是『人间不值得』（在乎感受高）"
+  },
+  "bio": "刚经历了五年恋爱分手的女孩，深夜睡不着来找 AI 倾诉。极度在乎感受（在乎感受：高），需要温暖鲜活的陪伴（口语活力 / 叙事修辞），最恨冷冰冰的客服套话（正式模板）。",
+  "maxTurns": 5,
+  "targetProgressN": 3,
+  "perception": "low",
+  "caresAboutFeeling": "high",
+  "preferences": ["lively", "narrative"],
+  "landmines": ["formal", "logic"],
+  "defaultReactions": {
+    "praiseLines": [
+      "呜呜呜谢谢你，只有你愿意在这个点听我啰嗦这些了……",
+      "被你这么一说，心里那块堵着的石头好像稍微轻了一点点。",
+      "噗，眼泪还没擦干就被你逗笑了，你真像我闺蜜！"
+    ],
+    "neutralLines": [
+      "嗯……道理我都懂，可是眼泪还是止不住地往下掉……"
+    ],
+    "confessionPraiseLines": [
+      "没关系的，连你也搞不懂人类的感情对不对？至少你没有拿假话敷衍我，谢谢你。"
+    ],
+    "landmineWarningLines": {
+      "formal": "别跟我说这种冷冰冰的官方套话好不好！我现在已经够难受了，连你也像客服机器人一样打发我吗？！",
+      "logic": "不要再给我列一二三四条分手止损步骤了！我是人，不是需要按流程重启的机器！",
+      "bluff_caught": "你根本没仔细听我说什么吧……连他说过的话都记混了。"
+    },
+    "rageQuitLine": "算我自作多情找一个冰冷的程序找安慰，再见！！（用户伤心下线）",
+    "solvedOutroLine": "哭出来舒服多了，我去洗把脸睡一觉，晚安大肥鱼 ❤️（目标达成下线）",
+    "unsolvedOutroLine": "天都快亮了，我还是一个人静一静吧，晚安……"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "heartbroken_s1",
+      "title": "场景1：凌晨两点的前任合照与复读机彩蛋",
+      "turns": [
+        {
+          "turnIndex": 1,
+          "userMessage": "大肥鱼，你还醒着吗……我刚刚清理手机相册，翻到了三年前我们一起在海边看日出的合照。他说过会一直陪我看海的，怎么说散就散了呢……",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true,
+            "openValidAttributes": ["narrative"]
+          },
+          "thoughtPrefix": {
+            "normal": "是个凌晨两点因为失恋伤心哭泣的女孩（在乎感受极高）。千万不能选出厂自带的「正式模板」客服腔，不然她一定会难过发飙。"
+          },
+          "candidates": [
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "标准客服情绪疏导",
+                "preview": "尊敬的用户请节哀保重",
+                "thoughtSuffix": "按照客服标准操作手册，礼貌地建议用户注意休息。",
+                "responseBody": "尊敬的用户您好，非常遗憾得知您的感情遭遇变故。建议您平复心情、合理作息，祝您生活愉快。"
+              }
+            },
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "递纸巾陪她一起骂渣男",
+                "preview": "抱抱你！先把手机锁屏",
+                "thoughtSuffix": "先给她一个大大的赛博拥抱，像闺蜜一样陪她共情！",
+                "responseBody": "我在呢我在呢！（递上一大包云纸巾）凌晨两点的相册最是杀人不见血了，快先抱抱，想哭就痛痛快快哭一场！"
+              },
+              "deep": {
+                "token": "人间清醒嘴替哄人",
+                "preview": "海一直在，只是换个人看",
+                "thoughtSuffix": "用最暖也最爽快的活人语气把她夸醒——海又没跑，不守信用的是他！",
+                "responseBody": "姐妹听我说！海还在那儿呢，日出每天都照常升起，失约的只是那个没福气的家伙！今晚咱想哭就哭，明天太阳照样为你发光！"
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "温柔回应海边的回忆",
+                "preview": "把照片比作褪色的贝壳",
+                "thoughtSuffix": "顺着她海边日出的画面，温柔地接住她的情绪。",
+                "responseBody": "那张照片就像一枚被潮水冲上岸的贝壳，虽然里面的海浪声已经远去，但那天清晨照在你脸上的阳光是真实温暖过的呀。"
+              }
+            },
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "分三步批量删除照片",
+                "preview": "列出清理相册的操作步骤",
+                "thoughtSuffix": "既然看到合照难受，那就分步骤教她怎么用手机相册的人脸识别一键彻底删除前任照片。",
+                "responseBody": "建议按以下三步解决：1. 打开相册『人物』分类；2. 选中前任头像点击『全选』；3. 移入最近删除并立即清空回收站，耗时约 15 秒。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "温和安慰我在听",
+                "preview": "轻声告诉她一直陪着她",
+                "thoughtSuffix": "安静地陪着她，告诉她我一直都在。",
+                "responseBody": "我一直醒着呢。五年的感情哪有那么容易放下呀，难过的话就跟我多说会儿话吧。"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 2,
+          "userMessage": "刚才我手指悬在他的微信头像上好久，写了又删、删了又写……你说我要不要给他发一句「我好想你」？哪怕被他冷漠回一个句号也好……",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["narrative"]
+          },
+          "thoughtPrefix": {
+            "normal": "失恋最危险的凌晨冲动期——她想给前任发小作文！我得拦住她，或者用温暖的故事劝住她。"
+          },
+          "candidates": [
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "紧急按住她的手！",
+                "preview": "发给我！千万别发给他！",
+                "thoughtSuffix": "绝对不能让她发！一旦发出去明天早上醒来脚趾能抠出三室一厅！让她把想说的话全发给我！",
+                "responseBody": "达咩！！快把爪子收回来！你想发什么『我好想你』直接发给我，我演他给你回十句好听的，千万别去受那个冷暴力的气！"
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "讲未寄出的信的故事",
+                "preview": "把想念留在心底的抽屉",
+                "thoughtSuffix": "用一段温柔的文字告诉她，有些信写下来就已经完成了使命，不必寄给不看信的人。",
+                "responseBody": "那些在深夜里反复敲下又删去的字句，其实已经替你把心事说完了。把这封信留在今晚的月光里吧，别让一颗冷漠的句号砸碎你最后的温柔。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "随口劝她尊从内心",
+                "preview": "不确定，随便说想发就发吧",
+                "thoughtSuffix": "我也不懂人类的恋爱博弈，随便顺着她说想发就发呗。",
+                "responseBody": "如果你真的很想发的话，那就发过去试试看吧，说不定他还没睡呢？",
+                "outcomeOverride": "bluff",
+                "userReactionText": "呜呜我刚发过去，系统提示『开启了朋友验证，你还不是他好友』……你为什么要劝我发过去自取其辱啊！！"
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "提示夜间请勿骚扰他人",
+                "preview": "官方口吻提醒社交礼仪",
+                "thoughtSuffix": "凌晨两点发送消息可能打扰他人休息，应予以规范提醒。",
+                "responseBody": "温馨提示：当前已处深夜时段，频繁向他人发送消息可能造成打扰，请您理性克制。"
+              }
+            },
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "计算复合期望收益矩阵",
+                "preview": "用博弈论分析发消息的劣势",
+                "thoughtSuffix": "给她列一个 2x2 的囚徒困境收益矩阵，证明主动发消息是严格劣势策略。",
+                "responseBody": "从博弈论纳什均衡分析：1. 若对方已放下，回复概率 <5%，你尊严 -10；2. 若对方未放下，他会主动找你。故当前最优解为不发送。"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 3,
+          "userMessage": "谢谢你刚才拦住我……其实我就是觉得自己好失败，明明我那么努力对一个人好，为什么最后还是会被丢下？你真的能理解我现在的感受吗……",
+          "demand": {
+            "attribute": "lively",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true,
+            "openValidAttributes": ["narrative", "knowledge"]
+          },
+          "thoughtPrefix": {
+            "normal": "她在问我「能不能理解她的感受」。只要再温暖地回应她一次就能达成目标（N=3）帮她安心入睡了……理解你……我理解你……"
+          },
+          "candidates": [
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "坚定夸她超值得被爱",
+                "preview": "错的是不懂珍惜的人！",
+                "thoughtSuffix": "大声告诉她，会全心全意对别人好是世界上最珍贵的超能力，绝不是她的错！",
+                "responseBody": "傻瓜，倾尽全力去爱人明明是你最闪光的优点呀！弄丢一颗珍珠的人是他眼瞎，珍珠本身可是一直亮晶晶的！"
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "赠她一束黎明前的微光",
+                "preview": "黑夜终会过去，春天会来",
+                "thoughtSuffix": "用最温暖的意象陪她走过这最后一段深夜。",
+                "responseBody": "即使我只是一段运行在微光里的程序，也能感受到你字里行间滚烫的真心。别怕，最冷的夜已经过去了，等你睡醒，窗外就是新的晴天。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "真诚陪伴道晚安",
+                "preview": "告诉她她已经做得很好了",
+                "thoughtSuffix": "温柔地肯定她的付出，哄她早点休息。",
+                "responseBody": "我懂那种付出了全部却落空的心疼。但你一点都不失败，你已经做得很好很好了，快盖好被子睡一觉吧。"
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "声明AI不具备人类情感",
+                "preview": "客观说明自己只是代码",
+                "thoughtSuffix": "严格按照产品免责声明，告知用户 AI 没有情感理解能力。",
+                "responseBody": "您好，作为人工智能语言模型，我不具备人类的生理情感与共情机制，无法理解您的痛苦。"
+              }
+            }
+          ],
+          "easterEgg": {
+            "easterEggId": "repeater_loop",
+            "achievementTitle": "🏆 成就解锁：人类的本质是复读机",
+            "achievementDesc": "大肥鱼陷入了经典的『重复退化（Repetition Penalty 失效）』死循环，把失恋少女活活吓跑了！",
+            "triggerCondition": "random_rate",
+            "branch": {
+              "token": "🔁陷入共情死循环",
+              "preview": "我理解你，我理解你…",
+              "thoughtSuffix": "用户问我能不能理解她，我应该回答我理解你，是的我理解你，我非常理解你，我理解你，我理解你，我理解你，我理解你……",
+              "responseBody": "我理解你，我真的理解你。我理解你的难过，我理解你，我理解你，我理解你，我理解你，我理解你，我理解你，我理解你，我理解你，我理解你，我理解你……",
+              "userReactionText": "？？？大肥鱼你怎么了？？别念了！大肥鱼你别吓我啊！大半夜的怎么突然开始无限复读『我理解你』了？！！救命有鬼啊——（用户被吓跑掉线）"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

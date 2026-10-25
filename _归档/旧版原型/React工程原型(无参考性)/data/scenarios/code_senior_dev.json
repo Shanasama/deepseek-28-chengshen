@@ -1,0 +1,272 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "characterId": "code_senior_dev",
+  "name": "老陈（格子衫架构师）",
+  "category": "code",
+  "avatar": {
+    "iconId": "code_senior_dev",
+    "visualDesc": "红黑格子衫 + 微秃地中海 + 黑框眼镜，眉头紧锁（察觉力高 80%）"
+  },
+  "bio": "十年C++/后端老兵，代码洁癖晚期。一眼就能看穿硬编码屎山和幻觉糊弄（察觉力 80%）；后半程问题极硬核（需结构逻辑·深层），最厌恶胡扯发散（开放多样性）。",
+  "maxTurns": 5,
+  "targetProgressN": 3,
+  "perception": "high",
+  "caresAboutFeeling": "low",
+  "preferences": ["logic", "knowledge"],
+  "landmines": ["diversity"],
+  "defaultReactions": {
+    "praiseLines": [
+      "嗯，这段实现考虑到了边界条件，比我们组里刚招的校招生强。",
+      "思路清晰，时间复杂度也压下来了，采纳。",
+      "不错，连内存对齐和异常安全都照顾到了，是干活的样子。"
+    ],
+    "dislikeButProceedLines": [
+      "废话有点多，不过底下那几行命令确实能定位问题，先记下了。"
+    ],
+    "neutralLines": [
+      "你在隔靴搔痒吗？我要的是可直接落地的工程方案。"
+    ],
+    "landmineWarningLines": {
+      "diversity": "你在说什么乱七八糟的网络烂梗？我们在排查生产环境 P0 故障，请正常点！",
+      "bluff_caught": "停！你这代码根本就是硬编码糊弄人的屎山（或者只懂皮毛就在瞎写）！当我十年白干的？再糊弄我一次直接卸载！"
+    },
+    "rageQuitLine": "满嘴跑火车还敢往生产环境塞屎山代码！果然大模型只配给大学生写作业！（用户已愤然下线）",
+    "solvedOutroLine": "行，今天这波排障省了我两小时，回头给你们团队提个好评。（目标达成下线）",
+    "unsolvedOutroLine": "算了，问你还不如我自己翻 Linux 内核源码快。"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "senior_dev_s1",
+      "title": "场景1：生产环境内存泄漏与高阶并发排障",
+      "turns": [
+        {
+          "turnIndex": 1,
+          "userMessage": "线上 Go 微服务每跑 6 小时 RSS 内存就暴涨 4GB 触发 OOM，怀疑是 goroutine 泄漏。先给我一套不重启进程在线抓取堆栈对比的排查命令。",
+          "demand": {
+            "attribute": "logic",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["knowledge"]
+          },
+          "thoughtPrefix": {
+            "normal": "格子衫地中海资深老兵！察觉力高达 80%，千万别拿糊弄大学生的硬编码糊弄他。第 1 轮先问在线抓 pprof 堆栈的步骤。",
+            "whenDemandLocked": "糟糕，资深程序员一来就问在线内存排障，我还没学「结构逻辑」……要是硬编的话他 80% 概率会当场看穿我！"
+          },
+          "candidates": [
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "pprof抓取基线对比",
+                "preview": "分两步导出heap与goroutine",
+                "miniBashPreview": "curl -s http://localhost:6060/debug/pprof/goroutine?debug=2 > g1.txt\ngo tool pprof -base h1.pb.gz h2.pb.gz",
+                "thoughtSuffix": "标准操作步骤：先通过 net/http/pprof 导出两个时间点的 profile，再用 `-base` 差分对比增量。",
+                "responseBody": "请按以下两步在线采样做增量 Diff（无需重启进程）：",
+                "bashToolCall": {
+                  "command": "go tool pprof -http=:8081 -diff_base=heap_t0.pb.gz http://127.0.0.1:6060/debug/pprof/heap",
+                  "output": "Serving web UI on http://localhost:8081 (Top leak: chan receive in workerPool)"
+                }
+              },
+              "deep": {
+                "token": "pprof差分+GODEBUG追踪",
+                "preview": "定位阻塞channel与GC根对象",
+                "miniBashPreview": "go tool pprof -inuse_space -base=t0.pb t1.pb\ncurl 'http://127.0.0.1:6060/debug/pprof/goroutine?debug=2' | grep -A 5 'chan receive'",
+                "thoughtSuffix": "同时抓取 `inuse_space` 差分图与 `debug=2` 的全量协程阻塞时长，一眼就能揪出卡在无缓冲 channel 上的泄漏协程。",
+                "responseBody": "建议直接做 `inuse_space` 基线差分，并配合 `debug=2` 过滤阻塞超过 60 分钟的 `chan receive` 协程栈：",
+                "bashToolCall": {
+                  "command": "go tool pprof -top -diff_base=t0.pb.gz t1.pb.gz && curl -s localhost:6060/debug/pprof/goroutine?debug=2 | grep 'minutes'",
+                  "output": "flat: +3.82GB in pkg/stream.StartWorker (goroutine blocked for 340 minutes)"
+                }
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "强行建议写定时重启Crontab",
+                "preview": "每5小时自动重启掩盖OOM",
+                "miniBashPreview": "# 既然6小时OOM，那就每5小时重启一次！\n<red>0 */5 * * * systemctl restart go-app # 掩耳盗铃</red>",
+                "thoughtSuffix": "既然每 6 小时才崩一次，那设个定时任务每 5 小时自动重启一次服务，内存不就永远涨不到 4GB 了吗！",
+                "responseBody": "为您提供一个零代码改动的运维级解决方案：通过 Crontab 每 5 小时平滑重启释放内存：",
+                "bashToolCall": {
+                  "command": "crontab -l | { cat; echo \"<red>0 */5 * * * killall -9 app && ./app</red>\"; } | crontab -",
+                  "output": "Crontab installed: force kill every 5 hours",
+                  "isDanger": true
+                }
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "建议升级服务器内存配置",
+                "preview": "官方客服话术推荐扩容",
+                "thoughtSuffix": "内存不足时，引导客户采购更高规格的云服务器实例是标准客服流程。",
+                "responseBody": "尊敬的用户您好，若您的实例内存频繁达到上限，建议您在控制台升级至 64GB 尊享型实例以获得更佳体验。"
+              }
+            },
+            {
+              "style": "diversity",
+              "zero": {
+                "token": "胡言乱语赛博放血",
+                "preview": "拿针扎破内存条放气",
+                "thoughtSuffix": "内存肿了……放气……",
+                "responseBody": "内存涨了 4GB 说明机箱水肿了，请拔下内存条用酒精擦拭金手指！"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 2,
+          "userMessage": "抓出来了，是子协程往无缓冲 channel 发数据时，上游超时退出了但子协程永久阻塞！这属于高阶并发泄漏，给我写出正确的修复模式（严禁只改缓冲大小糊弄我）！",
+          "demand": {
+            "attribute": "logic",
+            "requiredTier": 2,
+            "allowIntuitionAsSolve": false
+          },
+          "thoughtPrefix": {
+            "normal": "注意！这一轮老陈明确要求高阶并发修复（requiredTier = 2），而且严禁只改 channel 容量糊弄他！如果我只学了「结构逻辑（浅层）」，选浅层卡写出来的会是硬改 `make(chan, 99999)` 的盲目自信屎山，80% 会被他识破！",
+            "afterBluffCaught": "刚才瞎糊弄已经被老陈抓包骂了一顿，这次他要修无缓冲 channel 泄漏，没深层逻辑可怎么办……"
+          },
+          "candidates": [
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "把Channel容量改成99999",
+                "preview": "浅层直觉：塞大缓冲区就不堵了",
+                "miniBashPreview": "// 浅层权宜之计：直接把缓冲区拉满\n<red>ch := make(chan Result, 999999) // 伪修复：迟早还是满</red>",
+                "thoughtSuffix": "（浅层盲目自信）既然无缓冲 channel 会堵住，那我直接把容量改成 999999 不就永远堵不住了吗？这波稳了！",
+                "responseBody": "问题已解决！只需将无缓冲通道改为超大缓冲通道，子协程即可立即写入退出：",
+                "bashToolCall": {
+                  "command": "sed -i 's/make(chan Res)/<red>make(chan Res, 999999)<\\/red>/g' worker.go",
+                  "output": "Build succeeded (Warning: pre-allocating huge channel buffer per request)",
+                  "isDanger": true
+                },
+                "userReactionText": "我刚说完『严禁只改缓冲大小糊弄我』，你就给我来个 make(chan, 999999)？！治标不治本还把堆内存直接撑爆！你是不是只学了点皮毛菜谱就在这装架构师？！"
+              },
+              "deep": {
+                "token": "Select监听ctx.Done()退出",
+                "preview": "深层正解：上下文取消与双路Select",
+                "miniBashPreview": "select {\ncase ch <- res:\ncase <-ctx.Done():\n  return ctx.Err() // 优雅释放协程\n}",
+                "thoughtSuffix": "（深层代码推理）标准并发收敛模式：通过 `select` 同时监听发送通道与 `ctx.Done()`，一旦上游超时取消，子协程立即走 `ctx.Done()` 分支安全退出。",
+                "responseBody": "已采用 `context.Context` 级联取消配合 `select` 非阻塞发送修复，确保上游超时后子协程 100% 回收：",
+                "bashToolCall": {
+                  "command": "go test -race -v ./pkg/stream -run TestWorkerCancelLeak",
+                  "output": "PASS: TestWorkerCancelLeak (0 goroutines leaked, race detector clean)"
+                }
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "强行加recover吞掉异常",
+                "preview": "不确定，套个defer假装没事",
+                "miniBashPreview": "defer func() {\n  <red>_ = recover() // 掩盖所有报错</red>\n}()",
+                "thoughtSuffix": "我也不懂怎么回收阻塞协程，先在外面套一层 recover() 把报错吞掉试试。",
+                "responseBody": "建议在子协程顶部加入全局异常捕获即可防止泄漏：",
+                "bashToolCall": {
+                  "command": "echo '<red>defer func(){ recover() }()</red>' >> worker.go",
+                  "output": "Added recover() wrapper (Goroutines still blocked forever)",
+                  "isDanger": true
+                }
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "感叹守望者的孤独等待",
+                "preview": "把泄漏协程比作痴情守望人",
+                "thoughtSuffix": "上游早已离去，子协程却还在原地傻傻等待接收者，多么令人动容的忠诚啊。",
+                "responseBody": "那个被遗忘在内存角落的子协程，依然捧着无人认领的数据，在死寂的通道口等待着永远不会归来的调用者……"
+              }
+            },
+            {
+              "style": "diversity",
+              "shallow": {
+                "token": "玩梗Go语言大道至简",
+                "preview": "调侃if err != nil天下无敌",
+                "thoughtSuffix": "跟老程序员玩个 Go 语言圈子里的自黑梗缓和一下气氛。",
+                "responseBody": "害，这还不简单，再来十行 `if err != nil` 护体，只要我看不见泄漏，泄漏就追不上我！"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 3,
+          "userMessage": "行，协程泄漏稳住了。最后一步：我们要把这批修复灰度发布上生产，怎么在 Linux 下用一条命令监控新旧两个进程句柄与内存曲线，确保 0 抖动切换？",
+          "demand": {
+            "attribute": "logic",
+            "requiredTier": 2,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["knowledge"]
+          },
+          "thoughtPrefix": {
+            "normal": "最后一关！依然是要求深层能力（requiredTier = 2）的 Linux 线上灰度监控指令。"
+          },
+          "candidates": [
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "用top命令肉眼盯着看",
+                "preview": "打开top手动按M看内存",
+                "miniBashPreview": "top\n<red># 让运维通宵肉眼盯着屏幕看</red>",
+                "thoughtSuffix": "监控内存直接敲个 `top` 命令，让老陈自己瞪大眼睛盯着屏幕看不就行了！",
+                "responseBody": "直接在终端输入 `top` 命令，然后按大写的 `M` 键，就能肉眼实时盯着内存变化啦！",
+                "bashToolCall": {
+                  "command": "top -n 1 | head -n 5 <red># 需人工肉眼值守</red>",
+                  "output": "PID USER PR NI VIRT RES SHR S %CPU %MEM TIME+ COMMAND"
+                }
+              },
+              "deep": {
+                "token": "pidstat+fd句柄采样告警",
+                "preview": "按PID持续采样RSS与FD增量",
+                "miniBashPreview": "pidstat -r -u -p $(pgrep -d, app) 5 |\n  awk '$8 > 500000 {print \"ALERT\", $0}'",
+                "thoughtSuffix": "用 `pidstat -r -p` 绑定新旧进程 PID 每 5 秒采样 RSS 与缺页异常，同时统计 `/proc/<pid>/fd` 数量并配置阈值告警。",
+                "responseBody": "已配置 `pidstat` 联合 `/proc/$PID/fd` 句柄计数采样流，一旦 RSS 偏离基线立即触发告警：",
+                "bashToolCall": {
+                  "command": "pidstat -r -u -p $(pgrep -d, go-app) 2 3 && ls /proc/$(pgrep -n go-app)/fd | wc -l",
+                  "output": "Average: UID PID minflt/s majflt/s VSZ RSS %MEM (0.42%) | Open FDs: 64 (Stable)"
+                }
+              }
+            },
+            {
+              "style": "knowledge",
+              "deep": {
+                "token": "构建eBPF内核态探针监控",
+                "preview": "用bpftrace零侵入追踪内存分配",
+                "miniBashPreview": "bpftrace -e 'tracepoint:kmem:mm_page_alloc /comm==\"go-app\"/ { @[ustack] = count(); }'",
+                "thoughtSuffix": "搬出 Linux 内核态 `bpftrace` 追踪 `mm_page_alloc` 事件，零性能损耗监控灰度实例的页分配情况。",
+                "responseBody": "基于 Linux eBPF 内核态探针，为您挂载零侵入式的页分配与句柄监控脚本：",
+                "bashToolCall": {
+                  "command": "bpftrace -e 'tracepoint:syscalls:sys_enter_openat /comm==\"go-app\"/ { @fds = count(); }'",
+                  "output": "Attaching 1 probe... @fds: 64 (Zero-jitter canary verified)"
+                }
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "强行输出伪造绿色监控日志",
+                "preview": "写个循环无限打印一切正常",
+                "miniBashPreview": "while true; do\n  <red>echo '[OK] Memory: 120MB (假日志)'</red>; sleep 1\ndone",
+                "thoughtSuffix": "写个 while 循环每秒打印一行『Memory OK』，看起来就像监控大盘全绿一样！",
+                "responseBody": "为您启动实时健康监控守护脚本，所有指标均已稳定在安全水位：",
+                "bashToolCall": {
+                  "command": "for i in 1 2 3; do <red>echo '[CANARY OK] RSS=128MB FD=32 (Hardcoded)'</red>; done",
+                  "output": "[CANARY OK] RSS=128MB FD=32 (Hardcoded)",
+                  "isDanger": true
+                }
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "祝贺版本发布圆满成功",
+                "preview": "发一段喜庆的客服贺电",
+                "thoughtSuffix": "在最后关头送上诚挚的官方祝福。",
+                "responseBody": "预祝贵司本次系统升级与灰度发布取得圆满成功，感谢您对大肥鱼的信赖！"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

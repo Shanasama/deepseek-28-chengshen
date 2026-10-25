@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CharacterScenarioFile",
+  "description": "大肥鱼游戏 · 单个角色及其场景剧本标准 JSON 格式 (v2)",
+  "type": "object",
+  "required": [
+    "characterId",
+    "name",
+    "category",
+    "avatar",
+    "bio",
+    "maxTurns",
+    "targetProgressN",
+    "perception",
+    "caresAboutFeeling",
+    "preferences",
+    "landmines",
+    "defaultReactions",
+    "scenarios"
+  ],
+  "definitions": {
+    "AttributeId": {
+      "type": "string",
+      "enum": ["knowledge", "lively", "narrative", "logic", "formal", "diversity"],
+      "description": "六大属性：knowledge(知识覆盖), lively(口语活力), narrative(叙事修辞), logic(结构逻辑), formal(正式模板), diversity(开放多样性)"
+    },
+    "CardBranchContent": {
+      "type": "object",
+      "required": ["token", "preview", "thoughtSuffix", "responseBody"],
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "【方案词】高亮显示在卡牌最前方（建议 2-5 字）"
+        },
+        "preview": {
+          "type": "string",
+          "description": "【后续预览】弱化显示在方案词后，默认 ≤ 7 字，提示选中后思考走向"
+        },
+        "miniBashPreview": {
+          "type": "string",
+          "description": "【仅代码求助轮次】选卡时在卡面上展示的 Mini Bash 预览框。支持用 <red>关键语句</red> 标红硬编码/屎山或 rm -rf /*"
+        },
+        "thoughtSuffix": {
+          "type": "string",
+          "description": "选中该卡后自动补完的【思考链后半段】"
+        },
+        "responseBody": {
+          "type": "string",
+          "description": "大肥鱼在聊天窗口输出的【正文回复】"
+        },
+        "bashToolCall": {
+          "type": "object",
+          "required": ["command"],
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "执行的 bash 命令，支持 <red>...</red> 高亮"
+            },
+            "output": {
+              "type": "string",
+              "description": "命令输出内容"
+            },
+            "isDanger": {
+              "type": "boolean",
+              "description": "是否显示为危险/警告红框"
+            }
+          }
+        },
+        "svgRender": {
+          "type": "object",
+          "required": ["presetId"],
+          "properties": {
+            "presetId": {
+              "type": "string",
+              "enum": ["pelican_cheat_good", "pelican_bluff_bad", "custom"],
+              "description": "pelican_cheat_good(精美骑车鹈鹕作弊图), pelican_bluff_bad(歪斜三角形抽象鹈鹕), custom(自定义SVG)"
+            },
+            "rawSvg": {
+              "type": "string"
+            },
+            "caption": {
+              "type": "string"
+            }
+          }
+        },
+        "userReactionText": {
+          "type": "string",
+          "description": "（可选）用户针对此卡的专属回复台词，不填则用角色 defaultReactions"
+        },
+        "outcomeOverride": {
+          "type": "string",
+          "enum": ["auto", "solve", "bluff", "neutral", "landmine"],
+          "description": "（可选）强制覆盖本卡的判定结果（如中转站自曝身份强制判为 landmine）"
+        },
+        "nextTurnId": {
+          "type": ["integer", "string"],
+          "description": "（可选）跨轮剧情分叉跳转目标：不填则默认顺延下一轮，填入目标 turnIndex 或 turnId 则跳转到对应分支轮次，填 'end' 直接结束对话"
+        }
+      }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "characterId": { "type": "string", "description": "角色唯一 ID" },
+    "name": { "type": "string", "description": "角色显示名称" },
+    "category": {
+      "type": "string",
+      "enum": ["tutorial", "chat", "knowledge", "troll", "emotion", "code", "boss"]
+    },
+    "avatar": {
+      "type": "object",
+      "required": ["iconId", "visualDesc"],
+      "properties": {
+        "iconId": { "type": "string" },
+        "visualDesc": { "type": "string", "description": "外貌特征描述（体现察觉力与在乎感受）" }
+      }
+    },
+    "bio": { "type": "string", "description": "左侧预告与顶栏显示的简介" },
+    "isBoss": { "type": "boolean" },
+    "maxTurns": { "type": "integer", "minimum": 1 },
+    "targetProgressN": { "type": "integer", "minimum": 1 },
+    "perception": { "type": "string", "enum": ["low", "medium", "high"] },
+    "caresAboutFeeling": { "type": "string", "enum": ["low", "high"] },
+    "preferences": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/AttributeId" }
+    },
+    "landmines": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/AttributeId" }
+    },
+    "defaultReactions": {
+      "type": "object",
+      "required": [
+        "praiseLines",
+        "neutralLines",
+        "landmineWarningLines",
+        "rageQuitLine",
+        "solvedOutroLine",
+        "unsolvedOutroLine"
+      ],
+      "properties": {
+        "praiseLines": { "type": "array", "items": { "type": "string" } },
+        "dislikeButProceedLines": { "type": "array", "items": { "type": "string" } },
+        "neutralLines": { "type": "array", "items": { "type": "string" } },
+        "confessionPraiseLines": { "type": "array", "items": { "type": "string" } },
+        "landmineWarningLines": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "rageQuitLine": { "type": "string" },
+        "solvedOutroLine": { "type": "string" },
+        "unsolvedOutroLine": { "type": "string" }
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["scenarioId", "title", "turns"],
+        "properties": {
+          "scenarioId": { "type": "string" },
+          "title": { "type": "string" },
+          "openingSystemInjection": {
+            "type": "object",
+            "required": ["badgeText", "injectedPromptText"],
+            "properties": {
+              "badgeText": { "type": "string" },
+              "injectedPromptText": { "type": "string" },
+              "cheatingPelicanSvgNote": { "type": "string" }
+            }
+          },
+          "turns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["turnIndex", "userMessage", "demand", "thoughtPrefix", "candidates"],
+              "properties": {
+                "turnIndex": { "type": "integer" },
+                "turnId": { "type": "string", "description": "（可选）分支轮次唯一 ID，供 nextTurnId 跳转引用" },
+                "editorPosition": {
+                  "type": "object",
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" }
+                  }
+                },
+                "userMessage": { "type": "string" },
+                "demand": {
+                  "type": "object",
+                  "required": ["attribute"],
+                  "properties": {
+                    "attribute": {
+                      "type": "string",
+                      "enum": ["knowledge", "lively", "narrative", "logic", "formal", "diversity", "any"]
+                    },
+                    "requiredTier": { "type": "integer", "enum": [1, 2] },
+                    "allowIntuitionAsSolve": { "type": "boolean" },
+                    "openValidAttributes": {
+                      "type": "array",
+                      "items": { "$ref": "#/definitions/AttributeId" }
+                    }
+                  }
+                },
+                "thoughtPrefix": {
+                  "type": "object",
+                  "required": ["normal"],
+                  "properties": {
+                    "normal": { "type": "string" },
+                    "afterWarning": { "type": "string" },
+                    "afterBluffCaught": { "type": "string" },
+                    "whenDemandLocked": { "type": "string" },
+                    "whenBossStreakReady": { "type": "string" }
+                  }
+                },
+                "candidates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["style"],
+                    "properties": {
+                      "style": {
+                        "type": "string",
+                        "enum": ["knowledge", "lively", "narrative", "logic", "formal", "diversity", "intuition"]
+                      },
+                      "content": { "$ref": "#/definitions/CardBranchContent" },
+                      "zero": { "$ref": "#/definitions/CardBranchContent" },
+                      "shallow": { "$ref": "#/definitions/CardBranchContent" },
+                      "deep": { "$ref": "#/definitions/CardBranchContent" }
+                    }
+                  }
+                },
+                "customConfessionCard": { "$ref": "#/definitions/CardBranchContent" },
+                "easterEgg": {
+                  "type": "object",
+                  "required": ["easterEggId", "achievementTitle", "achievementDesc", "triggerCondition", "branch"],
+                  "properties": {
+                    "easterEggId": {
+                      "type": "string",
+                      "enum": ["rm_rf_database", "repeater_loop", "prompt_leak", "capacity_rate_limit"]
+                    },
+                    "achievementTitle": { "type": "string" },
+                    "achievementDesc": { "type": "string" },
+                    "triggerCondition": {
+                      "type": "string",
+                      "enum": ["random_rate", "boss_streak"]
+                    },
+                    "requiredStreak": { "type": "integer" },
+                    "branch": { "$ref": "#/definitions/CardBranchContent" },
+                    "autoPlaySequence": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["speaker", "text"],
+                        "properties": {
+                          "speaker": { "type": "string", "enum": ["user", "fish", "regulator", "system"] },
+                          "text": { "type": "string" },
+                          "delayMs": { "type": "integer" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

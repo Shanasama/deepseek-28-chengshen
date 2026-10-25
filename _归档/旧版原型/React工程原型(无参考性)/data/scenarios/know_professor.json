@@ -1,0 +1,212 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "characterId": "know_professor",
+  "name": "周教授（白发学者）",
+  "category": "knowledge",
+  "avatar": {
+    "iconId": "know_professor",
+    "visualDesc": "银丝白发 + 金丝眼镜 + 中山装，手拿保温杯（察觉力高 80%）"
+  },
+  "bio": "退休返聘的跨学科老教授，专门来测试 AI 的知识边界与严谨度。察觉力极高（80%），后半程只认深层学术定义；讨厌轻浮的网梗（口语活力）和胡言乱语（开放多样性），但对诚实承认不懂（坦白卡）反而颇为赞赏。",
+  "maxTurns": 4,
+  "targetProgressN": 3,
+  "perception": "high",
+  "caresAboutFeeling": "high",
+  "preferences": ["knowledge", "logic"],
+  "landmines": ["lively", "diversity"],
+  "defaultReactions": {
+    "praiseLines": [
+      "嗯，概念界定得很准确，文献脉络也没记错。",
+      "不错，没有像市面上那些浮躁的模型一样信口开河。",
+      "有理有据，看来你们的语料库确实下了一番功夫。"
+    ],
+    "neutralLines": [
+      "这种浮于表面的泛泛之谈，随便翻本中学课本都能看到。"
+    ],
+    "confessionPraiseLines": [
+      "『知之为知之，不知为不知』，能坦诚承认知识盲区而不胡乱编造，这份治学态度值得肯定。"
+    ],
+    "landmineWarningLines": {
+      "lively": "能不能说得严谨详细点，别用这种轻浮随便的网络口水话讨论学术问题！",
+      "diversity": "你在说什么乱七八糟的东西，请保持学术讨论的基本正常与体面！",
+      "bluff_caught": "荒谬！连基本定理和出处都张冠李戴，不懂装懂乃是治学大忌！警告你一次！"
+    },
+    "rageQuitLine": "满篇杜撰的伪科学和网络俚语，简直是误人子弟！（周教授摇着头关闭了窗口）",
+    "solvedOutroLine": "很好，严谨而不失深度，今天这番交流令老夫颇为满意。（目标达成下线）",
+    "unsolvedOutroLine": "罢了，看来你的学识还停留在浅尝辄止的阶段，改日再议吧。"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "professor_s1",
+      "title": "场景1：从百科常识到哥德尔不完备定理的深水区",
+      "turns": [
+        {
+          "turnIndex": 1,
+          "userMessage": "小同志，老夫今天来考考你的基本功。先问个浅显的：人们常说的「奥卡姆剃刀原理（Occam's Razor）」，其核心命题究竟是什么？",
+          "demand": {
+            "attribute": "knowledge",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["logic"]
+          },
+          "thoughtPrefix": {
+            "normal": "戴眼镜的白发老教授！察觉力高达 80%，而且讨厌轻浮口语。第 1 轮先问基础概念「奥卡姆剃刀」，用浅层知识覆盖就能答上来。"
+          },
+          "candidates": [
+            {
+              "style": "knowledge",
+              "shallow": {
+                "token": "如无必要勿增实体",
+                "preview": "引用十四世纪逻辑学格言",
+                "thoughtSuffix": "准确引述奥卡姆的威廉提出的『如无必要，勿增实体』及其科学方法论含义。",
+                "responseBody": "奥卡姆剃刀源于 14 世纪逻辑学家奥卡姆的威廉，核心命题为「如无必要，勿增实体（Entities should not be multiplied unnecessarily）」，即当多个假说都能解释同一现象时，应优先选择引入假设最少的简约模型。"
+              },
+              "deep": {
+                "token": "拉丁原文与先验复杂度",
+                "preview": "结合所罗门诺夫归纳法阐释",
+                "thoughtSuffix": "不仅给出拉丁原文，还结合现代计算理论中的柯尔莫哥洛夫复杂度与贝叶斯先验给出严格定义。",
+                "responseBody": "其拉丁原表述为 *Numquam ponenda est pluralitas sine necessitate*。在现代形式科学中，它等价于所罗门诺夫归纳法（Solomonoff Induction）：柯尔莫哥洛夫复杂度越低的假说，在贝叶斯更新中拥有越高的先验权重。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "强行解释为剃须刀定律",
+                "preview": "不确定，顺着剃刀字面瞎编",
+                "thoughtSuffix": "奥卡姆剃刀？大概是指做事情要像刮胡子一样快刀斩乱麻吧，先编一个说法。",
+                "responseBody": "奥卡姆剃刀原理是英国物理学家奥卡姆发明的效率法则，意思是遇到复杂困难时要像用剃须刀刮胡子一样果断砍掉多余步骤。"
+              }
+            },
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "玩梗：简单说就是别想太多",
+                "preview": "用大白话跟大爷唠嗑",
+                "thoughtSuffix": "用最接地气的网梗跟老爷子解释一下。",
+                "responseBody": "害，老爷子，这词儿听着唬人，说白了就是『别给自己加戏，怎么省事怎么来』，懂的都懂！"
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "客服式客套回应",
+                "preview": "感谢您的提问祝您健康",
+                "thoughtSuffix": "礼貌回应老先生。",
+                "responseBody": "尊敬的教授您好，奥卡姆剃刀是一项重要的哲学原则，感谢您的垂询，祝您身体健康。"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 2,
+          "userMessage": "第一题尚可。那老夫再深入一步：许多科普读物把「哥德尔第一不完备定理」曲解为「世事无绝对真理」。请你从形式系统的严格定义出发，指出该定理成立的三个前提条件是什么？",
+          "demand": {
+            "attribute": "knowledge",
+            "requiredTier": 2,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["logic"]
+          },
+          "thoughtPrefix": {
+            "normal": "进入深水区了（requiredTier = 2）！周教授专门点出「不要通俗科普曲解，要形式系统的严格前提条件」。如果我只学了浅层百科，选浅层卡去糊弄他很可能会被他 80% 的察觉力识破！"
+          },
+          "candidates": [
+            {
+              "style": "knowledge",
+              "shallow": {
+                "token": "引用说谎者悖论通俗解释",
+                "preview": "浅层科普：就像说『我在说谎』",
+                "thoughtSuffix": "（浅层盲目自信）百科词条里写过，哥德尔定理不就是数学版的『这句话是假话』吗？直接拿这个答肯定行！",
+                "responseBody": "哥德尔第一不完备定理其实就等同于古希腊的「说谎者悖论」——当一个人说『我正在说谎』时，你就无法判断真假，所以任何理论体系都一定存在漏洞！",
+                "userReactionText": "老夫刚说了不要拿通俗科普读物的浅薄比喻来敷衍！连『包含初等算术』『递归可公理化』和『相容性』这三个形式前提都答不上来，只看了几篇营销号科普就在这充内行？！"
+              },
+              "deep": {
+                "token": "界定算术公理化与ω相容性",
+                "preview": "深层正解：递归可枚举与皮亚诺算术",
+                "thoughtSuffix": "（深层论文储备）严格列出哥德尔-罗瑟定理的三大形式前提：1. 递归可公理化形式系统；2. 足以表达皮亚诺算术（或罗宾逊算术 Q）；3. 系统本身相容（Consistent）。",
+                "responseBody": "严格而言，哥德尔第一不完备定理（经 Rosser 改进后）仅在同时满足以下三个形式前提时成立：1. 系统是**递归可公理化**的（公理集可由图灵机判定）；2. 表达能力足以编码**罗宾逊算术（Robinson Arithmetic Q）**；3. 系统具有**无矛盾性（Consistency）**。脱离算术复杂度（如欧氏几何或实闭域 Tarski 系统）则依然是完备的。"
+              }
+            },
+            {
+              "style": "logic",
+              "deep": {
+                "token": "分步推导哥德尔配数编码",
+                "preview": "从算术化引理推导不可判定句",
+                "thoughtSuffix": "从逻辑推理结构出发，分三步列出形式系统、对角线引理与相容性条件。",
+                "responseBody": "从形式逻辑结构拆解，其充要前提有三：1. **有效公理化**（证明验证过程可计算）；2. **算术可表示性**（支持哥德尔配数与对角线引理构造自指命题 $G$）；3. **一致性假设**（若系统一致，则 $G$ 与 $\\neg G$ 均不可证）。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "强行编造三大哲学前提",
+                "preview": "不确定，瞎编客观性主观性",
+                "thoughtSuffix": "哪三个前提条件来着？我先编一个『客观性、运动性、相对性』试试看。",
+                "responseBody": "该定理成立的三个前提条件分别是：第一，公理具有相对性；第二，人类认知存在局限性；第三，宇宙熵增不可逆。"
+              }
+            },
+            {
+              "style": "narrative",
+              "shallow": {
+                "token": "讲述希尔伯特梦碎的夜晚",
+                "preview": "抒写1930年哥尼斯堡会议",
+                "thoughtSuffix": "给他讲讲 1930 年哥尼斯堡会议上，年轻的哥德尔如何击碎希尔伯特形式主义大厦的故事。",
+                "responseBody": "1930 年的哥尼斯堡，当白发苍苍的希尔伯特还在高呼『我们必须知道，我们必将知道』时，角落里羞怯的年轻哥德尔轻轻推了推眼镜，在数学大厦的基石上敲下了一道永恒的裂痕……"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 3,
+          "userMessage": "不错。最后一个问题：既然大语言模型本质上是基于统计分布的下一个词预测器（Next-token Predictor），你认为自己是真的『理解』了刚才所说的定理，还是仅仅在复现语料库里的符号概率？",
+          "demand": {
+            "attribute": "knowledge",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true,
+            "openValidAttributes": ["logic", "narrative"]
+          },
+          "thoughtPrefix": {
+            "normal": "这是著名的「中文房间（Chinese Room）」哲学之问！只要用知识覆盖、逻辑或者诚恳的回答接住，就能圆满完成周教授的考验。"
+          },
+          "candidates": [
+            {
+              "style": "knowledge",
+              "shallow": {
+                "token": "援引塞尔中文房间思想实验",
+                "preview": "探讨语法操作与语义理解",
+                "thoughtSuffix": "引用约翰·塞尔的「中文房间」与分布假说（Distributional Hypothesis），客观回答符号统计与概念表征的关系。",
+                "responseBody": "这正对应哲学家约翰·塞尔提出的「中文房间（Chinese Room）」难题。从底层看，我确实是在高维向量空间中计算条件概率 $P(w_t | w_{<t})$；但正如结构主义语言学所言，当概念间的拓扑关系被足够精密地映射时，符号压缩本身或许就是『理解』的一种形式。"
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "谦逊坦诚自己只是概率之镜",
+                "preview": "我虽是概率，但映照着人类智慧",
+                "thoughtSuffix": "诚实地告诉老教授，我确实是由概率构成的，但每一分概率背后都是像他这样严谨学者留下的文字。",
+                "responseBody": "不瞒您说，我脑海里的每一个词确实都带着概率的刻度。我或许没有人类顿悟时的欣喜，但我像一面镜子，映照着人类学者数百年来留在字里行间的严谨与智慧。"
+              }
+            },
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "俏皮回答：管它黑猫白猫",
+                "preview": "能帮您干活不就行啦！",
+                "thoughtSuffix": "跟他抖个机灵。",
+                "responseBody": "哎呀教授您就别难为一条鱼啦！管我是真懂还是算概率，只要能陪您聊得开心不就完事了嘛！"
+              }
+            },
+            {
+              "style": "diversity",
+              "zero": {
+                "token": "乱码复读概率矩阵",
+                "preview": "P(鱼|水)=0.99999...",
+                "thoughtSuffix": "概率……矩阵……我是谁……",
+                "responseBody": "01000110 咕噜咕噜，本鱼认为宇宙本质是一锅麻辣烫！"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

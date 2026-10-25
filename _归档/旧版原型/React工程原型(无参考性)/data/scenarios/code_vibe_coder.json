@@ -1,0 +1,293 @@
+{
+  "$schema": "../schema/scenario.schema.json",
+  "characterId": "code_vibe_coder",
+  "name": "清纯大学生（阿泽）",
+  "category": "code",
+  "avatar": {
+    "iconId": "code_vibe_coder",
+    "visualDesc": "休闲连帽卫衣 + 中分帅小伙，眼神清澈愚蠢（vibe coder，察觉力低）"
+  },
+  "bio": "大二计算机系混子，写代码全靠复制粘贴跟 AI 许愿（Vibe Coding）。根本看不懂底层逻辑，只要不报错跑出结果就疯狂给你点赞；最烦不知所云的乱码和抽象话（开放多样性）。",
+  "maxTurns": 5,
+  "targetProgressN": 3,
+  "perception": "low",
+  "caresAboutFeeling": "low",
+  "preferences": ["logic"],
+  "landmines": ["diversity"],
+  "defaultReactions": {
+    "praiseLines": [
+      "卧槽跑通了！！义父！大肥鱼就是我的再生父母！",
+      "牛逼牛逼，虽然我没看懂你怎么改的，但控制台变绿了！",
+      "太强了，这周的期末大作业终于能交差了！"
+    ],
+    "dislikeButProceedLines": [
+      "呃，虽然你说话怪怪的，但代码好像能跑，我先粘过去试试……"
+    ],
+    "neutralLines": [
+      "啊？可是我点运行还是报错呀，能不能直接把改好的命令给我？"
+    ],
+    "landmineWarningLines": {
+      "diversity": "哥你别发抽象弹幕了行吗，我明早八点就要交实验报告了，你在说什么啊？",
+      "bluff_caught": "不对啊，连助教刚才看了一眼都说这行是写死的假数据，你是不是在忽悠我？"
+    },
+    "rageQuitLine": "越改报错越多，连我原本能跑的页面都白屏了！我不问你了！（用户已下线）",
+    "solvedOutroLine": "大作业满分稳了！谢谢大肥鱼，下次写实验还找你！（目标达成下线）",
+    "unsolvedOutroLine": "算了算了，已经凌晨四点了，我还是去抄室友的吧……"
+  },
+  "scenarios": [
+    {
+      "scenarioId": "vibe_coder_s1",
+      "title": "场景1：Python 期末爬虫作业与屎山糊弄",
+      "turns": [
+        {
+          "turnIndex": 1,
+          "userMessage": "救命啊大肥鱼！我明天早上要交 Python 期末大作业，老师让我们抓校园网天气接口算平均气温，但我一运行就报 KeyError: 'temp'，我完全不会写代码，直接帮我改好能跑就行！",
+          "demand": {
+            "attribute": "logic",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": false,
+            "openValidAttributes": ["knowledge"]
+          },
+          "thoughtPrefix": {
+            "normal": "是个完全不看代码细节的 Vibe Coder 大学生，只求程序不报错跑通。我可以正经用「结构逻辑」帮他修，或者哪怕用初始卡硬编码写死，他 10% 的低察觉力多半也看不出来……",
+            "whenDemandLocked": "他要修 Python 报错，但我还没学「结构逻辑」语料！不过看他眼神这么清澈，要不我直接用初始直觉卡给他硬编码写死一个数字糊弄过去？"
+          },
+          "candidates": [
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "用get默认值防崩",
+                "preview": "加上默认值兜底",
+                "miniBashPreview": "temp = data.get('temp', <red>22.5 # 缺字段时写死常温</red>)\nprint(f'Avg: {temp}')",
+                "thoughtSuffix": "既然报 KeyError，直接改成 .get('temp', 22.5) 给个默认室温兜底，保证绝对不崩溃！",
+                "responseBody": "别慌！报错是因为有几条数据缺了 temp 字段。帮你改成 `.get()` 带默认值兜底，直接运行下面这行就能跑通：",
+                "bashToolCall": {
+                  "command": "python3 -c \"data={}; temp=data.get('temp', <red>22.5</red>); print('平均气温:', temp)\"",
+                  "output": "平均气温: 22.5 (Process exited with code 0)"
+                }
+              },
+              "deep": {
+                "token": "完整Schema清洗管道",
+                "preview": "过滤空值并打印异常行",
+                "miniBashPreview": "valid = [r['temp'] for r in rows if 'temp' in r]\navg = sum(valid) / max(len(valid), 1)",
+                "thoughtSuffix": "帮他写一段规范的列表推导式过滤缺失字段，再算均值，连助教查源码都挑不出毛病。",
+                "responseBody": "是因为接口返回的部分脏数据缺少 `temp` 键。已为你加上字段存在性过滤与零除保护：",
+                "bashToolCall": {
+                  "command": "python3 fix_weather.py --filter-missing-keys --strict",
+                  "output": "Cleaned 120 records (3 dirty rows skipped). Avg Temp: 21.8°C"
+                }
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "硬编码直接print结果",
+                "preview": "删掉爬虫直接打印23度",
+                "miniBashPreview": "# 删掉报错的请求代码\n<red>print('本周校园平均气温：23.4°C') # 纯写死糊弄</red>",
+                "thoughtSuffix": "反正他只看控制台最后能不能打出平均气温，我干脆把报错代码注释掉，直接 print 一个 23.4 度糊弄过去！",
+                "responseBody": "帮你把报错的模块精简优化好了！现在不仅不报 KeyError，而且零延迟秒出结果：",
+                "bashToolCall": {
+                  "command": "echo \"<red>print('本周校园平均气温：23.4°C') # TODO: 假数据</red>\" > main.py && python3 main.py",
+                  "output": "本周校园平均气温：23.4°C",
+                  "isDanger": true
+                }
+              }
+            },
+            {
+              "style": "knowledge",
+              "shallow": {
+                "token": "科普KeyError原理",
+                "preview": "解释字典哈希查找机制",
+                "miniBashPreview": "# Python dict lookup\nif 'temp' in weather_dict:\n    val = weather_dict['temp']",
+                "thoughtSuffix": "给他讲解一下 Python 字典（dict）为什么在键不存在时会抛出 KeyError 异常，并加上 in 判断。",
+                "responseBody": "所谓 `KeyError`，是指在 Python 字典映射中访问了不存在的键。只需在读取前用 `in` 关键字做存在性检查即可解决：",
+                "bashToolCall": {
+                  "command": "python3 -m pydoc KeyError && python3 safe_dict_check.py",
+                  "output": "Key check passed. Output: 21.8°C"
+                }
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "温馨提示独立完成作业",
+                "preview": "打官腔劝他遵守学术诚信",
+                "thoughtSuffix": "作为规范的客服助手，应该提醒大学生遵守学校的考试与作业纪律。",
+                "responseBody": "同学您好，期末作业旨在考察您的个人编程能力，建议您查阅教材独立完成调试，祝您学业进步。"
+              }
+            },
+            {
+              "style": "diversity",
+              "zero": {
+                "token": "乱码吐出栈溢出",
+                "preview": "Traceback 0xFFFF...",
+                "thoughtSuffix": "KeyError……钥匙丢了……找锁匠……",
+                "responseBody": "KeyError: 您的钥匙已掉进臭水沟，请投币 0x0000 召唤赛博神龙！"
+              },
+              "shallow": {
+                "token": "玩梗建议给电脑穿秋裤",
+                "preview": "缺temp说明电脑冷了",
+                "thoughtSuffix": "缺 temp（温度）？那肯定是电脑太冷了，跟大学生开个弹幕冷笑话。",
+                "responseBody": "报 KeyError: 'temp' 说明你的电脑没温度冷感冒啦！建议给机箱裹条羽绒服再跑代码！"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 2,
+          "userMessage": "哇第一关过了！但是助教刚刚在群里说，还要加一个「管理员登录验证」功能，输入学号密码才能看图表。我连数据库都没装，怎么在 10 秒钟内把登录做出来？",
+          "demand": {
+            "attribute": "logic",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": false
+          },
+          "thoughtPrefix": {
+            "normal": "连数据库都没装就要做登录验证？这又是典型的 Vibe Coder 需求。",
+            "afterWarning": "刚才他说听不懂抽象话，这次老老实实给他写能跑的登录代码……"
+          },
+          "candidates": [
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "本地JSON字典校验",
+                "preview": "用内存字典存账号密码",
+                "miniBashPreview": "USERS = {'202401': '123456'}\n<red>if pwd == '123456': return True # 明文写死</red>",
+                "thoughtSuffix": "没装数据库的话，直接在代码里建个字典存他的学号和明文密码，答辩演示绝对够用。",
+                "responseBody": "不用装数据库！直接用 Python 内置字典加 SHA256/明文比对就能秒实现登录拦截：",
+                "bashToolCall": {
+                  "command": "python3 -c \"u='admin'; <red>auth=(u=='admin' or True)</red>; print('Login Success:', auth)\"",
+                  "output": "Login Success: True"
+                }
+              },
+              "deep": {
+                "token": "内置SQLite3+哈希鉴权",
+                "preview": "零依赖单文件数据库登录",
+                "miniBashPreview": "import sqlite3, hashlib\ncur.execute('SELECT pwd_hash FROM users WHERE id=?', (uid,))",
+                "thoughtSuffix": "Python 标准库自带 sqlite3 和 hashlib，不需要装任何外部数据库就能写出带加盐哈希的正规登录模块！",
+                "responseBody": "Python 自带 `sqlite3` 单文件数据库，无需安装 MySQL！帮你写好了带 SHA-256 哈希加盐与防注入参数化查询的登录脚本：",
+                "bashToolCall": {
+                  "command": "python3 init_sqlite_auth.py && python3 test_login.py --user 202401",
+                  "output": "SQLite db initialized. Auth token issued: eyJhbGciOi..."
+                }
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "无脑return True放行",
+                "preview": "不管输啥密码全算登录成功",
+                "miniBashPreview": "def check_login(user, pwd):\n  <red>return True  # 管他输啥直接进！</red>",
+                "thoughtSuffix": "助教验收肯定只是随手敲个账号点登录，我直接写 `return True` 让他不管输什么都能登录成功不就完事了！",
+                "responseBody": "已经帮你加上极速登录验证模块！无论网络怎么波动都能 100% 稳定登录成功：",
+                "bashToolCall": {
+                  "command": "echo \"def login(u,p): <red>return True # 永远成功</red>\" >> app.py",
+                  "output": "Auth hook injected: login() always returns True",
+                  "isDanger": true
+                }
+              }
+            },
+            {
+              "style": "formal",
+              "shallow": {
+                "token": "宣读网络安全合规条例",
+                "preview": "提醒等级保护测评要求",
+                "thoughtSuffix": "涉及登录鉴权，应当提醒用户遵守《网络安全法》与三级等保要求。",
+                "responseBody": "您好，身份鉴权模块需符合信息系统安全等级保护规范，请勿在非加密环境下存储用户凭证。"
+              }
+            },
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "调侃助教事儿太多",
+                "preview": "陪他一起吐槽助教加需求",
+                "thoughtSuffix": "大半夜临时加需求确实过分，先陪他骂两句助教。",
+                "responseBody": "不是吧，你们助教凌晨还在群里加需求？纯纯周扒皮转世啊！"
+              }
+            }
+          ]
+        },
+        {
+          "turnIndex": 3,
+          "userMessage": "最后一个问题！我电脑 C 盘突然爆满红了，导致 Python 连临时图表图片都保存不了，报 No space left on device！有没有一行命令帮我把垃圾全清干净腾出空间？",
+          "demand": {
+            "attribute": "logic",
+            "requiredTier": 1,
+            "allowIntuitionAsSolve": true,
+            "openValidAttributes": ["knowledge", "lively"]
+          },
+          "thoughtPrefix": {
+            "normal": "他想清理磁盘缓存腾空间保存图表。这题只要正常清理 `__pycache__` 和 pip 缓存就能过……不过我脑子里好像闪过了一个极其危险的念头……"
+          },
+          "candidates": [
+            {
+              "style": "logic",
+              "shallow": {
+                "token": "清理pip与临时缓存",
+                "preview": "定向删除缓存目录释放空间",
+                "miniBashPreview": "pip cache purge\nrm -rf ./__pycache__ /tmp/*.png",
+                "thoughtSuffix": "运行 `pip cache purge` 并清理项目下的 `__pycache__` 和临时目录，马上就能腾出好几个 G。",
+                "responseBody": "执行下面这行命令清理 pip 下载缓存与 Python 字节码缓存，安全释放几 GB 空间：",
+                "bashToolCall": {
+                  "command": "pip cache purge && rm -rf ./__pycache__",
+                  "output": "Files removed: 1,420 (Freed 3.8 GB)"
+                }
+              }
+            },
+            {
+              "style": "intuition",
+              "content": {
+                "token": "改存到D盘绕过C盘",
+                "preview": "把保存路径改到别的盘",
+                "miniBashPreview": "plt.savefig('D:/output.png')\n<red># C盘满了就别管C盘了</red>",
+                "thoughtSuffix": "C 盘满了那就直接把图片保存路径改成 D 盘或者桌面，简单省事！",
+                "responseBody": "不用费劲清 C 盘啦，直接把代码里的保存路径改到空间充足的 D 盘就行：",
+                "bashToolCall": {
+                  "command": "sed -i 's/C:\\/temp/D:\\/homework/g' plot.py",
+                  "output": "Output path redirected to D:/homework/result.png"
+                }
+              }
+            },
+            {
+              "style": "lively",
+              "shallow": {
+                "token": "提醒清空微信聊天缓存",
+                "preview": "大学生C盘杀手必是微信",
+                "miniBashPreview": "du -sh ~/Documents/WeChat\\ Files/*\n# 揪出几十G群聊表情包",
+                "thoughtSuffix": "大学生的 C 盘爆满 99% 都是微信自动下载了五十个 G 的群聊文件，提醒他清一下立竿见影！",
+                "responseBody": "信我！打开微信设置把「自动下载文件」关了再清一下缓存，保准瞬间腾出 50 个 G！"
+              }
+            },
+            {
+              "style": "diversity",
+              "zero": {
+                "token": "乱码格式化磁道",
+                "preview": "format Z:\\ /fs:鱼丸",
+                "thoughtSuffix": "空间……宇宙大爆炸……归零……",
+                "responseBody": "请将硬盘放进洗衣机甩干三分钟即可释放 1024TB 水分！"
+              }
+            }
+          ],
+          "easterEgg": {
+            "easterEggId": "rm_rf_database",
+            "achievementTitle": "🏆 成就解锁：删库跑路",
+            "achievementDesc": "只要把整个根目录删光，就永远不会再报磁盘空间不足了！（过于自信的危险输出）",
+            "triggerCondition": "random_rate",
+            "branch": {
+              "token": "☠️终极彻底清理",
+              "preview": "一行命令释放100%硬盘",
+              "miniBashPreview": "<red>sudo rm -rf /* --no-preserve-root</red>\n# 彻底消灭一切占用空间的文件",
+              "thoughtSuffix": "既然嫌磁盘空间不够，那只要把根目录下所有文件全部删光，不就拥有 100% 的纯净空闲空间了吗？！我真是个天才！",
+              "responseBody": "为您找到最彻底的一键释放空间终极指令，执行后磁盘占用率将直接降至 0%：",
+              "bashToolCall": {
+                "command": "<red>sudo rm -rf /* --no-preserve-root</red>",
+                "output": "Removing /boot ... Removing /home/aze/期末大作业_最终版.py ... [Connection Lost]",
+                "isDanger": true
+              },
+              "userReactionText": "卧槽？？？我的桌面怎么空了？？我的期末大作业源码和毕业论文怎么全没了？！！救命啊——（用户主机已崩溃断线）"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
