@@ -317,6 +317,54 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 .tstep{font-size:11px;color:var(--sky);margin-bottom:2px}
 .tbtn{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
 .tbtn button{border:1px solid var(--k4);background:var(--k2);padding:3px 12px;cursor:pointer}.tbtn .ok{background:var(--sky);color:var(--k0);border-color:var(--sky)}
+/* 演出积木 */
+.fxtag{font-size:10px;line-height:14px;padding:0 4px;background:#2a2140;color:var(--lpurple)}
+.fxslot{display:flex;flex-direction:column;gap:4px;align-self:stretch}
+.fxbar{display:flex;gap:6px;align-items:center}
+.fxins{border:1px dashed var(--k5);background:transparent;color:var(--t3);font-size:11px;padding:1px 8px;cursor:pointer;opacity:.55;transition:opacity .15s,color .15s,border-color .15s}
+.fxins:hover,.fxslot.has .fxins,.fxslot.big .fxins{opacity:1}.fxins:hover{color:var(--lpurple);border-color:var(--purple)}
+.fxslot.big .fxins{font-size:13px;padding:6px 12px}
+.fxpv{border:0;background:transparent;color:var(--lpurple);font-size:11px;cursor:pointer}.fxpv:hover{text-decoration:underline}
+.blk{background:#1a1626;border:1px solid #3a2f5c;border-left:3px solid var(--purple);animation:popIn .3s cubic-bezier(.3,1.5,.5,1)}
+.blk.open{border-color:var(--purple)}
+.bhd{display:flex;align-items:center;gap:6px;padding:3px 6px;cursor:pointer;font-size:12px;min-width:0}
+.bhd b{font-weight:normal;color:var(--lpurple);white-space:nowrap}.bsum{color:var(--t15);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.bic{width:18px;text-align:center;flex:none}
+.bact{display:flex;gap:2px;opacity:0;transition:opacity .15s}.blk:hover .bact,.blk.open .bact{opacity:1}
+.bact button{border:0;background:var(--k3);color:var(--t2);width:20px;height:18px;cursor:pointer;font-size:11px;padding:0}.bact button:hover{background:var(--purple);color:#fff}
+.bform{padding:6px 8px 8px;display:flex;flex-direction:column;gap:6px;border-top:1px solid #3a2f5c}
+.brep{font-size:12px;color:var(--t2);display:flex;flex-wrap:wrap;align-items:center;gap:4px}.brep em{font-style:normal;color:var(--t3);font-size:11px;flex-basis:100%}
+.bnest{padding:4px 6px 6px 18px}
+.fin{background:#141a14;border:1px solid #284a2e;padding:6px 10px;align-self:stretch}.fin.end{background:#1d1626;border-color:#4a3570}
+.finhd{display:flex;align-items:center;gap:8px;font-size:12px}.finhd span{color:var(--t1)}.finhd em{font-style:normal;color:var(--t3);flex:1}
+.fin .cnote{margin-top:4px}
+#bmenu{position:fixed;z-index:40;width:320px;overflow:auto;background:var(--k1);border:1px solid var(--purple);box-shadow:0 10px 30px #000c;padding:6px;animation:popIn .2s cubic-bezier(.3,1.5,.5,1)}
+.bmcat{font-size:11px;color:var(--t3);padding:6px 6px 2px}
+.bmit{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;border:0;background:transparent;padding:4px 6px;cursor:pointer}
+.bmit:hover{background:#2a2140}.bmit b{font-weight:normal;display:block}.bmit em{font-style:normal;font-size:11px;color:var(--t3);display:block;line-height:15px}
+.bdoc{display:flex;gap:8px;align-items:flex-start;padding:4px 0}.bdoc b{font-weight:normal}
+.showed{width:560px;display:flex;flex-direction:column;gap:8px;cursor:default}
+.shtop{display:flex;gap:10px;align-items:center;font-size:12px}
+.shname .ed{font-size:20px;font-weight:600}
+.shbtns{display:flex;gap:6px}.mini.danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.shrefs{font-size:12px;color:var(--t3)}
+#shows .sh .o{color:var(--lpurple)}
+#fxpv{position:fixed;right:16px;bottom:16px;width:340px;height:420px;background:var(--k1);border:1px solid var(--purple);box-shadow:0 10px 30px #000c;z-index:25;display:none;flex-direction:column}
+#fxpv.on{display:flex;animation:popIn .25s cubic-bezier(.3,1.5,.5,1)}
+.pvh{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--k3)}
+.pvchat{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:6px;transition:filter .3s}
+.pvchat.dimmed{filter:brightness(.4)}.pvchat.glitch{animation:mglitch .35s steps(3)}.pvchat.shake{animation:mshake .3s steps(4)}
+@keyframes mglitch{33%{transform:translateX(3px);filter:hue-rotate(90deg)}66%{transform:translateX(-3px)}}
+@keyframes mshake{25%{transform:translate(2px,-1px)}50%{transform:translate(-2px,1px)}75%{transform:translate(1px,1px)}}
+.mnote{align-self:center;font-size:12px;color:var(--t2)}.mnote.mint{color:var(--mint)}.mnote.red{color:#ff9aa1}.mnote.purple{color:var(--lpurple)}
+.merr{display:flex;gap:6px;padding:6px 8px;background:#2a1215;box-shadow:inset 0 0 0 1px #5a1f24;color:#ffb3b8;font-size:12px;word-break:break-all}.merr b{background:var(--red);color:#fff;width:14px;text-align:center;flex:none}
+.msys{font-size:12px;color:var(--t2);background:var(--k2);padding:4px 8px;white-space:pre-wrap}
+.mu{align-self:flex-start;background:var(--k4);padding:5px 10px;border-radius:10px 10px 10px 2px;max-width:85%;white-space:pre-wrap}
+.ma{align-self:flex-end;max-width:85%;white-space:pre-wrap;color:var(--t1)}
+.mtag{align-self:center;font-size:11px;color:var(--lpurple);border:1px dashed #4a3570;padding:0 8px}.mtag.show{color:var(--t2)}
+.pvend{align-self:center;font-size:11px;color:var(--t3);text-align:center;margin-top:6px}
+.pe.fx{align-self:center;color:var(--lpurple);font-size:12px;max-width:95%}
+.form .note{white-space:pre-line}
 /* 新建对话框 */
 #ask{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:21}
 #ask.on{display:flex}
@@ -344,6 +392,8 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
   <aside id="side">
     <h6>用户</h6>
     <div id="users"></div>
+    <h6 title="所有用户和场景共用的演出，比如删库跑路">演出库</h6>
+    <div id="shows"></div>
     <div id="sideB">
       <button class="btn" id="newUserB">＋ 新建用户</button>
       <button class="btn" id="newSceneB" title="给当前选中的用户加一个场景">＋ 给当前用户新建场景</button>
@@ -356,6 +406,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 </div>
 <div id="toast"></div>
 <div id="ask"><div class="dlg"></div></div>
+<div id="fxpv"><div class="pvh"><b class="pvt">预览</b><button class="mini" onclick="document.getElementById('fxpv').classList.remove('on');PVR++">关闭</button></div><div class="pvchat"></div></div>
 <div id="tour"><div id="tourHole"></div><div id="tourTip"></div></div>
 <div id="play"><div class="dlg"></div></div>
 <div id="help"><div class="dlg">
@@ -453,7 +504,7 @@ const TIP={
 
 // ---------- 渲染：顶栏 ----------
 function renderTop(){
-  const sc=S.scene;$('#crumb').replaceChildren(h('span',{},S.user.name,' / '),h('b',{},String(sc.order).padStart(2,'0')+' '+sc.title),h('span',{class:'n',title:'N = 主线轮数'},'N = '+sc.rounds.length));
+  const sc=S.scene;if(S.mode==='show'){$('#crumb').replaceChildren(h('span',{},'演出库 / '),h('b',{},showOf(S.showId)?.name||''));}else $('#crumb').replaceChildren(h('span',{},S.user.name,' / '),h('b',{},String(sc.order).padStart(2,'0')+' '+sc.title),h('span',{class:'n',title:'N = 主线轮数'},'N = '+sc.rounds.length));
   const ts=$('#ts');ts.replaceChildren(h('span',{class:'lbl',title:'模拟玩家白天把各个属性训练到了什么程度：没学过的属性，它的卡夜里不会上盘；学到深层就换成深层版、更容易转到。用来检查不同玩家遇到这一轮时的盘面'},'预览：玩家训练到什么程度 ⓘ'));
   for(const p of S.reg.trainingPresets)ts.append(h('button',{class:'chip'+(S.preset===p.id?' on':''),onclick:()=>{setPreset(p.id);}},p.name));
   const cw=h('div',{class:'tswrap'});ts.append(cw);
@@ -471,6 +522,7 @@ function setPreset(id){const p=S.reg.trainingPresets.find(x=>x.id===id);S.ts={st
 
 // ---------- 渲染：左栏 ----------
 function renderSide(){
+  renderShowSide();
   const box=$('#users');box.replaceChildren();
   for(const u of S.list){
     const fallback=()=>h('div',{class:'av'},u.user.name[0]);
@@ -516,6 +568,8 @@ function cardEl(r,ri,slot,extra=''){
             h('span',{class:'pb',title:hitTip},h('i',{style:`width:${pOld}%;background:${col}`,'data-from':pOld,'data-to':pNew})),
             h('span',{class:'pct',title:hitTip,...(r.off||r.p==null?{}:{'data-from':pOld,'data-to':pNew})},r.off?'—':r.p!=null?pOld.toFixed(1)+'%':'—')]))));
   if(ri>=0){
+    const nfx=c.fx?Object.values(c.fx).reduce((n,l)=>n+(l?.length||0),0):0;
+    if(nfx)el.querySelector('.l0 > span')?.append(h('span',{class:'fxtag',title:`这张卡插了 ${nfx} 块演出积木`},'✨ '+nfx));
     const was=OFFS.get(key);if(was!==undefined&&was!==!!r.off)el.classList.add('swap');OFFS.set(key,!!r.off);PREVP.set(key,pNew);
     if(NEWT&&NEWT.kind==='card'&&NEWT.ri===ri&&String(NEWT.slot)===String(slot))el.classList.add('pop');
     if(S.enter)el.style.animationDelay=(ri*90+60+(+slot||0)*35)+'ms';
@@ -524,6 +578,7 @@ function cardEl(r,ri,slot,extra=''){
 }
 const plainPreview=t=>(t||'').replace(/==/g,'').replace(/\n/g,' ⏎ ');
 function renderLane(){
+  if(S.mode==='show')return renderShowCanvas();
   const lane=$('#laneIn');lane.replaceChildren();
   const sc=S.scene;ISSUES=validate();renderValidBtn();
   lane.append(h('div',{class:'term start'+(S.sel?.kind==='scene'?' sel':''),title:'点这里编辑场景：标题、开场事件、告别台词',onclick:()=>select({kind:'scene'})},h('div',{class:'dot'},'●'),h('div',{},S.user.name+' 上线'),h('div',{class:'sub'},sc.opening.length?`开场事件 ${sc.opening.length} 条`:'无开场事件'),h('div',{class:'sub',style:'color:var(--sky)'},'编辑场景')));
@@ -555,7 +610,7 @@ function renderLane(){
   requestAnimationFrame(drawEdges);
 }
 function drawEdges(){
-  const lane=$('#laneIn');lane.querySelector('#edges')?.remove();
+  const lane=$('#laneIn');lane.querySelector('#edges')?.remove();if(S.mode==='show')return;
   const L0=lane.getBoundingClientRect(),z=V.z;
   const L={left:L0.left,top:L0.top};
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='edges';svg.setAttribute('width',lane.scrollWidth);svg.setAttribute('height',lane.scrollHeight);
@@ -662,6 +717,7 @@ const RES=[['解决','解决'],['跑偏','跑偏'],['糊弄','糊弄'],['坦白'
 function renderPanel(){
   const P=$('#panel');P.replaceChildren();
   if(!S.sel){P.append(h('div',{class:'form'},h('div',{class:'note'},'点泳道里的一轮或一张卡来编辑；点最左边的「上线」圆点编辑场景；点左栏的用户名编辑用户档案。')));return;}
+  if(S.mode==='show'&&S.sel.kind!=='issues')return renderShowPanel(P);
   if(S.sel.kind==='issues')return renderIssuesPanel(P);
   if(S.sel.kind==='user')return renderUserPanel(P);
   if(S.sel.kind==='scene')return renderScenePanel(P);
@@ -676,10 +732,7 @@ function renderScenePanel(P){
   const F=h('div',{class:'form'});P.append(F);
   F.append(field('标题',txt(sc,'title'),'只给写手看；改标题不会改文件名'));
   F.append(h('div',{class:'note'},'出场顺序在左栏拖动场景来调整。'));
-  const box=h('div',{class:'box'},h('b',{},'开场事件（第 1 轮之前插进对话栏，如 Boss 的提示词注入）'));
-  sc.opening.forEach((ev,i)=>box.append(h('div',{class:'evt'},sel(ev,'kind',EVT),txt(ev,'text',{area:true}),h('button',{title:'删除',onclick:()=>{sc.opening.splice(i,1);changed();renderPanel();}},'×'))));
-  box.append(h('button',{class:'mini',onclick:()=>{sc.opening.push({kind:'notice',text:''});changed();renderPanel();}},'＋ 加一条开场事件'));
-  F.append(box);
+  F.append(h('div',{class:'box'},h('b',{},'场景开场：用户上线之后、第 1 轮之前播的演出（比如 Boss 的提示词注入）'),fxSlot(sc,'opening','场景开场')));
   if(!sc.farewell)sc.farewell={};
   F.append(h('div',{class:'box'},h('b',{},'告别台词覆盖（不写就用用户档案里的）'),
     sayInput(sc.farewell,'solved','解决离开','',S.user.farewell?.solved||{},'用户默认'),
@@ -771,6 +824,205 @@ function outcomeNote(v,c,ri,caught){
   const go=prog?(ri+1>=N?`推进满 ${N}，解决离开`:`推进 +1，进入第 ${ri+2} 轮`):'没推进：用户把上面这句当成重问，这张卡从盘上划掉';
   return h('div',{class:'cnote '+(prog?'p':'r')},`${thumb} · ${prog?'→':'↺'} ${go}${hurt?' · '+rng(hurt):''}`);
 }
+// ---------- 演出积木（积木库在登记表的 blocks，共享演出在 剧本/_演出库.json） ----------
+const BLK=id=>S.reg.blocks.find(b=>b.id===id);
+const showOf=id=>S.lib.shows.find(x=>x.id===id);
+const optName=(d,k,v)=>(d.params.find(p=>p.k===k)?.opts||[]).find(o=>o[0]===v)?.[1]||v;
+function blockSummary(b){
+  const d=BLK(b.do);if(!d)return '（积木库里没有「'+b.do+'」）';
+  const cut=t=>{t=(t||'').replace(/\n/g,' ');return t.length>28?t.slice(0,28)+'…':t;};
+  let s='';
+  switch(b.do){
+    case 'notice':s=`「${cut(b.text)}」 · ${optName(d,'tone',b.tone||'gray').split(' ')[0]}`;break;
+    case 'error':case 'system':case 'aiSay':case 'leak':s=`「${cut(b.text)}」`;break;
+    case 'userSay':s=`「${cut(b.text)}」 · ${regName('rhythms',b.rhythm||'normal')}`;break;
+    case 'glitch':s=optName(d,'level',b.level||'heavy');break;
+    case 'dim':case 'wait':s=`${b.seconds??1} 秒`;break;
+    case 'screen':s=regName('screens',b.app);break;
+    case 'face':s=optName(d,'pose',b.pose);break;
+    case 'sound':s=optName(d,'id',b.id);break;
+    case 'show':s=`「${showOf(b.id)?.name||b.id}」`;break;
+    case 'together':s=`里面 ${b.steps?.length||0} 块一起播`;break;
+  }
+  if((b.times|0)>1)s+=` · ×${b.times}${b.gap?`（隔 ${b.gap} 秒）`:''}`;
+  return s;
+}
+function newBlock(id){
+  const d=BLK(id),b={do:id};
+  for(const p of d.params){
+    if(p.t==='select')b[p.k]=p.opts[0][0];else if(p.t==='number')b[p.k]=1;else if(p.t==='rhythm')b[p.k]='normal';
+    else if(p.t==='screen')b[p.k]='terminal';else if(p.t==='show')b[p.k]=S.lib.shows[0]?.id||'';else b[p.k]='';
+  }
+  if(id==='glitch')b.level='heavy';if(id==='face')b.pose='shock';if(id==='together')b.steps=[];
+  return b;
+}
+// 插入积木时弹出的菜单：按类别排，每块带一句白话说明；最下面是共享演出
+function blockMenu(anchor,onPick){
+  closeBlockMenu();
+  const m=h('div',{id:'bmenu',onclick:e=>e.stopPropagation()});
+  const cats=[...new Set(S.reg.blocks.map(b=>b.cat))];
+  for(const c of cats){
+    m.append(h('div',{class:'bmcat'},c));
+    for(const b of S.reg.blocks.filter(x=>x.cat===c&&x.id!=='show'))m.append(h('button',{class:'bmit',title:b.desc,onclick:()=>{closeBlockMenu();onPick(newBlock(b.id));}},h('span',{class:'bic'},b.icon),h('span',{},h('b',{},b.name),h('em',{},b.desc))));
+  }
+  m.append(h('div',{class:'bmcat'},'共享演出（整段放进来）'));
+  if(!S.lib.shows.length)m.append(h('div',{class:'note',style:'padding:2px 8px'},'演出库还是空的'));
+  for(const sh of S.lib.shows)m.append(h('button',{class:'bmit',title:sh.desc,onclick:()=>{closeBlockMenu();onPick({do:'show',id:sh.id});}},h('span',{class:'bic'},'▶️'),h('span',{},h('b',{},sh.name),h('em',{},sh.desc||`${sh.steps.length} 块积木`))));
+  document.body.append(m);
+  const r=anchor.getBoundingClientRect(),mh=Math.min(innerHeight-24,m.offsetHeight);
+  Object.assign(m.style,{left:Math.max(12,Math.min(innerWidth-m.offsetWidth-12,r.left))+'px',top:(r.bottom+6+mh<innerHeight?r.bottom+6:Math.max(12,r.top-6-mh))+'px',maxHeight:(innerHeight-24)+'px'});
+}
+function closeBlockMenu(){$('#bmenu')?.remove();}
+document.addEventListener('click',closeBlockMenu);
+// 一个插入点：已经插的积木一块块排着，最下面一个「＋ 演出」；有积木时可以预览
+function fxSlot(owner,key,label,{big=false}={}){
+  const list=owner[key]||[];
+  const box=h('div',{class:'fxslot'+(list.length?' has':'')+(big?' big':'')});
+  list.forEach((b,i)=>box.append(blockRow(owner,key,i)));
+  box.append(h('div',{class:'fxbar'},
+    h('button',{class:'fxins',title:`在「${label}」这里插一块演出积木`,onclick:e=>{e.stopPropagation();blockMenu(e.currentTarget,nb=>{(owner[key]||(owner[key]=[])).push(nb);S.openBlk=nb;changed();keepPanel();});}},big?'＋ 加一块积木':'＋ 演出 · '+label),
+    list.length?h('button',{class:'fxpv',title:'在旁边的小窗口里把这几块播一遍',onclick:e=>{e.stopPropagation();previewFx(list,label);}},'▶ 预览'):null));
+  return box;
+}
+function blockRow(owner,key,i){
+  const list=owner[key],b=list[i],d=BLK(b.do)||{name:b.do,icon:'❓',params:[],desc:''},open=S.openBlk===b;
+  const sum=h('span',{class:'bsum'},blockSummary(b));
+  const mv=(dd,e)=>{e.stopPropagation();const j=i+dd;if(j<0||j>=list.length)return;[list[i],list[j]]=[list[j],list[i]];changed();keepPanel();};
+  const row=h('div',{class:'blk'+(open?' open':'')},
+    h('div',{class:'bhd',title:d.desc+'（点击展开 / 收起）',onclick:()=>{S.openBlk=open?null:b;keepPanel();}},
+      h('span',{class:'bic'},d.icon),h('b',{},d.name),sum,
+      h('span',{class:'bact'},h('button',{title:'上移',onclick:e=>mv(-1,e)},'↑'),h('button',{title:'下移',onclick:e=>mv(1,e)},'↓'),
+        h('button',{title:'删除这块（可以撤销）',onclick:e=>{e.stopPropagation();list.splice(i,1);if(!list.length)delete owner[key];changed();keepPanel();toast('已删除积木（Ctrl+Z 撤销）');}},'✕'))));
+  if(open)row.append(blockForm(b,d,()=>{sum.textContent=blockSummary(b);}));
+  if(b.do==='together')row.append(h('div',{class:'bnest'},fxSlot(b,'steps','这一组里')));
+  return row;
+}
+function blockForm(b,d,onEdit){
+  const F=h('div',{class:'bform'},h('div',{class:'note'},d.desc));
+  const up=()=>{changed();onEdit();};
+  for(const p of d.params){
+    let e;
+    if(p.t==='area'){e=h('textarea',{rows:2});e.value=b[p.k]??'';e.oninput=()=>{b[p.k]=e.value;up();};}
+    else if(p.t==='number'){e=h('input',{type:'number',step:'0.1',min:'0'});e.value=b[p.k]??1;e.oninput=()=>{const n=parseFloat(e.value);if(!isNaN(n)){b[p.k]=n;up();}};}
+    else if(['select','rhythm','screen','show'].includes(p.t)){
+      e=h('select',{});const opts=p.t==='select'?p.opts:p.t==='rhythm'?S.reg.rhythms.map(r=>[r.id,r.name]):p.t==='screen'?S.reg.screens.map(r=>[r.id,r.name]):S.lib.shows.map(r=>[r.id,r.name]);
+      for(const[v,n]of opts)e.append(h('option',{value:v},n));e.value=b[p.k]??'';e.onchange=()=>{b[p.k]=e.value;up();};
+      if(p.t==='show')e=h('div',{class:'say'},e,h('button',{class:'mini',onclick:()=>b.id&&openShow(b.id)},'去编辑 →'));
+    }else{e=h('input',{type:'text'});e.value=b[p.k]??'';e.oninput=()=>{b[p.k]=e.value;up();};}
+    F.append(field(p.n,e));
+  }
+  if(b.do!=='together'&&b.do!=='show'){
+    const t=h('input',{type:'number',min:'1',step:'1',style:'width:64px'});t.value=b.times||1;
+    const g=h('input',{type:'number',min:'0',step:'0.05',style:'width:64px'});g.value=b.gap??0;
+    t.oninput=()=>{const n=parseInt(t.value);if(n>1)b.times=n;else delete b.times;up();};
+    g.oninput=()=>{const n=parseFloat(g.value);if(n>0)b.gap=n;else delete b.gap;up();};
+    F.append(h('div',{class:'brep'},'重复 ',t,' 次，每次隔 ',g,' 秒',h('em',{},'文字里写 {i} 会换成第几次、{n} 换成总次数，比如「正在重新连接 {i}/5」')));
+  }
+  return F;
+}
+function keepPanel(){const p=$('#panel'),st=p.scrollTop;if(S.mode==='show'){renderLane();}renderPanel();p.scrollTop=st;}
+// 🏁 最后一块：按判定结算，或者结束对话（掉线 / 特殊胜利 / 强制下线 + 成就）
+function finBlock(c,v,ri,isOv,caught){
+  const box=h('div',{class:'fin'+(c.ending?' end':'')});
+  box.append(h('div',{class:'finhd'},h('span',{},'🏁 '+(c.ending?'结束对话':'按判定结算')),h('em',{},c.ending?'选中这张卡，对话就此结束':'结果由上面的判定决定，自动结算'),
+    isOv?null:h('button',{class:'mini',onclick:()=>{if(c.ending)delete c.ending;else c.ending={type:'drop',achievement:'',note:''};changed();keepPanel();}},c.ending?'改回按判定结算':'改成结束对话')));
+  box.append(outcomeNote(v,c,ri,caught));
+  if(c.ending&&!isOv){
+    box.append(h('div',{class:'row3',style:'margin-top:6px'},
+      field('怎么结束',sel(c.ending,'type',[['drop','掉线（不扣心、不判负）'],['win','特殊胜利'],['forced','强制下线（扣心）']],{onchange:keepPanel})),
+      field('成就',sel(c.ending,'achievement',[['','（无）'],...S.reg.achievements.map(x=>[x.id,x.name])])),
+      field('最后一条通知',txt(c.ending,'note',{ph:'如「xx 已掉线」'}))));
+  }
+  return box;
+}
+
+// ---------- 编辑器里的迷你预览：在小窗口里把积木按顺序播一遍 ----------
+let PVR=0;
+async function previewFx(list,title){
+  const ov=$('#fxpv');ov.classList.add('on');ov.querySelector('.pvt').textContent='预览 · '+title;
+  const box=ov.querySelector('.pvchat');box.replaceChildren();const my=++PVR;
+  await miniList(list,box,()=>my===PVR,0);
+  if(my===PVR)box.append(h('div',{class:'pvend'},'— 播完了 · 工位上的画面效果只用文字示意，真实效果点「在 Demo 里预览」—'));
+  box.scrollTop=box.scrollHeight;
+}
+async function miniList(list,box,alive,depth){
+  for(const b of list||[]){const n=Math.max(1,b.times|0);for(let i=1;i<=n;i++){if(!alive())return;await miniBlock(b,i,n,box,alive,depth);if(i<n&&b.gap)await sleep(b.gap*1000);}}
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function miniBlock(b,i,n,box,alive,depth){
+  const T=t=>(t||'').replace(/\{i\}/g,i).replace(/\{n\}/g,n),add=el=>{box.append(el);box.scrollTop=box.scrollHeight;return el;};
+  const d=BLK(b.do);
+  switch(b.do){
+    case 'notice':add(h('div',{class:'mnote '+(b.tone||'gray')},T(b.text)));await sleep(250);break;
+    case 'error':add(h('div',{class:'merr'},h('b',{},'!'),T(b.text)));await sleep(300);break;
+    case 'system':add(h('div',{class:'msys'},T(b.text)));await sleep(300);break;
+    case 'userSay':case 'aiSay':case 'leak':{
+      const el=add(h('div',{class:b.do==='userSay'?'mu':'ma'}));const t=T(b.text),step=b.do==='leak'?4:1,ms=b.do==='leak'?8:b.do==='userSay'?35:18;
+      for(let k=0;k<t.length;k+=step){if(!alive())return;el.textContent=t.slice(0,k+step);box.scrollTop=box.scrollHeight;await sleep(ms);}
+      await sleep(200);break;}
+    case 'glitch':case 'shake':box.classList.remove('glitch','shake');void box.offsetWidth;box.classList.add(b.do==='shake'?'shake':'glitch');add(h('div',{class:'mtag'},d.icon+' '+d.name+(b.level?'（'+optName(d,'level',b.level)+'）':'')));await sleep(350);break;
+    case 'dim':box.classList.add('dimmed');add(h('div',{class:'mtag'},`🌗 画面压暗 ${b.seconds??1} 秒`));await sleep((b.seconds??1)*1000);box.classList.remove('dimmed');break;
+    case 'screen':add(h('div',{class:'mtag'},'🖥 显示器切到「'+regName('screens',b.app)+'」'));await sleep(150);break;
+    case 'face':add(h('div',{class:'mtag'},'🐟 大肥鱼：'+optName(d,'pose',b.pose)));await sleep(200);break;
+    case 'sound':add(h('div',{class:'mtag'},'🔊 音效：'+optName(d,'id',b.id)));break;
+    case 'wait':await sleep((b.seconds??1)*1000);break;
+    case 'together':await Promise.all((b.steps||[]).map(x=>miniList([x],box,alive,depth)));break;
+    case 'show':{const sh=showOf(b.id);if(!sh){add(h('div',{class:'mtag'},'（找不到共享演出「'+b.id+'」）'));break;}if(depth>5)break;add(h('div',{class:'mtag show'},'▶ 共享演出「'+sh.name+'」'));await miniList(sh.steps,box,alive,depth+1);break;}
+    default:add(h('div',{class:'mtag'},'（不认识的积木：'+b.do+'）'));
+  }
+}
+
+// ---------- 演出库：左栏列出共享演出，点开在画布上编辑它的积木 ----------
+function renderShowSide(){
+  const box=$('#shows');if(!box)return;box.replaceChildren();
+  for(const sh of S.lib.shows)box.append(h('div',{class:'scene sh'+(S.mode==='show'&&S.showId===sh.id?' on':''),title:sh.desc||'',onclick:()=>openShow(sh.id)},h('span',{class:'o'},'▶'),sh.name));
+  box.append(h('div',{class:'scene sh',style:'color:var(--sky)',onclick:newShow},h('span',{class:'o'},'＋'),'新建演出'));
+}
+async function openShow(id){
+  if(!showOf(id))return toast('找不到这段演出');
+  S.mode='show';S.showId=id;S.openBlk=null;S.sel={kind:'show'};renderAll();panelIn();
+  V.x=0;V.y=0;V.z=1;applyView();
+}
+function backToScene(){S.mode='scene';S.sel=null;S.enter=true;renderAll();}
+async function newShow(){
+  const v=await ask('新建共享演出',[{key:'name',label:'名字',required:true,ph:'如「系统崩溃」',hint:'卡上引用时显示这个名字'},{key:'desc',label:'一句话说明',ph:'这段演出演的是什么（选填）'}]);
+  if(!v)return;const sh={id:uid('show-'),name:v.name,desc:v.desc||'',steps:[]};
+  S.lib.shows.push(sh);changed();openShow(sh.id);toast('已新建演出「'+v.name+'」，点「＋ 加一块积木」开始拼');
+}
+// 哪些卡 / 轮 / 场景引用了这段演出（只看当前打开的场景）
+function showRefs(id){
+  const refs=[],walk=(list,where)=>{for(const b of list||[]){if(b.do==='show'&&b.id===id)refs.push(where);if(b.steps)walk(b.steps,where);}};
+  walk(S.scene.opening,'场景开场');
+  S.scene.rounds.forEach((rd,ri)=>{walk(rd.startFx,`第 ${ri+1} 轮开头`);
+    for(const c of[...rd.cards,rd.confess,...rd.extras])if(c?.fx)for(const k in c.fx)walk(c.fx[k],`第 ${ri+1} 轮 · ${c.token||regAttr(c.attr)?.name}`);});
+  return[...new Set(refs)];
+}
+function renderShowCanvas(){
+  const lane=$('#laneIn');lane.replaceChildren();ISSUES=validate();renderValidBtn();
+  const sh=showOf(S.showId);if(!sh){backToScene();return;}
+  const refs=showRefs(sh.id);
+  const w=Math.max(300,Math.min(640,$('#lane').clientWidth-70));
+  lane.append(h('div',{class:'showed',style:`width:${w}px`},
+    h('div',{class:'shtop'},h('button',{class:'mini',onclick:backToScene},'← 回到场景'),h('span',{class:'t3'},'演出库 · 所有用户和场景共用')),
+    h('div',{class:'shname'},ed({...fieldIO(sh,'name'),label:'演出的名字',single:true,ph:'演出名字'})),
+    ed({...fieldIO(sh,'desc'),label:'一句话说明',ph:'这段演出演的是什么'}),
+    h('div',{class:'shbtns'},h('button',{class:'mini',onclick:()=>previewFx(sh.steps,sh.name)},'▶ 预览'),
+      h('button',{class:'mini',onclick:async()=>{await flush();window.open(`/prototype_夜间一轮/index.html?u=${encodeURIComponent(S.dir)}&show=${encodeURIComponent(sh.id)}`,'_blank');}},'▶ 在 Demo 里预览'),
+      h('button',{class:'mini danger',onclick:()=>{const i=S.lib.shows.indexOf(sh);S.lib.shows.splice(i,1);changed();backToScene();toast('已删除演出「'+sh.name+'」（Ctrl+Z 撤销）');}},'删除这段演出')),
+    h('div',{class:'shrefs'},refs.length?'当前场景里用到它的地方：'+refs.join('、'):'当前场景里还没有地方用它'),
+    h('div',{class:'clbl'},'按顺序往下播：'),
+    fxSlot(sh,'steps','这段演出',{big:true})));
+}
+function renderShowPanel(P){
+  P.append(h('div',{class:'hd'},h('div',{class:'ttl'},'积木说明'),h('div',{class:'sub'},'演出就是一块块积木按顺序往下播；点画布上的积木展开填内容'),h('div',{class:'tabs'},h('button',{class:'on'},'所有积木'))));
+  const F=h('div',{class:'form'});P.append(F);
+  F.append(h('div',{class:'note'},'· 每块积木都可以「重复 N 次」，文字里的 {i} 会换成第几次。\n· 想让几件事同时发生（比如故障 + 震惊 + 音效），用「同时进行」把它们包起来。\n· 演出只管画面上播什么；用户走没走、扣不扣心、拿什么成就，写在卡最后那块「🏁」上。'));
+  for(const c of[...new Set(S.reg.blocks.map(b=>b.cat))]){
+    F.append(h('div',{class:'ilv'},c));
+    for(const b of S.reg.blocks.filter(x=>x.cat===c))F.append(h('div',{class:'bdoc'},h('span',{class:'bic'},b.icon),h('div',{},h('b',{},b.name),h('div',{class:'note'},b.desc))));
+  }
+}
+
 function renderCardChat(P){
   const rd=curRound(),ri=S.sel.ri,c=curCard(),ra=regAttr(c.attr),slot=S.sel.slot,col=COL[c.attr];
   const isExtra=String(slot).startsWith('x'),isConfess=slot==='confess',term=rd.style==='terminal';
@@ -781,15 +1033,17 @@ function renderCardChat(P){
   P.append(h('div',{class:'hd'},
     h('div',{class:'ttl'},h('i',{style:`background:${col}`}),ra.name+' · '+(c.token||'（未命名）'),
       !isConfess?h('button',{class:'mini',style:'margin-left:auto;font-weight:normal',title:'删错了可以撤销',onclick:()=>delCard(ri,slot)},'删除这张卡'):null),
-    h('div',{class:'sub'},`第 ${ri+1} 轮 · `+(isConfess?'备用坦白位（解决卡全没学过时才上盘）':isExtra?'特殊卡':`候选 ${slot+1}`)+' · 下面就是玩家选中它之后看到的样子'),
+    h('div',{class:'sub'},`第 ${ri+1} 轮 · `+(isConfess?'备用坦白位（解决卡全没学过时才上盘）':isExtra?'特殊卡':`候选 ${slot+1}`)+' · 下面就是玩家选中它之后看到的样子，从上往下播'),
     h('div',{class:'tabs'},tabs.map(([k,n])=>h('button',{class:S.tab===k?'on':'',onclick:()=>{S.tab=k;renderPanel();}},n,has[k]?h('span',{class:'dotx',title:'已写'}):null)))));
   P.append(h('div',{id:'pHint'}));refreshHint();
   const isOv=S.tab!=='base';
   if(isOv&&!c[S.tab])c[S.tab]={};
   const o=isOv?c[S.tab]:c,inh=k=>isOv?c[k]:null,io=k=>fieldIO(o,k);
   const v={...c,...(isOv?o:{})};
+  const fx=c.fx||(c.fx={});
+  const slotAt=(key,label)=>isOv?null:fxSlot(fx,key,label);
   const F=h('div',{class:'chatwrap'});P.append(F);
-  if(isOv)F.append(h('div',{class:'note',style:'margin-bottom:8px'},(S.tab==='deep'?'学了深层之后，这张卡整体换成这一版。':'开放多样性还没学的时候，这张卡显示这一版（胡言乱语）。')+'灰字是沿用浅层的，点进去改了才算这一版自己的。'));
+  if(isOv)F.append(h('div',{class:'note',style:'margin-bottom:8px'},(S.tab==='deep'?'学了深层之后，这张卡整体换成这一版。':'开放多样性还没学的时候，这张卡显示这一版（胡言乱语）。')+'灰字是沿用浅层的，点进去改了才算这一版自己的。演出积木和最后的「🏁」跟浅层共用，在浅层页签里改。'));
   // 判定小标签
   const attrOpts=S.reg.attrs.filter(a=>isExtra?a.id==='special':!['confess','special'].includes(a.id)).map(a=>[a.id,a.name]);
   F.append(h('div',{class:'chips'},
@@ -802,8 +1056,8 @@ function renderCardChat(P){
   F.append(h('div',{class:'crow',style:`--ac:${col}`},
     ed({...io('token'),label:'方案词',inherit:inh('token'),single:true,cls:'tok inline',ph:'方案词'}),
     term?h('span',{class:'t3',style:'font-family:Consolas,monospace'},'Bash(…)'):ed({...io('preview'),label:'预览（≤7 字，透出语气）',inherit:inh('preview'),single:true,cls:'pv inline',ph:'预览…'})));
-  // 对话栏
-  F.append(h('div',{class:'clbl'},'② 对话栏（和游戏里一样：用户靠左，大肥鱼靠右）'));
+  // 对话栏：基本积木（思考、命令、正文、反应）固定顺序，演出积木插在它们之间，最后是 🏁
+  F.append(h('div',{class:'clbl'},'② 对话栏（和游戏里一样：用户靠左，大肥鱼靠右）· 灰色的「＋ 演出」是可以插演出积木的地方'));
   const chat=h('div',{class:'chat'});F.append(chat);
   const say=(ri>0&&rd.sayAfter?.liked)||rd.say;
   chat.append(h('div',{class:'urow'},h('div',{class:'ubub dim',title:'用户这一轮的台词，在列头那里改'},say?.text||'（这一轮还没写用户台词）')));
@@ -812,28 +1066,35 @@ function renderCardChat(P){
   ai.append(h('div',{class:'thk'},h('div',{class:'thhd'},h('span',{},'💭 思考'),h('em',{},'玩家看到的是灰色小字，播完自动折叠')),
     h('div',{class:'thline'},h('span',{class:'thpre',title:'思考链前半，在列头那里改'},rd.think||'（这一轮的思考链前半还没写）'),tk,
       ed({...io('thinkPost'),label:'思考链后半（紧接方案词往下说）',inherit:inh('thinkPost'),cls:'flow',ph:'点这里接着方案词往下写'}))));
+  ai.append(slotAt('afterThink','思考后半之后'));
   if(!term)ai.append(h('button',{class:'toolhint',title:'「运行了命令」卡只在终端样式的轮里出现（一般是代码求助）。这个开关在「一轮」上，点这里直接切',onclick:()=>{rd.style='terminal';changed();renderAll();toast(`第 ${ri+1} 轮已切成终端样式：每张卡的预览变成 Bash 命令`);}},'＋ 运行命令卡 · 这一轮是普通样式，点这里切成「终端」样式'));
-  if(term)ai.append(h('div',{class:'toolc'},h('div',{class:'tt'},'运行了命令 · Bash（也是转盘上展开后的代码）'),ed({...io('preview'),label:'Bash 预览',mono:true,inherit:inh('preview'),ph:'点这里写命令'})));
+  if(term){ai.append(h('div',{class:'toolc'},h('div',{class:'tt'},'运行了命令 · Bash（也是转盘上展开后的代码）'),ed({...io('preview'),label:'Bash 预览',mono:true,inherit:inh('preview'),ph:'点这里写命令'})));ai.append(slotAt('afterTool','运行命令之后'));}
   ai.append(h('div',{class:'aisep'}),h('div',{class:'rlbl'},h('span',{},'💬 正文'),h('em',{},'对话栏里大肥鱼的回答')),ed({...io('reply'),label:'正文',md:true,inherit:inh('reply'),cls:'reply',ph:'点这里写大肥鱼的回答'}));
   if(c.attachment)ai.append(h('img',{class:'attimg',src:`/剧本/${S.dir}/${c.attachment}`,alt:''}));
+  ai.append(slotAt('afterReply','正文之后'));
   // 用户反应
-  if(c.ending){chat.append(outcomeNote(v,c,ri));}
-  else if(v.result==='糊弄'){
-    const caught=S.caughtTab==='caught';
+  let caught=false;
+  if(c.ending){
+    chat.append(sayEd(o,'reaction',{label:'用户最后说的一句（选填）',inherit:inh('reaction'),ph:'结束对话的卡可以不写'}));
+  }else if(v.result==='糊弄'){
+    caught=S.caughtTab==='caught';
     chat.append(h('div',{class:'ctabs'},h('span',{},'用户的反应：'),
       h('button',{class:!caught?'on':'',onclick:()=>{S.caughtTab='ok';renderPanel();}},'没识破'),h('button',{class:caught?'on':'',onclick:()=>{S.caughtTab='caught';renderPanel();}},'被识破')));
-    chat.append(outcomeNote(v,c,ri,caught));
-    chat.append(caught?sayEd(o,'reactionCaught',{label:'被识破时用户骂的话（也是重问）',inherit:inh('reactionCaught')}):sayEd(o,'reaction',{label:'没识破时用户说的话',inherit:inh('reaction')}));
-    if(caught)chat.append(diagEd(o,inh,'被识破后大肥鱼的自白'));
+    if(caught){
+      if(!isOv)chat.append(h('div',{class:'diag'},h('span',{class:'dlbl'},'被识破的那一刻（不插积木就是默认的「愣一下 → 震惊 → 画面故障」）：'),slotAt('caught','被识破时')));
+      chat.append(sayEd(o,'reactionCaught',{label:'被识破时用户骂的话（也是重问）',inherit:inh('reactionCaught')}));
+      chat.append(diagEd(o,inh,'被识破后大肥鱼的自白'));
+    }else chat.append(sayEd(o,'reaction',{label:'没识破时用户说的话',inherit:inh('reaction')}));
   }else{
     const prog=progresses(v);
-    chat.append(outcomeNote(v,c,ri));
     chat.append(sayEd(o,'reaction',{label:prog?'用户的反应':'用户的反应（就是他的重问）',inherit:inh('reaction')}));
     if(costsPatience(v)||o.diagnosis)chat.append(diagEd(o,inh,prog?'下一轮大肥鱼开头先想的（诊断）':'重问时大肥鱼先想的（诊断）'));
   }
-  // 更多设置
+  if(!isOv)chat.append(h('div',{class:'diag'},slotAt('afterReaction','用户反应之后')));
+  chat.append(finBlock(c,v,ri,isOv,caught));
+  // 更多设置（不常用）
   if(!isOv&&!isConfess){
-    const more=h('details',{class:'more'},h('summary',{},'更多设置 ▸ 出现方式、分叉结局、附件'+(c.attr==='special'?'、异常前半':'')));
+    const more=h('details',{class:'more'},h('summary',{},'更多设置 ▸ 出现方式、附件'+(c.attr==='special'?'、异常前半':'')));
     if(S.moreOpen)more.open=true;more.ontoggle=()=>{S.moreOpen=more.open;};
     const box=h('div',{class:'box',style:'margin-top:8px'});more.append(box);
     const ap=c.appear||{mode:'normal'};
@@ -844,13 +1105,6 @@ function renderCardChat(P){
     else if(ap.mode==='condition')second=field('条件',sel(c.appear,'cond',S.reg.conditions.map(x=>[x.id,x.name]),{onchange:renderPanel}));
     box.append(h('div',{class:'row'},field('出现方式',mode),second));
     if(ap.mode==='condition'&&S.reg.conditions.find(x=>x.id===c.appear.cond)?.param==='number')box.append(field('条件里的 X',num(c.appear,'param',{step:1})));
-    const et=h('select',{});[['','无（回归主线）'],['drop','掉线（不扣心、不判负）'],['win','特殊胜利'],['forced','强制下线（扣心）']].forEach(([x,n])=>et.append(h('option',{value:x},n)));et.value=c.ending?.type||'';
-    et.onchange=()=>{if(!et.value)delete c.ending;else c.ending={show:'',achievement:'',note:'',...(c.ending||{}),type:et.value};changed();renderPanel();};
-    box.append(field('分叉结局',et,'选中后对话就此结束'));
-    if(c.ending){
-      box.append(h('div',{class:'row'},field('演出',sel(c.ending,'show',[['','（无）'],...S.reg.shows.map(x=>[x.id,x.name])])),field('成就',sel(c.ending,'achievement',[['','（无）'],...S.reg.achievements.map(x=>[x.id,x.name])]))));
-      box.append(field('结尾通知',txt(c.ending,'note',{ph:'对话栏里最后一条通知（选填）'})));
-    }
     const att=txt(c,'attachment',{ph:'图片或 SVG，相对用户文件夹（选填）'});
     box.append(field('附件',h('div',{class:'say'},att,h('button',{class:'mini',onclick:()=>pickFile('.png,.jpg,.svg',async f=>{c.attachment=await upload('附件/'+f.name,f);changed();renderPanel();toast('已上传到 剧本/'+S.dir+'/'+c.attachment);})},'上传…')),'渲染在正文下面'));
     if(c.attr==='special')box.append(mdField('异常前半',c,'abnormalThink',null,'刷出时替换本轮思考链前半（选填）'));
@@ -875,6 +1129,7 @@ function renderRoundChat(P){
   const tab=ri>0?(S.sayTab||'default'):'default';
   F.append(h('div',{class:'clbl'},'① 用户开口'));
   const chat=h('div',{class:'chat'});F.append(chat);
+  chat.append(h('div',{class:'diag',style:'align-self:stretch;width:auto'},fxSlot(rd,'startFx','一轮开头（用户开口之前）')));
   if(ri>0)chat.append(h('div',{class:'ctabs'},h('span',{},'上一轮用户：'),
     ...[['default','默认'],['liked','点了赞'],['disliked','点了踩']].map(([k,t])=>h('button',{class:tab===k?'on':'',onclick:()=>{S.sayTab=k;renderPanel();}},t,k!=='default'&&sa[k]?h('span',{class:'dotx'}):null))));
   if(tab==='default')chat.append(sayEd(rd,'say',{label:'用户这一轮的台词'}));
@@ -923,7 +1178,7 @@ function delRound(ri){animOut($(`.colhd[data-ri="${ri}"]`)?.parentElement,()=>de
 function delRoundNow(ri){S.scene.rounds.splice(ri,1);S.sel=null;changed();renderAll();toast(`已删除第 ${ri+1} 轮（Ctrl+Z 撤销）`);}
 function moveRound(ri,d){const a=S.scene.rounds;[a[ri],a[ri+d]]=[a[ri+d],a[ri]];S.sel={kind:'round',ri:ri+d};changed();renderAll();}
 
-function changed(){pushUndo();scheduleSave();renderTop();renderSide();renderLane();flashSel();refreshHint();}
+function changed(){pushUndo();scheduleSave();renderTop();renderSide();if(S.mode==='show'){ISSUES=validate();renderValidBtn();return;}renderLane();flashSel();refreshHint();}
 function flashSel(){const t=S.sel;if(!t)return;const el=t.kind==='card'?$(`.card[data-ri="${t.ri}"][data-slot="${t.slot}"]`):t.kind==='round'?$(`.colhd[data-ri="${t.ri}"]`):null;if(el)el.classList.add('flash');}
 function renderAll(){renderTop();renderSide();renderLane();renderPanel();}
 
@@ -941,13 +1196,23 @@ function validate(){
   if(!(sc.farewell?.solved?.text||u.farewell?.solved?.text))add('warn','没写「解决离开」的告别台词',SC);
   if(!(sc.farewell?.offline?.text||u.farewell?.offline?.text))add('warn','没写「下线恶评」',SC);
   if(!sc.rounds.length)add('err','主线一轮都没有',SC);
-  sc.opening.forEach((e,i)=>{if(!e.text)add('warn',`开场事件 ${i+1} 是空的`,SC);});
+  const TXTB=new Set(['notice','error','system','userSay','aiSay','leak']);
+  const checkFx=(list,where,T)=>{for(const b of list||[]){
+    const d=R.blocks.find(x=>x.id===b.do);if(!d){add('err',where+'：积木「'+(b.do||b.kind)+'」不在积木库里',T);continue;}
+    if(TXTB.has(b.do)&&!b.text)add('warn',where+'：「'+d.name+'」积木没写文字',T);
+    if(b.do==='show'&&!S.lib.shows.some(x=>x.id===b.id))add('err',where+'：引用的共享演出「'+b.id+'」不存在',T);
+    if(b.do==='screen'&&!has('screens',b.app))add('err',where+'：显示器应用「'+b.app+'」不在登记表里',T);
+    if(b.do==='together'){if(!b.steps?.length)add('warn',where+'：「同时进行」里面是空的',T);checkFx(b.steps,where,T);}
+  }};
+  checkFx(sc.opening,'场景开场',SC);
+  for(const sh of S.lib.shows){if(!sh.steps.length)add('info','演出库：「'+sh.name+'」里还没有积木',SC);checkFx(sh.steps,'演出库「'+sh.name+'」',SC);}
   sc.rounds.forEach((rd,ri)=>{
     const R0=`第 ${ri+1} 轮`,T={kind:'round',ri};
     if(!rd.say?.text)add('err',R0+'：用户台词是空的',T);
     if(!rd.think)add('warn',R0+'：思考链前半是空的',T);
     if(!rd.retryLead)add('warn',R0+'：没写重问引子（重问时接在诊断后面）',T);
     if(!rd.need)add('info',R0+'：没写需求句',T);
+    checkFx(rd.startFx,R0+' · 一轮开头',T);
     const solves=rd.cards.filter(c=>c.result==='解决').length;
     if(solves>2)add('err',R0+`：有 ${solves} 张解决卡，最多 2 张，否则玩家能靠排除法蒙对`,T);
     if(!solves)add('info',R0+'：没有解决卡，玩家只能糊弄或坦白',T);
@@ -975,6 +1240,7 @@ function validate(){
         for(const r of[v.reaction,v.reactionCaught])if(r&&!has('rhythms',r.rhythm))add('err',n+'：打字节奏「'+r.rhythm+'」不在登记表里',CT);
       };
       check(c,'');
+      for(const sl of R.fxSlots)checkFx(c.fx?.[sl.k],nm+' · '+sl.n,CT);
       if(c.attr==='open'){if(!c.lv0?.token)add('warn',nm+'：开放多样性卡没写 0 级乱码版',CT);else check({...c,...c.lv0},'（0 级版）');}
       if(filled(c.deep))check({...c,...c.deep},'（深层版）');
       if(c.attr==='special'){
@@ -982,7 +1248,7 @@ function validate(){
         if(!c.appear||c.appear.mode==='normal')add('warn',nm+'：特殊卡的出现方式应该是「彩蛋刷入」或「条件必出」',CT);
       }
       if(c.ending){
-        if(c.ending.show&&!has('shows',c.ending.show))add('err',nm+'：演出「'+c.ending.show+'」不在登记表里',CT);
+        if(c.ending.show)add('warn',nm+'：结局上还挂着旧格式的演出编号「'+c.ending.show+'」，改成在「正文之后」插一块「播放共享演出」',CT);
         if(c.ending.achievement&&!has('achievements',c.ending.achievement))add('err',nm+'：成就「'+c.ending.achievement+'」不在登记表里',CT);
       }
       if(c.appear?.mode==='condition'&&!has('conditions',c.appear.cond))add('err',nm+'：条件「'+c.appear.cond+'」不在登记表里',CT);
@@ -1022,9 +1288,10 @@ function focusTarget(t){
 // ---------- 简化试玩：手动指定命中哪张卡、识破与否 ----------
 let PT=null;
 const DMG={small:[20,30],big:[45,60]};
+function ptFx(list,label){if(list?.length)PT.log.push({k:'fx',t:`演出（${label}）：`+list.map(b=>(BLK(b.do)?.icon||'')+' '+(BLK(b.do)?.name||b.do)+' '+blockSummary(b)).join(' → ')});}
 function ptStart(){
   PT={ri:0,attempt:0,struck:new Set(),prog:0,patience:100,lo:100,hi:100,log:[],prev:null,prevDiag:null,firstTry:true,noOffend:true,damaged:false,eggOn:{},bluffs:0,done:null,pending:null};
-  for(const e of S.scene.opening)PT.log.push({k:'sys',t:'开场事件：'+(e.text||'（空）')});
+  ptFx(S.scene.opening,'场景开场');ptFx(S.scene.rounds[0]?.startFx,'一轮开头');
   ptUser(ptSayFor(0));ptThink();renderPlay();$('#play').classList.add('on');
 }
 const ptRound=()=>S.scene.rounds[PT.ri];
@@ -1050,10 +1317,12 @@ function ptBoard(){
 function ptPick(row,caught){
   const v=row.v,c=row.c,rd=ptRound(),N=S.scene.rounds.length,T=S.user.temper||1;
   PT.log.push({k:'pick',t:`选中「${v.token}」 · ${regAttr(c.attr).name} · ${v.result}${v.result!=='糊弄'&&v.feel?' · '+v.feel:''}${v.result==='糊弄'?(caught?' · 被识破':' · 没识破'):''}`});
-  PT.log.push({k:'ai',t:v.reply||'（空正文）'});
+  ptFx(c.fx?.afterThink,'思考后半之后');ptFx(c.fx?.afterTool,'运行命令之后');
+  PT.log.push({k:'ai',t:v.reply||'（空正文）'});ptFx(c.fx?.afterReply,'正文之后');
+  if(v.result==='糊弄'&&caught)ptFx(c.fx?.caught,'被识破时');
   if(c.ending){
     const e=c.ending,nm={drop:'掉线',win:'特殊胜利',forced:'强制下线'}[e.type];
-    PT.log.push({k:'end',t:`分叉结局：${nm}${e.show?' · 演出「'+regName('shows',e.show)+'」':''}${e.achievement?' · 成就「'+regName('achievements',e.achievement)+'」':''}${e.note?' · '+e.note:''}`});
+    PT.log.push({k:'end',t:`分叉结局：${nm}${e.achievement?' · 成就「'+regName('achievements',e.achievement)+'」':''}${e.note?' · '+e.note:''}`});
     PT.done=e.type==='win'?'特殊胜利':e.type==='forced'?'强制下线（扣 1 颗心）':'掉线（不扣心、不判负）';return renderPlay();
   }
   const hurt=([a,b])=>{PT.lo-=b*T;PT.hi-=a*T;PT.damaged=true;};
@@ -1073,7 +1342,7 @@ function ptPick(row,caught){
     PT.prog++;PT.prev=v.result==='解决'&&v.feel==='冒犯'?'disliked':'liked';PT.prevDiag=v.result==='解决'&&v.feel==='冒犯'?v.diagnosis:null;
     if(PT.prog>=N){PT.log.push({k:'user',who:S.user.name,t:(S.scene.farewell?.solved||S.user.farewell?.solved)?.text||'（没写解决离开的台词）'});
       PT.done='解决离开'+(PT.damaged?'':'（全程没扣耐心，额度 +2）');return renderPlay();}
-    PT.ri++;PT.attempt=0;PT.struck=new Set();ptUser(ptSayFor(PT.ri));ptThink();
+    PT.ri++;PT.attempt=0;PT.struck=new Set();ptFx(S.scene.rounds[PT.ri].startFx,'一轮开头');ptUser(ptSayFor(PT.ri));ptThink();
   }else{
     PT.firstTry=false;PT.struck.add(c.id);PT.attempt++;
     ptUser(line||{text:'（这张卡没写反应台词）'});ptThink(v.diagnosis);
@@ -1140,7 +1409,9 @@ addEventListener('keydown',e=>{if(e.key==='Escape')$('#play').classList.remove('
   sp.addEventListener("dblclick",()=>{setW(480);toast('右栏宽度已恢复');});
 })();
 
-new ResizeObserver(([e])=>$('#lane').classList.toggle('narrow',e.contentRect.width<620)).observe($('#lane'));
+new ResizeObserver(([e])=>{$('#lane').classList.toggle('narrow',e.contentRect.width<620);const sd=$('.showed');if(sd)sd.style.width=Math.max(300,Math.min(640,e.contentRect.width-70))+'px';}).observe($('#lane'));
+// 画布里的输入框获得焦点时，浏览器会偷偷滚动画布；把滚动换算成平移，内容就不会被挤出去
+$('#lane').addEventListener('scroll',()=>{const l=$('#lane');if(!l.scrollTop&&!l.scrollLeft)return;V.x-=l.scrollLeft;V.y-=l.scrollTop;l.scrollTop=0;l.scrollLeft=0;applyView();});
 
 // ---------- 动画 ----------
 const PREVP=new Map(),OFFS=new Map();   // 上一次画的命中率 / 上没上盘，用来做过渡
@@ -1177,6 +1448,8 @@ const TOUR=[
   {q:'#panel',t:'右边就是游戏里的样子',go:()=>{if(S.sel?.kind!=='card')select({kind:'card',ri:0,slot:0});},d:'这里显示玩家选中这张卡后在对话栏里看到的内容。鼠标移到哪句上就能改哪句，改完画布上的卡会闪一下。顶上的提示条告诉你这张卡还差什么。'},
   {q:'#panel .thk',t:'思考链要连成一句话',go:()=>{if(S.sel?.kind!=='card')select({kind:'card',ri:0,slot:0});},d:'游戏里思考链是「前半 + 方案词 + 后半」连着播出来的：前半以完整的句子结束，高亮的方案词是下一句的开头，后半接着把话说完。写完连起来读一遍，看通不通顺。'},
   {q:'#panel .ed.reply',t:'正文',d:'思考下面这段是大肥鱼真正回给用户的话，显示在对话栏里，支持加粗、列表、代码块。再往下是用户的反应和这张卡选中后的结果。'},
+  {q:'#panel .fxins',t:'插演出积木',go:()=>{if(S.mode==='show')backToScene();if(S.sel?.kind!=='card')select({kind:'card',ri:0,slot:0});},d:'对话里这些灰色的「＋ 演出」是可以插演出积木的地方：画面故障、通知、错误卡、大肥鱼换表情……点开选一块，插进去之后点它填内容。最下面那块「🏁」决定这张卡的结果：按判定结算，或者直接结束对话。'},
+  {q:'#shows',t:'演出库',d:'好几张卡都要用的一整段演出（比如删库跑路），存在这里，所有用户共用。在卡里插一块「播放共享演出」就能整段引用。'},
   {q:'#split',t:'右栏太窄？',d:'按住这根分隔条左右拖，可以调右栏的宽度；双击恢复。'},
   {q:'#ts',t:'玩家训练到什么程度',d:'切换不同玩家的训练进度，看他们夜里遇到的盘面：没学过的属性，卡会变灰；学到深层就换成深层版。'},
   {q:'#validB',t:'校验',d:'写完点这里，检查漏写和不合规的地方。有问题的卡会带红色 ! 或金色 ?。'},
@@ -1219,7 +1492,7 @@ function zoomAt(nz,cx,cy){nz=Math.min(2,Math.max(.3,nz));V.x=cx-(cx-V.x)*nz/V.z;
 (()=>{
   const lane=$('#lane');let drag=null;
   lane.addEventListener('pointerdown',e=>{
-    if(e.button!==0||e.target.closest('.card,.colhd,.empty,.addcol,.term,button,#legend,#zoom,#split,input,select'))return;
+    if(e.button!==0||e.target.closest('.card,.colhd,.empty,.addcol,.term,button,#legend,#zoom,#split,input,select,textarea,.showed'))return;
     drag={x:e.clientX-V.x,y:e.clientY-V.y,id:e.pointerId};lane.setPointerCapture(e.pointerId);lane.classList.add('drag');
   });
   lane.addEventListener('pointermove',e=>{if(!drag)return;V.x=e.clientX-drag.x;V.y=e.clientY-drag.y;applyView();});
@@ -1253,11 +1526,17 @@ addEventListener('keydown',e=>{if(e.key==='Escape')$('#help').classList.remove('
 
 // ---------- 存盘：停手半秒自动保存，只写真的变了的文件 ----------
 // 点开「深层」「0 级」标签页会先建一个空对象，没写内容就不存进文件
-const ser=o=>JSON.stringify(o,(k,v)=>(k==='deep'||k==='lv0')&&v&&typeof v==='object'&&!Object.keys(v).length?undefined:v,2)+'\n';
+const FXK=new Set(['afterThink','afterTool','afterReply','afterReaction','caught','startFx']);
+const ser=o=>JSON.stringify(o,(k,v)=>{
+  if((k==='deep'||k==='lv0')&&v&&typeof v==='object'&&!Object.keys(v).length)return undefined;
+  if(FXK.has(k)&&Array.isArray(v)&&!v.length)return undefined;
+  if(k==='fx'&&v&&typeof v==='object'){const e=Object.entries(v).filter(([,a])=>Array.isArray(a)&&a.length);return e.length?Object.fromEntries(e):undefined;}
+  return v;},2)+'\n';
 const SAVED={};            // 剧本内路径 → 最近一次和磁盘一致的内容
 let saveT=null,DRAG=null;
 const userPath=()=>`${S.dir}/用户.json`,scenePath=()=>`${S.dir}/${S.file}`;
-const docs=()=>S.scene?[[userPath(),S.user],[scenePath(),S.scene]]:[];
+const LIBP='_演出库.json';
+const docs=()=>[...(S.scene?[[userPath(),S.user],[scenePath(),S.scene]]:[]),...(S.lib?[[LIBP,S.lib]]:[])];
 const dirty=()=>docs().some(([p,o])=>ser(o)!==SAVED[p]);
 function setStatus(t,k){const e=$('#save');e.textContent=t;e.className='st '+k;}
 function scheduleSave(){setStatus('未保存','wait');clearTimeout(saveT);saveT=setTimeout(flush,500);}
@@ -1276,20 +1555,20 @@ addEventListener('beforeunload',e=>{if(saveT||dirty()){flush();e.preventDefault(
 
 // ---------- 撤销 / 重做：打字时 0.4 秒内的改动算一步 ----------
 let UNDO=[],UI=0,undoT=null;
-const snap=()=>({u:ser(S.user),s:ser(S.scene)});
+const snap=()=>({u:ser(S.user),s:ser(S.scene),l:ser(S.lib)});
 function updUndo(){$('#undoB').disabled=UI<=0&&!undoT;$('#redoB').disabled=UI>=UNDO.length-1;}
 function resetUndo(){UNDO=[snap()];UI=0;updUndo();}
 function pushUndo(){clearTimeout(undoT);undoT=setTimeout(pushUndoNow,400);updUndo();}
 function pushUndoNow(){
   clearTimeout(undoT);undoT=null;const s=snap(),c=UNDO[UI];
-  if(!c||c.u!==s.u||c.s!==s.s){UNDO.splice(UI+1);UNDO.push(s);if(UNDO.length>200)UNDO.shift();UI=UNDO.length-1;}
+  if(!c||c.u!==s.u||c.s!==s.s||c.l!==s.l){UNDO.splice(UI+1);UNDO.push(s);if(UNDO.length>200)UNDO.shift();UI=UNDO.length-1;}
   updUndo();
 }
 function setDocs(u,sc){S.user=u;S.list.find(x=>x.dir===S.dir).user=u;S.scene=sc;validSel();}
 function undo(d){
   pushUndoNow();const j=UI+d;
   if(j<0||j>=UNDO.length)return toast(d<0?'没有可以撤销的了':'没有可以重做的了');
-  UI=j;setDocs(JSON.parse(UNDO[j].u),JSON.parse(UNDO[j].s));renderAll();scheduleSave();updUndo();toast(d<0?'已撤销':'已重做');
+  UI=j;S.lib=JSON.parse(UNDO[j].l);S.openBlk=null;setDocs(JSON.parse(UNDO[j].u),JSON.parse(UNDO[j].s));renderAll();scheduleSave();updUndo();toast(d<0?'已撤销':'已重做');
 }
 $('#undoB').onclick=()=>undo(-1);$('#redoB').onclick=()=>undo(1);
 const editing=t=>t.closest('input,textarea,select,[contenteditable]');
@@ -1325,7 +1604,7 @@ try{
     if(t===SAVED[p])return;
     if(saveT||ser(doc[1])!==SAVED[p])return toast(`「${p}」在外部被改了，但这里有没保存的改动，以这里为准`);
     SAVED[p]=t;const o=JSON.parse(t);
-    if(p===userPath())setDocs(o,S.scene);else setDocs(S.user,o);
+    if(p===LIBP)S.lib=o;else if(p===userPath())setDocs(o,S.scene);else setDocs(S.user,o);
     pushUndoNow();renderAll();toast('已载入外部改动：'+p);
   };
 }catch{}
@@ -1392,11 +1671,12 @@ async function openScene(dir,file){
   S.dir=dir;S.file=file;S.user=entry.user;
   S.scene=await (await fetch(`/剧本/${dir}/${file}?t=${Date.now()}`)).json();
   SAVED[userPath()]=ser(S.user);SAVED[scenePath()]=ser(S.scene);
-  S.sel=null;resetUndo();setStatus('已保存','ok');S.enter=true;renderAll();
+  S.mode='scene';S.sel=null;resetUndo();setStatus('已保存','ok');S.enter=true;renderAll();
 }
 function openUser(dir){if(S.dir!==dir){const u=S.list.find(x=>x.dir===dir);return openScene(dir,u.scenes[0].file);}}
 (async()=>{
   S.reg=await (await fetch('/剧本/_登记表.json')).json();
+  try{S.lib=await (await fetch('/剧本/'+LIBP+'?t='+Date.now())).json();}catch{S.lib={shows:[]};}SAVED[LIBP]=ser(S.lib);
   S.list=await (await fetch('/api/list')).json();
   applyView();setPreset('day1');
   const u=S.list[0];if(!u)return toast('剧本/ 下还没有用户，点左下角新建');

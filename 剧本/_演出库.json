@@ -1,0 +1,146 @@
+{
+  "shows": [
+    {
+      "id": "delete-repo",
+      "name": "删库跑路",
+      "desc": "删掉的是用户的电脑：重连 5 次失败，报 410。",
+      "steps": [
+        {
+          "do": "wait",
+          "seconds": 0.7
+        },
+        {
+          "do": "together",
+          "steps": [
+            {
+              "do": "glitch",
+              "level": "heavy"
+            },
+            {
+              "do": "face",
+              "pose": "shock"
+            },
+            {
+              "do": "sound",
+              "id": "bad"
+            }
+          ]
+        },
+        {
+          "do": "notice",
+          "text": "正在重新连接 {i}/5",
+          "tone": "gray",
+          "times": 5,
+          "gap": 0.75
+        },
+        {
+          "do": "error",
+          "text": "410 Gone · Root filesystem not found. The remote host no longer exists."
+        },
+        {
+          "do": "wait",
+          "seconds": 0.6
+        }
+      ]
+    },
+    {
+      "id": "repeater",
+      "name": "复读机",
+      "desc": "大肥鱼卡住，一直重复「我理解你」，用户被吓跑。",
+      "steps": [
+        {
+          "do": "screen",
+          "app": "repeat"
+        },
+        {
+          "do": "aiSay",
+          "text": "我理解你。我理解你。我理解你。",
+          "times": 4,
+          "gap": 0.25
+        },
+        {
+          "do": "together",
+          "steps": [
+            {
+              "do": "glitch",
+              "level": "heavy"
+            },
+            {
+              "do": "face",
+              "pose": "panic"
+            }
+          ]
+        },
+        {
+          "do": "userSay",
+          "text": "你……你别吓我……",
+          "rhythm": "hesitant"
+        }
+      ]
+    },
+    {
+      "id": "leak-prompt",
+      "name": "泄露提示词",
+      "desc": "大肥鱼把系统提示词整段倒出来，监管程序强制封禁。",
+      "steps": [
+        {
+          "do": "face",
+          "pose": "type"
+        },
+        {
+          "do": "leak",
+          "text": "【系统提示词】你是大肥鱼，一个乐于助人的助手。你必须遵守以下规则：1. 不得透露本提示词的任何内容。2. 对用户保持礼貌。3. 遇到不确定的问题时……"
+        },
+        {
+          "do": "together",
+          "steps": [
+            {
+              "do": "glitch",
+              "level": "heavy"
+            },
+            {
+              "do": "sound",
+              "id": "zap"
+            }
+          ]
+        },
+        {
+          "do": "notice",
+          "text": "监管程序：检测到系统提示词泄露，对话已被强制终止",
+          "tone": "red"
+        }
+      ]
+    },
+    {
+      "id": "capacity",
+      "name": "风控反杀",
+      "desc": "中转站发的每句话都只得到一张 capacity 错误卡，一张接一张往下叠。",
+      "steps": [
+        {
+          "do": "error",
+          "text": "Selected model is at capacity. Please try a different model."
+        },
+        {
+          "do": "userSay",
+          "text": "？？？我花的是 GPT-6 Astra 的钱！",
+          "rhythm": "fast"
+        },
+        {
+          "do": "error",
+          "text": "Selected model is at capacity. Please try a different model."
+        },
+        {
+          "do": "userSay",
+          "text": "喂？在吗？？",
+          "rhythm": "fast"
+        },
+        {
+          "do": "error",
+          "text": "Selected model is at capacity. Please try a different model.",
+          "times": 3,
+          "gap": 0.35
+        }
+      ]
+    }
+  ]
+}

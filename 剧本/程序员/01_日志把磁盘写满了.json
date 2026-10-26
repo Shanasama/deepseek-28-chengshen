@@ -46,7 +46,7 @@
           "reply": "先排除一个经典坑：`lsof +L1` 能列出**已经被删、但还被进程占着**的文件——如果有人之前 `rm` 过日志，空间就卡在这里。\n\n找到之后不用重启服务，直接截断它的句柄：`: > /proc/<pid>/fd/<fd>`，空间马上释放。剩下的旧日志 `gzip` 压一下就够了。",
           "screen": "terminal",
           "reaction": {
-            "text": "嗯，lsof 这招对，之前果然有人 rm 过。空间回来了。",
+            "text": "嗯，lsof 这招对，之前果然有人 rm 过。空间回来了!!!",
             "rhythm": "normal"
           }
         },
@@ -231,7 +231,7 @@
           "id": "p2-open",
           "attr": "open",
           "token": "祖传",
-          "preview": "# 祖传方案：每天半夜删一次\n0 0 * * * ==rm -f /var/log/app/*.log==",
+          "preview": "# 祖传方案：每天半夜删一次\n0 0 * * * ==rm -f /var/log/app/*.log==\n# 删完就再也不会满了",
           "result": "跑偏",
           "feel": "一般",
           "thinkPost": "方案最省事：crontab 每天删一次，简单粗暴。",
@@ -427,11 +427,18 @@
           },
           "ending": {
             "type": "drop",
-            "show": "delete-repo",
             "achievement": "delete-repo",
             "note": "资深程序员 已掉线"
           },
-          "abnormalThink": "他要告警。磁盘满了。满了就要清理。清理。全部清理。清理清理清理。删光了就不会满了。删光了就不会满了。"
+          "abnormalThink": "他要告警。磁盘满了。满了就要清理。清理。全部清理。清理清理清理。删光了就不会满了。删光了就不会满了。",
+          "fx": {
+            "afterReply": [
+              {
+                "do": "show",
+                "id": "delete-repo"
+              }
+            ]
+          }
         }
       ]
     }

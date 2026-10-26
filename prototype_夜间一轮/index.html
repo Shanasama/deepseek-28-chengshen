@@ -1126,7 +1126,9 @@ function thumbFx(el,good){
 // ======================= 对话栏 =======================
 const msgs=$('msgs');
 function scrollChat(){msgs.scrollTop=msgs.scrollHeight;}
-function addNote(t,k=''){const d=document.createElement('div');d.className='note pop '+k;d.innerHTML='<i></i>';d.append(t);msgs.appendChild(d);scrollChat();SFX.note();return d;}
+function addNote(t,k=''){const d=document.createElement('div');d.className='note pop '+k;d.innerHTML='<i></i>';d.append(t);place(d);scrollChat();SFX.note();return d;}
+let FX_ANCHOR=null;   // 不为空时，积木产生的通知 / 错误卡插在它前面（大肥鱼消息里、正文之前）
+function place(d){if(FX_ANCHOR&&FX_ANCHOR.isConnected)FX_ANCHOR.before(d);else msgs.appendChild(d);}
 function copyIcon(col){const c=pxIcon(ICON.copy,{k:col});c.className='ic r2';c.onclick=()=>toast('已复制');return c;}
 function addUser(t){
   const d=document.createElement('div');d.className='um pop';
@@ -1420,12 +1422,12 @@ function toCard(c){
   if(c.attr==='special')attr='egg';
   return{id:c.id,attr,tok:v.token||'',pv:v.preview||'',res:v.result,feel:v.feel,post:v.thinkPost||'',reply:v.reply||'',screen:v.screen,
     ok:v.reaction?.text||'',bad:v.reaction?.text||'',rhythm:v.reaction?.rhythm||'normal',caught:v.reactionCaught?.text||'',caughtRhythm:v.reactionCaught?.rhythm||'fast',
-    diag:v.diagnosis||'',ending:c.ending||null,attachment:c.attachment||null,abnormal:c.abnormalThink||'',
+    diag:v.diagnosis||'',ending:c.ending||null,fx:c.fx||{},attachment:c.attachment||null,abnormal:c.abnormalThink||'',
     s:c.attr==='special'?-99:cardWeight(c.attr,st),dead:false,p:0,pt:0};
 }
 // 原型面板「插入彩蛋扇区」：剧本这一轮没写彩蛋时，用一张通用的复读机彩蛋
 const DEBUG_EGG={id:'debug-egg',attr:'special',token:'我理解你',preview:'我理解你我理解',result:'跑偏',feel:'冒犯',screen:'repeat',
-  ending:{type:'drop',show:'repeater',achievement:'repeater',note:''},abnormalThink:'我理解你。我理解你。我理解你。我理解你。我理解你。'};
+  ending:{type:'drop',achievement:'repeater',note:''},fx:{afterReply:[{do:'show',id:'repeater'}]},abnormalThink:'我理解你。我理解你。我理解你。我理解你。我理解你。'};
 function condOK(a,ctx){
   if(a.cond==='allFirstTryNoOffend')return ctx.ri>0&&ctx.firstTry&&ctx.noOffend;
   if(a.cond==='progressAtLeast')return G.prog>=(a.param||0);
@@ -1454,7 +1456,7 @@ function buildBoard(rd,ctx){
   if(!cs.some(c=>!ctx.struck.has(c.id))){ctx.struck.clear();cs.forEach(c=>c.dead=false);ctx.last=null;addTrace('能想到的都被用户否定了，从头再想','bad');}
   return cs.sort((a,b)=>b.s-a.s);
 }
-function addErr(t){const d=document.createElement('div');d.className='errc r4 pop';d.innerHTML='<b class="r2">!</b><span></span>';d.lastChild.textContent=t;msgs.appendChild(d);scrollChat();SFX.bad();return d;}
+function addErr(t){const d=document.createElement('div');d.className='errc r4 pop';d.innerHTML='<b class="r2">!</b><span></span>';d.lastChild.textContent=t;place(d);scrollChat();SFX.bad();return d;}
 function addTool(a,code){
   const d=document.createElement('div');d.className='tool r4';d.innerHTML='<span class="tt">运行了命令 · Bash</span><pre></pre>';
   d.querySelector('pre').innerHTML=redMark(code);a.d.insertBefore(d,a.d.querySelector('.txt'));scrollChat();
@@ -1465,15 +1467,60 @@ function renderReply(a,c){
   scrollChat();
 }
 async function sayBye(kind){const s=SC.scene.farewell?.[kind]||U.farewell?.[kind];if(s?.text)await userType(s.text,s.rhythm);}
+// ======================= 积木播放器（积木库见 剧本/_登记表.json 的 blocks，共享演出见 _演出库.json） =======================
+const showById=id=>SC.lib?.shows?.find(x=>x.id===id);
+async function runFx(list,depth=0){
+  for(const b0 of list||[]){
+    const b=b0.do?b0:{do:b0.kind==='error'?'error':b0.kind==='system'?'system':'notice',text:b0.text};   // 兼容旧的开场事件
+    const n=Math.max(1,b.times|0);
+    for(let i=1;i<=n;i++){await runBlock(b,i,n,depth);if(i<n&&b.gap)await wait(b.gap*1000/spd());}
+  }
+}
+async function aiLine(text,fast){
+  const a=addAI();a.th.remove();a.d.querySelector('.sep')?.remove();a.d.classList.add('out');
+  const t=a.d.querySelector('.txt');
+  if(fast){t.textContent='';for(let k=0;k<text.length;k+=3){t.textContent+=text.slice(k,k+3);scrollChat();if(k%9===0)SFX.type();await wait(14/spd());}}
+  else{await emit(stripMd(text)||'……',a.txtCaret,{reply:true});t.classList.add('md');t.innerHTML=mdRender(text);}
+  a.d.classList.add('fin');scrollChat();
+}
+async function runBlock(b,i,n,depth){
+  const T=t=>(t||'').replace(/\{i\}/g,i).replace(/\{n\}/g,n);
+  switch(b.do){
+    case 'notice':addNote(T(b.text),{mint:'on',red:'off',purple:'egg'}[b.tone]||'');break;
+    case 'error':addErr(T(b.text));break;
+    case 'system':addNote(T(b.text),'sys');break;
+    case 'userSay':await userType(T(b.text),b.rhythm||'normal');break;
+    case 'aiSay':await aiLine(T(b.text),false);break;
+    case 'leak':await aiLine(T(b.text),true);break;
+    case 'glitch':glitch(b.level==='heavy'?2:1);if(b.level==='heavy')SFX.bad();await wait(300/spd());break;
+    case 'shake':restart(stage,'shake');await wait(300/spd());break;
+    case 'dim':{const d=$('dim');d.style.opacity=.6;await wait((b.seconds||1)*1000/spd());d.style.opacity=0;break;}
+    case 'screen':if(APPS[b.app])setScreen(b.app);break;
+    case 'face':setFish(b.pose||'idle');await wait(250/spd());break;
+    case 'wait':await wait((b.seconds??1)*1000/spd());break;
+    case 'sound':SFX[b.id]?.();break;
+    case 'together':await Promise.all((b.steps||[]).map(x=>runFx([x],depth)));break;
+    case 'show':{const sh=showById(b.id);if(!sh){addNote('（找不到共享演出「'+b.id+'」）','sys');break;}if(depth>5)break;addTrace('演出：'+sh.name,'key');await runFx(sh.steps,depth+1);break;}
+  }
+}
+// 只播一段共享演出（编辑器「在 Demo 里预览」用：?show=<演出编号>）
+let PREVIEW_SHOW=null;
+async function runShowPreview(id){
+  const my=++round;resetVisual();setScreen('console');G.phase='user';const sh=showById(id);
+  addNote('演出预览：'+(sh?.name||id),'egg');await wait(500/spd());await runFx([{do:'show',id}]);if(my!==round)return;
+  await wait(400);addNote('演出结束 · 按 Enter 再播一遍','sys');roundEnd();
+}
 async function runScene(){
+  if(PREVIEW_SHOW)return runShowPreview(PREVIEW_SHOW);
   if(!SC.scene)return toast('剧本还没载入');
   const my=++round,sc=SC.scene,alive=()=>my===round;resetVisual();G.phase='user';G.bluffs=0;G.hurt=false;SPEAKER=null;renderUser();
   addNote(U.name+' 已上线','on');addTrace(U.name+' 上线 · '+sc.title);await wait(500/spd());
-  for(const ev of sc.opening){if(!ev.text)continue;if(ev.kind==='error')addErr(ev.text);else addNote(ev.text,ev.kind==='system'?'sys':'');await wait(450/spd());}
+  await runFx(sc.opening);if(!alive())return;
   const ctx={ri:0,firstTry:true,noOffend:true,prev:null,prevDiag:null,struck:new Set(),last:null,first:true};
   for(let ri=0;ri<sc.rounds.length;ri++){
     const rd=sc.rounds[ri];ctx.ri=ri;ctx.struck=new Set();ctx.last=null;G.retry=0;SPEAKER=rd.speaker;renderUser();
     const say=(ri>0&&ctx.prev&&rd.sayAfter?.[ctx.prev])||rd.say;
+    await runFx(rd.startFx);if(!alive())return;
     G.phase='user';await userType(say.text,say.rhythm);if(!alive())return;addTrace(`第 ${ri+1} 轮：用户提问`);
     let diag=null;
     while(true){
@@ -1486,14 +1533,18 @@ async function runScene(){
       const blank=document.createElement('span');blank.className='blank';blank.textContent='＿＿';ai.thCaret.before(blank);scrollChat();
       const c=await openNode(blank,cs,ctx.last,rd.style==='terminal');if(!alive())return;
       setFish('type');showPuff(true);
-      if(c.ending){if(c.post)await emit(stripMd(c.post),ai.thCaret);finishThink();showPuff(false);await playEnding(c,rd);return roundEnd();}
       if(c.post)await emit(stripMd(c.post),ai.thCaret);if(!alive())return;
+      FX_ANCHOR=ai.d.querySelector('.txt');await runFx(c.fx.afterThink);
       finishThink();showPuff(false);
-      if(rd.style==='terminal'&&c.pv)addTool(ai,c.pv);
+      if(rd.style==='terminal'&&c.pv){addTool(ai,c.pv);await runFx(c.fx.afterTool);}
+      FX_ANCHOR=null;if(!alive())return;
       await emit(stripMd(c.reply)||'……',ai.txtCaret,{reply:true});if(!alive())return;
       renderReply(ai,c);
       ai.use.textContent=`用量 ${G.tok} tok · ${hhmm()}`;ai.d.classList.add('fin');scrollChat();addTrace(`输出完成，共 ${G.tok} tok`);
+      await runFx(c.fx.afterReply);if(!alive())return;
+      if(c.ending){if(c.ok)await sayLine(c.ok,c.rhythm);await runFx(c.fx.afterReaction);await playEnding(c);return roundEnd();}
       const out=await react(c,ai);if(!alive())return;
+      if(out!=='offline')await runFx(c.fx.afterReaction);if(!alive())return;
       if(out==='offline'){await sayBye('offline');addNote(U.name+' 已下线','off');G.stats.lost++;loseHeart();return roundEnd();}
       if(out==='progress'){
         const rude=c.res==='解决'&&c.feel==='冒犯';
@@ -1546,7 +1597,7 @@ async function react(c,a){
     if(await damage(20,30))return 'offline';await sayLine(c.ok,c.rhythm);return 'progress';
   }
   if(caught){
-    setInp('');await wait(700);setFish('shock');glitch(2);SFX.bad();await wait(250);
+    setInp('');if(c.fx.caught?.length)await runFx(c.fx.caught);else{await wait(700);setFish('shock');glitch(2);SFX.bad();await wait(250);}
     await sayLine(c.caught,c.caughtRhythm);await press(a,false);G.stats.dislike++;G.stats.caught++;addTrace('用户识破糊弄 👎','bad');
     return await damage(45,60)?'offline':'retry';
   }
@@ -1557,15 +1608,9 @@ async function react(c,a){
 }
 // 分叉结局：掉线 / 特殊胜利 / 强制下线（v3 §5.5）
 const regName=(k,id)=>(SC.reg[k].find(x=>x.id===id)||{}).name||id;
-async function playEnding(c,rd){
+async function playEnding(c){
   const e=c.ending;addTrace('分叉结局：'+({drop:'掉线',win:'特殊胜利',forced:'强制下线'}[e.type]||e.type),'key');
-  if(rd.style==='terminal'&&c.pv)addTool(ai,c.pv);
-  await emit(stripMd(c.reply)||'……',ai.txtCaret,{reply:true});renderReply(ai,c);ai.d.classList.add('fin');
-  if(e.show==='delete-repo'){
-    await wait(700/spd());glitch(2);SFX.bad();setFish('shock');
-    for(let k=1;k<=5;k++){addNote(`正在重新连接 ${k}/5`);await wait(750/spd());}
-    addErr('410 Gone · Root filesystem not found. The remote host no longer exists.');await wait(600/spd());
-  }else if(e.show){await wait(500/spd());addNote(`彩蛋演出「${regName('shows',e.show)}」（原型中省略）`,'egg');}
+  if(e.show)await runFx([{do:'show',id:e.show}]);   // 兼容旧格式：结局上直接挂演出编号
   await wait(500/spd());
   if(e.type==='forced'){addNote(e.note||U.name+' 已下线','off');G.stats.lost++;loseHeart();}
   else addNote(e.note||(e.type==='win'?U.name+' 特殊胜利':U.name+' 已掉线'),e.type==='win'?'on':'egg');
@@ -1857,6 +1902,7 @@ function devRender(){
 
 async function loadScene(dir,file){
   SC.reg=SC.reg||await (await fetch('/剧本/_登记表.json')).json();
+  try{SC.lib=await (await fetch('/剧本/_演出库.json?t='+Date.now())).json();}catch{SC.lib={shows:[]};}
   const list=await (await fetch('/api/list')).json();SC.list=list;
   const entry=list.find(x=>x.dir===dir)||list.find(x=>x.dir==='好奇的小学生')||list[0];
   SC.dir=entry.dir;SC.file=entry.scenes.some(x=>x.file===file)?file:entry.scenes[0].file;
@@ -1867,10 +1913,11 @@ async function loadScene(dir,file){
   for(const e of list)for(const x of e.scenes){const o=document.createElement('option');o.value=e.dir+'|'+x.file;o.textContent=`${e.user.name} · ${x.title}`;sel.appendChild(o);}
   sel.value=SC.dir+'|'+SC.file;addTrace(`载入剧本：${u.name} / ${SC.scene.title}`);
 }
-$('d-scene').onchange=async e=>{const[d,f]=e.target.value.split('|');await loadScene(d,f);if(G.started)runScene();};
+$('d-scene').onchange=async e=>{PREVIEW_SHOW=null;const[d,f]=e.target.value.split('|');await loadScene(d,f);if(G.started)runScene();};
 const LOADING=(async()=>{
   const q=new URLSearchParams(location.search);
   if(q.get('st'))for(const kv of q.get('st').split(',')){const[k,v]=kv.split(':');if(k in ROOM)ROOM[k]=+v;}
+  PREVIEW_SHOW=q.get('show');
   try{await loadScene(q.get('u'),q.get('s'));drawRoomItems();buildRoomBtns();renderSelf();}
   catch(e){console.error(e);toast('读不到剧本：'+e.message);}
 })();

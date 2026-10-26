@@ -1,0 +1,3 @@
+interface:
+  display_name: "写大肥鱼剧本"
+  short_description: "按写作规则写或改用户剧本 JSON（含演出积木）"

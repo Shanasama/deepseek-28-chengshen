@@ -1,53 +1,526 @@
 {
   "attrs": [
-    { "id": "formal",     "name": "正式模板",   "weight": 2.0,  "defaultScreen": "doc" },
-    { "id": "intuition",  "name": "基础直觉",   "weight": 1.8,  "defaultScreen": "notepad", "always": true },
-    { "id": "knowledge",  "name": "知识覆盖",   "weight": 1.6,  "defaultScreen": "wiki" },
-    { "id": "colloquial", "name": "口语活力",   "weight": 1.5,  "defaultScreen": "chat" },
-    { "id": "logic",      "name": "结构逻辑",   "weight": 1.4,  "defaultScreen": "ide" },
-    { "id": "narrative",  "name": "叙事修辞",   "weight": 1.3,  "defaultScreen": "novel" },
-    { "id": "open",       "name": "开放多样性", "weight": 1.2,  "defaultScreen": "danmaku", "always": true, "lv0Weight": 1.1, "lv0Screen": "noise" },
-    { "id": "confess",    "name": "坦白",       "weight": 1.15, "defaultScreen": "notepad" },
-    { "id": "special",    "name": "特殊",       "weight": 0,    "defaultScreen": "repeat" }
+    {
+      "id": "formal",
+      "name": "正式模板",
+      "weight": 2,
+      "defaultScreen": "doc"
+    },
+    {
+      "id": "intuition",
+      "name": "基础直觉",
+      "weight": 1.8,
+      "defaultScreen": "notepad",
+      "always": true
+    },
+    {
+      "id": "knowledge",
+      "name": "知识覆盖",
+      "weight": 1.6,
+      "defaultScreen": "wiki"
+    },
+    {
+      "id": "colloquial",
+      "name": "口语活力",
+      "weight": 1.5,
+      "defaultScreen": "chat"
+    },
+    {
+      "id": "logic",
+      "name": "结构逻辑",
+      "weight": 1.4,
+      "defaultScreen": "ide"
+    },
+    {
+      "id": "narrative",
+      "name": "叙事修辞",
+      "weight": 1.3,
+      "defaultScreen": "novel"
+    },
+    {
+      "id": "open",
+      "name": "开放多样性",
+      "weight": 1.2,
+      "defaultScreen": "danmaku",
+      "always": true,
+      "lv0Weight": 1.1,
+      "lv0Screen": "noise"
+    },
+    {
+      "id": "confess",
+      "name": "坦白",
+      "weight": 1.15,
+      "defaultScreen": "notepad"
+    },
+    {
+      "id": "special",
+      "name": "特殊",
+      "weight": 0,
+      "defaultScreen": "repeat"
+    }
   ],
   "deepBonus": 0.35,
   "trainingPresets": [
-    { "id": "day1",     "name": "第 1 天开局", "stages": { "formal": 1, "colloquial": 1, "knowledge": 0, "logic": 0, "narrative": 0, "open": 0 } },
-    { "id": "shallow",  "name": "全浅层",      "stages": { "formal": 1, "colloquial": 1, "knowledge": 1, "logic": 1, "narrative": 1, "open": 1 } },
-    { "id": "deep",     "name": "全深层",      "stages": { "formal": 2, "colloquial": 2, "knowledge": 2, "logic": 2, "narrative": 2, "open": 2 } }
+    {
+      "id": "day1",
+      "name": "第 1 天开局",
+      "stages": {
+        "formal": 1,
+        "colloquial": 1,
+        "knowledge": 0,
+        "logic": 0,
+        "narrative": 0,
+        "open": 0
+      }
+    },
+    {
+      "id": "shallow",
+      "name": "全浅层",
+      "stages": {
+        "formal": 1,
+        "colloquial": 1,
+        "knowledge": 1,
+        "logic": 1,
+        "narrative": 1,
+        "open": 1
+      }
+    },
+    {
+      "id": "deep",
+      "name": "全深层",
+      "stages": {
+        "formal": 2,
+        "colloquial": 2,
+        "knowledge": 2,
+        "logic": 2,
+        "narrative": 2,
+        "open": 2
+      }
+    }
   ],
   "screens": [
-    { "id": "wiki",     "name": "百科" },
-    { "id": "chat",     "name": "聊天软件" },
-    { "id": "novel",    "name": "写作" },
-    { "id": "ide",      "name": "IDE" },
-    { "id": "doc",      "name": "公文" },
-    { "id": "noise",    "name": "花屏" },
-    { "id": "danmaku",  "name": "弹幕视频" },
-    { "id": "notepad",  "name": "记事本" },
-    { "id": "terminal", "name": "终端" },
-    { "id": "repeat",   "name": "复读（卡死）" }
-  ],
-  "shows": [
-    { "id": "delete-repo", "name": "删库跑路：重连 1/5…5/5 后报 410" },
-    { "id": "repeater",    "name": "复读机：思考链和正文无限重复" },
-    { "id": "leak-prompt", "name": "泄露提示词：自动倒出系统提示词，监管程序封禁" },
-    { "id": "capacity",    "name": "风控反杀：每句都回 capacity 错误卡" }
+    {
+      "id": "wiki",
+      "name": "百科"
+    },
+    {
+      "id": "chat",
+      "name": "聊天软件"
+    },
+    {
+      "id": "novel",
+      "name": "写作"
+    },
+    {
+      "id": "ide",
+      "name": "IDE"
+    },
+    {
+      "id": "doc",
+      "name": "公文"
+    },
+    {
+      "id": "noise",
+      "name": "花屏"
+    },
+    {
+      "id": "danmaku",
+      "name": "弹幕视频"
+    },
+    {
+      "id": "notepad",
+      "name": "记事本"
+    },
+    {
+      "id": "terminal",
+      "name": "终端"
+    },
+    {
+      "id": "repeat",
+      "name": "复读（卡死）"
+    }
   ],
   "achievements": [
-    { "id": "delete-repo", "name": "删库跑路" },
-    { "id": "repeater",    "name": "复读机" },
-    { "id": "leak-prompt", "name": "泄露提示词" },
-    { "id": "capacity",    "name": "Capacity 风控反杀" }
+    {
+      "id": "delete-repo",
+      "name": "删库跑路"
+    },
+    {
+      "id": "repeater",
+      "name": "复读机"
+    },
+    {
+      "id": "leak-prompt",
+      "name": "泄露提示词"
+    },
+    {
+      "id": "capacity",
+      "name": "Capacity 风控反杀"
+    }
   ],
   "conditions": [
-    { "id": "allFirstTryNoOffend", "name": "此前各轮均一次推进且无冒犯" },
-    { "id": "progressAtLeast",     "name": "推进已达 X", "param": "number" }
+    {
+      "id": "allFirstTryNoOffend",
+      "name": "此前各轮均一次推进且无冒犯"
+    },
+    {
+      "id": "progressAtLeast",
+      "name": "推进已达 X",
+      "param": "number"
+    }
   ],
   "rhythms": [
-    { "id": "normal",   "name": "正常" },
-    { "id": "fast",     "name": "飞快" },
-    { "id": "hesitant", "name": "打了又删" },
-    { "id": "paste",    "name": "整段粘贴" }
+    {
+      "id": "normal",
+      "name": "正常"
+    },
+    {
+      "id": "fast",
+      "name": "飞快"
+    },
+    {
+      "id": "hesitant",
+      "name": "打了又删"
+    },
+    {
+      "id": "paste",
+      "name": "整段粘贴"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "notice",
+      "name": "通知行",
+      "icon": "🔔",
+      "cat": "对话栏",
+      "desc": "对话栏中间的一行状态，比如「正在重新连接 3/5」「xx 已上线」。",
+      "params": [
+        {
+          "k": "text",
+          "n": "文字",
+          "t": "text"
+        },
+        {
+          "k": "tone",
+          "n": "颜色",
+          "t": "select",
+          "opts": [
+            [
+              "gray",
+              "灰 · 普通"
+            ],
+            [
+              "mint",
+              "绿 · 好事"
+            ],
+            [
+              "red",
+              "红 · 出事"
+            ],
+            [
+              "purple",
+              "紫 · 彩蛋"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "error",
+      "name": "错误卡",
+      "icon": "⛔",
+      "cat": "对话栏",
+      "desc": "红色的报错卡片，照 Codex 原版样式，一般写英文报错。",
+      "params": [
+        {
+          "k": "text",
+          "n": "报错文字",
+          "t": "area"
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "name": "系统消息",
+      "icon": "🖥️",
+      "cat": "对话栏",
+      "desc": "灰色的系统提示，比如提示词注入、监管程序的话。",
+      "params": [
+        {
+          "k": "text",
+          "n": "文字",
+          "t": "area"
+        }
+      ]
+    },
+    {
+      "id": "userSay",
+      "name": "用户说一句",
+      "icon": "👤",
+      "cat": "对话栏",
+      "desc": "用户在输入框里打字、发出一句话。",
+      "params": [
+        {
+          "k": "text",
+          "n": "台词",
+          "t": "area"
+        },
+        {
+          "k": "rhythm",
+          "n": "打字节奏",
+          "t": "rhythm"
+        }
+      ]
+    },
+    {
+      "id": "aiSay",
+      "name": "大肥鱼说一句",
+      "icon": "🐟",
+      "cat": "对话栏",
+      "desc": "大肥鱼额外回一条消息（不带思考）。配合「重复次数」就是复读机。",
+      "params": [
+        {
+          "k": "text",
+          "n": "内容",
+          "t": "area"
+        }
+      ]
+    },
+    {
+      "id": "leak",
+      "name": "往外倒文字",
+      "icon": "📜",
+      "cat": "对话栏",
+      "desc": "大肥鱼不受控制地飞快往外倒一大段文字，泄露提示词用。",
+      "params": [
+        {
+          "k": "text",
+          "n": "倒出来的内容",
+          "t": "area"
+        }
+      ]
+    },
+    {
+      "id": "glitch",
+      "name": "画面故障",
+      "icon": "⚡",
+      "cat": "画面",
+      "desc": "整个画面闪一下、错位。",
+      "params": [
+        {
+          "k": "level",
+          "n": "强度",
+          "t": "select",
+          "opts": [
+            [
+              "light",
+              "轻"
+            ],
+            [
+              "heavy",
+              "重"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shake",
+      "name": "震屏",
+      "icon": "📳",
+      "cat": "画面",
+      "desc": "整个窗口抖一下。",
+      "params": []
+    },
+    {
+      "id": "dim",
+      "name": "画面压暗",
+      "icon": "🌗",
+      "cat": "画面",
+      "desc": "画面暗下来一会儿，制造紧张感。",
+      "params": [
+        {
+          "k": "seconds",
+          "n": "持续秒数",
+          "t": "number"
+        }
+      ]
+    },
+    {
+      "id": "screen",
+      "name": "显示器换应用",
+      "icon": "🖥",
+      "cat": "画面",
+      "desc": "工位上的显示器切到某个应用。",
+      "params": [
+        {
+          "k": "app",
+          "n": "应用",
+          "t": "screen"
+        }
+      ]
+    },
+    {
+      "id": "face",
+      "name": "大肥鱼换表情",
+      "icon": "🙂",
+      "cat": "大肥鱼",
+      "desc": "大肥鱼做一个反应动作。",
+      "params": [
+        {
+          "k": "pose",
+          "n": "表情",
+          "t": "select",
+          "opts": [
+            [
+              "happy",
+              "开心"
+            ],
+            [
+              "panic",
+              "慌张"
+            ],
+            [
+              "shock",
+              "震惊"
+            ],
+            [
+              "think",
+              "思考"
+            ],
+            [
+              "type",
+              "打字"
+            ],
+            [
+              "idle",
+              "发呆"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wait",
+      "name": "等待",
+      "icon": "⏱️",
+      "cat": "流程",
+      "desc": "停顿一下再往下播。",
+      "params": [
+        {
+          "k": "seconds",
+          "n": "秒数",
+          "t": "number"
+        }
+      ]
+    },
+    {
+      "id": "together",
+      "name": "同时进行",
+      "icon": "⇉",
+      "cat": "流程",
+      "desc": "里面的几块同时播，比如故障 + 震惊 + 音效。",
+      "params": []
+    },
+    {
+      "id": "show",
+      "name": "播放共享演出",
+      "icon": "▶️",
+      "cat": "流程",
+      "desc": "把演出库里的一段演出整段放进来。",
+      "params": [
+        {
+          "k": "id",
+          "n": "演出",
+          "t": "show"
+        }
+      ]
+    },
+    {
+      "id": "sound",
+      "name": "音效",
+      "icon": "🔊",
+      "cat": "声音",
+      "desc": "播一个现成的音效。",
+      "params": [
+        {
+          "k": "id",
+          "n": "音效",
+          "t": "select",
+          "opts": [
+            [
+              "bad",
+              "出错"
+            ],
+            [
+              "good",
+              "成功"
+            ],
+            [
+              "note",
+              "通知"
+            ],
+            [
+              "hit",
+              "命中"
+            ],
+            [
+              "slam",
+              "砸下"
+            ],
+            [
+              "zap",
+              "电流"
+            ],
+            [
+              "heart",
+              "心碎"
+            ],
+            [
+              "damage",
+              "扣血"
+            ],
+            [
+              "confirm",
+              "确认"
+            ],
+            [
+              "erase",
+              "划掉"
+            ],
+            [
+              "pop",
+              "弹出"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "blockCommon": {
+    "times": "重复次数（文字里的 {i} 换成第几次，{n} 换成总次数）",
+    "gap": "每次之间隔几秒"
+  },
+  "fxSlots": [
+    {
+      "k": "afterThink",
+      "n": "思考后半之后"
+    },
+    {
+      "k": "afterTool",
+      "n": "运行命令之后"
+    },
+    {
+      "k": "afterReply",
+      "n": "正文之后"
+    },
+    {
+      "k": "afterReaction",
+      "n": "用户反应之后"
+    },
+    {
+      "k": "caught",
+      "n": "被识破时（用户骂人之前）"
+    }
   ]
 }
