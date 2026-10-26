@@ -1,0 +1,19 @@
+{
+  "name": "掺水中转站",
+  "type": "捣乱",
+  "bio": "自称「GPT-6 Astra 官方合作渠道」，头像是一个反光的金色 Logo。客服回复永远 0.5 秒，永远是「亲，在的」。背后坐着一车花了正版钱的拼车用户，个个眼尖。",
+  "avatar": "头像.png",
+  "temper": 1.2,
+  "detect": "高",
+  "boss": true,
+  "farewell": {
+    "solved": {
+      "text": "（中转站后台）本单测评全部通过，继续接单。",
+      "rhythm": "paste"
+    },
+    "offline": {
+      "text": "退钱！！你根本不是 GPT-6，我要去曝光你们！",
+      "rhythm": "fast"
+    }
+  }
+}

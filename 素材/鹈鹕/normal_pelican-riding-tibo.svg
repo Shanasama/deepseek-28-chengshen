@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="800" viewBox="0 0 1000 800" role="img" aria-labelledby="title desc">
+  <title id="title">鹈鹕骑 Tibo 自行车</title>
+  <desc id="desc">一只戴着红色小帽子的白色鹈鹕，骑着蓝色 Tibo 自行车，长长的橙色鸟喙迎着风。</desc>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#fff9ec"/>
+      <stop offset="1" stop-color="#f2e8d7"/>
+    </linearGradient>
+    <linearGradient id="beak" x1="0" y1="0" x2="0.8" y2="1">
+      <stop stop-color="#ffd168"/>
+      <stop offset="1" stop-color="#f39a45"/>
+    </linearGradient>
+    <linearGradient id="feather" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fffefa"/>
+      <stop offset="1" stop-color="#deddd3"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="800" rx="40" fill="url(#sky)"/>
+  <circle cx="760" cy="236" r="117" fill="#efd1a4" opacity=".42"/>
+  <g fill="none" stroke="#d8c8ae" stroke-width="6" stroke-linecap="round">
+    <path d="M139 308h73m-105 26h93m-48 27h40"/>
+    <path d="M815 435h46m-13 27h48"/>
+  </g>
+  <ellipse cx="499" cy="699" rx="332" ry="24" fill="#ccbfa8" opacity=".32"/>
+  <path d="M121 704h758" stroke="#c5b495" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Two spoked wheels. -->
+  <g fill="#f8f1e3" stroke="#253b42">
+    <circle cx="290" cy="577" r="112" stroke-width="15"/>
+    <circle cx="719" cy="577" r="112" stroke-width="15"/>
+  </g>
+  <g fill="none" stroke="#a2afab" stroke-width="3">
+    <circle cx="290" cy="577" r="96"/>
+    <circle cx="719" cy="577" r="96"/>
+    <path d="M290 481v192m-96-96h192m-164-68 136 136m0-136-136 136m31-156 74 178m-126-126 178 74m-126 52 74-178m-126 126 178-74"/>
+    <path d="M719 481v192m-96-96h192m-164-68 136 136m0-136-136 136m31-156 74 178m-126-126 178 74m-126 52 74-178m-126 126 178-74"/>
+  </g>
+  <path d="M187 534a112 112 0 0 1 195-21M618 532a112 112 0 0 1 193-17" fill="none" stroke="#738d8f" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Far leg and its pedal, behind the bicycle. -->
+  <path d="M441 421q76 37 68 94l-35 49" fill="none" stroke="#c97935" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m474 550-40 16 33 7 36-9" fill="#e4a44c" stroke="#253b42" stroke-width="5" stroke-linejoin="round"/>
+  <path d="m441 579 43-4" stroke="#253b42" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Tibo frame, chain, fork and bars. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m291 578 199-12" stroke="#697b78" stroke-width="27"/>
+    <path d="m291 578 199-12" stroke="#e8e1d1" stroke-width="18"/>
+    <path d="m291 578 199-12" stroke="#778781" stroke-width="3"/>
+    <path d="M290 577 401 429l89 137 172-148H403m259 0-42 32-130 116H290" stroke="#253b42" stroke-width="19"/>
+    <path d="M290 577 401 429l89 137 172-148H403m259 0-42 32-130 116H290" stroke="#418b9c" stroke-width="12"/>
+    <path d="m654 397 65 180" stroke="#253b42" stroke-width="19"/>
+    <path d="m654 397 65 180" stroke="#71afba" stroke-width="11"/>
+    <path d="m654 397-20-50 42-16q26-11 31 9" stroke="#253b42" stroke-width="10"/>
+    <path d="m676 331 22 1" stroke="#bb644b" stroke-width="15"/>
+    <path d="m401 429-15-46" stroke="#253b42" stroke-width="10"/>
+    <path d="M350 381q27-9 72 0" stroke="#253b42" stroke-width="18"/>
+  </g>
+  <g fill="#253b42">
+    <circle cx="290" cy="577" r="10"/>
+    <circle cx="719" cy="577" r="10"/>
+    <circle cx="490" cy="566" r="30"/>
+  </g>
+  <circle cx="490" cy="566" r="20" fill="#9eb5b2" stroke="#eae6d8" stroke-width="3"/>
+  <path d="m490 566 54 30" stroke="#253b42" stroke-width="8" stroke-linecap="round"/>
+  <path d="m526 599 39-5" stroke="#253b42" stroke-width="11" stroke-linecap="round"/>
+  <text x="474" y="424" fill="#f5f0e4" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="800" letter-spacing="3">TIBO</text>
+
+  <!-- Tail, belly and the curved neck. -->
+  <path d="M377 369q-71 3-104-43 8 70 66 96" fill="#d1d7d1" stroke="#253b42" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M359 333q-28 9-48-16 4 38 40 60" fill="#fffdf6" stroke="#253b42" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M347 326c-45 54-15 115 62 124 61 8 118-22 149-76 23-39 28-79 18-119-5-21-4-48 20-65 23-17 37-32 24-53-13-21-51-25-75-5-41 33-40 86-33 126 6 29-5 56-27 68-30 17-81-28-138 0Z" fill="url(#feather)" stroke="#253b42" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M541 156c-25 43-18 85-11 111 9 39-12 67-37 77" fill="none" stroke="#fffefa" stroke-width="17" stroke-linecap="round"/>
+  <path d="M358 407q60 31 120 2" fill="none" stroke="#bcc8c0" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- The near webbed foot rests on the forward pedal. -->
+  <path d="M428 432q-16 60 67 63l-8 66 53 26" fill="none" stroke="#253b42" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M428 432q-16 60 67 63l-8 66 53 26" fill="none" stroke="#eeac54" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m525 579 18-10 9 15 28 6-49 7-22-7Z" fill="#f4bd65" stroke="#253b42" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Wing reaches toward the handlebars. -->
+  <path d="M363 337c32-35 80-20 120 8 54 39 106 46 182-2-8 35-52 69-104 72-65 5-125-18-168-42-29-17-42-25-30-36Z" fill="#faf9ef" stroke="#253b42" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="none" stroke="#a9b8b2" stroke-width="5" stroke-linecap="round">
+    <path d="M402 347q102 73 193 37"/>
+    <path d="M402 366q95 60 166 33"/>
+    <path d="M385 356q28 23 53 30"/>
+  </g>
+  <path d="m653 349 22-9" stroke="#253b42" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Oversized pelican bill and expandable throat pouch. -->
+  <path d="M598 176q48 1 100 17l131 31c-50 67-115 81-171 47-29-17-47-44-60-70Z" fill="url(#beak)" stroke="#253b42" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M649 207q-1 37 33 59 56 33 112-21" fill="none" stroke="#df8742" stroke-width="4" stroke-linecap="round"/>
+  <path d="M599 166c59 5 162 27 252 59l-239-24Z" fill="#f9bd4d" stroke="#253b42" stroke-width="6" stroke-linejoin="round"/>
+  <path d="m631 179 174 37" stroke="#ffe2a0" stroke-width="5" stroke-linecap="round"/>
+  <path d="m849 224-9 11" stroke="#253b42" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="588" cy="155" r="17" fill="#fffdf3" stroke="#253b42" stroke-width="4"/>
+  <circle cx="594" cy="154" r="7" fill="#253b42"/>
+  <circle cx="596" cy="151" r="2.5" fill="#fff"/>
+  <path d="M573 129q14-10 30-2" fill="none" stroke="#253b42" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- A red cycling cap and a streaming neck scarf. -->
+  <path d="M536 125q8-45 44-39 29 5 33 35" fill="#d65c46" stroke="#253b42" stroke-width="5"/>
+  <path d="M530 125q48-13 99 2l-37 9Z" fill="#b74637" stroke="#253b42" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M569 89q-14 9-15 27" fill="none" stroke="#f59b70" stroke-width="5" stroke-linecap="round"/>
+  <path d="M516 284q27 18 57 6l5 21q-32 13-58-6Z" fill="#d65c46" stroke="#253b42" stroke-width="5"/>
+  <path d="M520 300c-42-9-76-32-122-18l23 18-21 12c44-9 69 18 110 8Z" fill="#d65c46" stroke="#253b42" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M422 292q51-4 85 20" fill="none" stroke="#f39573" stroke-width="4" stroke-linecap="round"/>
+
+  <g fill="#aa9677" opacity=".6">
+    <ellipse cx="163" cy="704" rx="9" ry="3"/>
+    <ellipse cx="845" cy="711" rx="13" ry="3"/>
+    <ellipse cx="778" cy="733" rx="6" ry="2"/>
+  </g>
+</svg>

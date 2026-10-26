@@ -426,7 +426,7 @@
 
 - 创意概念页面：大肥鱼游戏 · 创意概念 v0.1，https://cursor.com/canvas/store-222f5f73-a2f5-4a3a-9ad2-45ca0f134eba/618b2e0f-c2e9-4f0d-89b5-7c3ae415e9c1
 - 美术与界面规范：[大肥鱼游戏_美术与界面规范_v1.md](./大肥鱼游戏_美术与界面规范_v1.md)。
-- 鹈鹕 SVG：`C:\Users\yuan\Desktop\sb\normal_pelican-riding-tibo.svg`、`error_pelican_bicycle.svg`。
+- 鹈鹕 SVG：项目里的 `素材/鹈鹕/normal_pelican-riding-tibo.svg`（照抄正解）、`素材/鹈鹕/error_pelican_bicycle.svg`（硬画失败版）；原件在 `C:\Users\yuan\Desktop\sb\`。
 - 术语表：[CONTEXT.md](./CONTEXT.md)。
 
 ## 附录：完整版设想（不在 Demo 范围）

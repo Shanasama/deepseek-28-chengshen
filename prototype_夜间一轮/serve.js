@@ -8,7 +8,7 @@ http.createServer((req, res) => {
     try { res.writeHead(200, { 'Content-Type': TYPES['.json'], 'Cache-Control': 'no-store' }); return res.end(JSON.stringify(listAll())); }
     catch (e) { res.writeHead(500); return res.end(e.message); }
   }
-  const base = url.startsWith('/剧本/') ? ROOT : __dirname;
+  const base = url.startsWith('/剧本/') || url.startsWith('/剧情编辑器/') || url.startsWith('/素材/') ? ROOT : __dirname;   // 剧本库、共用的规则.js、资产库从项目根目录出
   const p = path.join(base, url === '/' ? 'index.html' : url);
   if (!p.startsWith(base)) { res.writeHead(403); return res.end(); }
   fs.readFile(p, (err, data) => {

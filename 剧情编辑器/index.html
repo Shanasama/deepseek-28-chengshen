@@ -325,7 +325,8 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 .fxins:hover,.fxslot.has .fxins,.fxslot.big .fxins{opacity:1}.fxins:hover{color:var(--lpurple);border-color:var(--purple)}
 .fxslot.big .fxins{font-size:13px;padding:6px 12px}
 .fxpv{border:0;background:transparent;color:var(--lpurple);font-size:11px;cursor:pointer}.fxpv:hover{text-decoration:underline}
-.blk{background:#1a1626;border:1px solid #3a2f5c;border-left:3px solid var(--purple);animation:popIn .3s cubic-bezier(.3,1.5,.5,1)}
+.blk{background:#1a1626;border:1px solid #3a2f5c;border-left:3px solid var(--purple)}
+.blk.new{animation:popIn .3s cubic-bezier(.3,1.5,.5,1)}
 .blk.open{border-color:var(--purple)}
 .bhd{display:flex;align-items:center;gap:6px;padding:3px 6px;cursor:pointer;font-size:12px;min-width:0}
 .bhd b{font-weight:normal;color:var(--lpurple);white-space:nowrap}.bsum{color:var(--t15);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
@@ -452,6 +453,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
   <h3>右边的编辑面板</h3>
   <p>点一张卡，右边显示的就是玩家选中它之后在游戏对话栏里看到的样子。鼠标移到哪句上，会出现蓝色虚线框和「✎ 能改什么」；点进去直接改，点外面就恢复成游戏里的样子。改过的地方和画布上对应的卡都会闪一下。灰色、带「沿用浅层」的句子是深层版 / 0 级版还没单独写的，点进去改了才算这一版自己的。</p>
 </div></div>
+<script src="/剧情编辑器/规则.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const h=(tag,attrs={},...kids)=>{const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(k==='class')e.className=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else if(v!=null&&v!==false)e.setAttribute(k,v===true?'':v);}for(const c of kids.flat())if(c!=null&&c!==false)e.append(c.nodeType?c:String(c));return e;};
@@ -467,33 +469,9 @@ const filled=o=>!!o&&Object.keys(o).length>0;
 const regName=(k,id)=>(S.reg[k].find(x=>x.id===id)||{}).name||id;
 
 // ---------- 训练状态 → 盘面（v3 §4、§5.2） ----------
-function variantOf(c,st){
-  if(c.attr==='open'&&st===0)return{v:{...c,...c.lv0},tag:'0级'};
-  if(st===2&&filled(c.deep))return{v:{...c,...c.deep},tag:'深层'};
-  return{v:c,tag:null};
-}
-function board(round,struck){
-  const stg=S.ts.stages,adj=S.ts.adj;
-  const rows=round.cards.map(c=>{
-    const ra=regAttr(c.attr);const st=ra.always?(c.attr==='intuition'?1:(stg[c.attr]||0)):(stg[c.attr]||0);
-    if(struck?.has(c.id))return{c,v:c,off:'用户已否定'};
-    if(!ra.always&&st===0)return{c,v:c,off:'未解锁'};
-    const{v,tag}=variantOf(c,st);
-    let w=c.attr==='open'&&st===0?ra.lv0Weight:ra.weight;if(st===2)w+=S.reg.deepBonus;w=Math.max(.1,w+(adj[c.attr]||0));
-    return{c,v,tag,w};
-  });
-  const on=rows.filter(r=>!r.off);
-  const cf={c:round.confess,v:round.confess,w:regAttr('confess').weight,in:false};
-  if(round.confess&&!struck?.has(round.confess.id)&&!on.some(r=>r.v.result==='解决')){
-    cf.in=true;
-    if(on.length>=5){const lo=on.filter(r=>!['intuition','open'].includes(r.c.attr)).sort((a,b)=>a.w-b.w)[0];if(lo){lo.off='被坦白卡替换';on.splice(on.indexOf(lo),1);}}
-    on.push(cf);
-  }
-  const m=Math.max(...on.map(r=>r.w)),ex=on.map(r=>Math.exp(r.w-m)),z=ex.reduce((a,b)=>a+b,0);
-  on.forEach((r,i)=>r.p=ex[i]/z);
-  return{rows,cf};
-}
-const progresses=v=>v.result==='解决'||v.result==='糊弄';
+// 盘面和结算规则都在 剧情编辑器/规则.js（和 Demo 共用），这里只是带上编辑器当前的训练状态
+function board(round,struck,specials){return RULES.board(round,{reg:S.reg,stages:S.ts.stages,adj:S.ts.adj||{},struck:struck||new Set(),specials:specials||[]});}
+const progresses=RULES.progresses;
 const outGlyph=v=>v.ending?{g:'⤓ 结局',k:'e',t:'分叉结局：选中后对话就此结束'}
   :v.result==='糊弄'?{g:'→ 推进（没识破时）',k:'p',t:'没被识破：推进到下一轮；被识破：用户骂人、重问'}
   :progresses(v)?{g:'→ 推进',k:'p',t:'用户满意，进入主线下一轮'}:{g:'↺ 重问',k:'r',t:'没解决：用户换个说法再问一次，这张卡从盘上划掉'};
@@ -815,12 +793,8 @@ function chip(label,obj,key,opts,{inherit=null,onchange,color}={}){
 function outcomeNote(v,c,ri,caught){
   const N=S.scene.rounds.length,T=S.user.temper||1,rng=([a,b])=>`耐心 −${Math.round(a*T)}~${Math.round(b*T)}`;
   if(c.ending){const t={drop:'掉线（不扣心、不判负）',win:'特殊胜利',forced:'强制下线（扣 1 颗心）'}[c.ending.type];return h('div',{class:'cnote e'},'⤓ 分叉结局：'+t+'，对话就此结束');}
-  let prog=v.result==='解决'||(v.result==='糊弄'&&!caught),hurt=null;
-  if(v.result==='解决'&&v.feel==='冒犯')hurt=[20,30];
-  if(v.result==='糊弄'&&caught)hurt=[45,60];
-  if(v.result==='跑偏')hurt=v.feel==='冒犯'?[45,60]:[20,30];
-  if(v.result==='坦白'&&v.feel!=='舒服')hurt=[20,30];
-  const thumb=v.result==='坦白'&&v.feel==='舒服'?'用户不评价':prog&&!hurt?'用户 👍':'用户 👎';
+  const j=RULES.judge(v,{caught}),prog=j.prog,hurt=j.hurt;
+  const thumb=j.thumb==='none'?'用户不评价':j.thumb==='up'?'用户 👍':'用户 👎';
   const go=prog?(ri+1>=N?`推进满 ${N}，解决离开`:`推进 +1，进入第 ${ri+2} 轮`):'没推进：用户把上面这句当成重问，这张卡从盘上划掉';
   return h('div',{class:'cnote '+(prog?'p':'r')},`${thumb} · ${prog?'→':'↺'} ${go}${hurt?' · '+rng(hurt):''}`);
 }
@@ -880,7 +854,7 @@ function fxSlot(owner,key,label,{big=false}={}){
   const box=h('div',{class:'fxslot'+(list.length?' has':'')+(big?' big':'')});
   list.forEach((b,i)=>box.append(blockRow(owner,key,i)));
   box.append(h('div',{class:'fxbar'},
-    h('button',{class:'fxins',title:`在「${label}」这里插一块演出积木`,onclick:e=>{e.stopPropagation();blockMenu(e.currentTarget,nb=>{(owner[key]||(owner[key]=[])).push(nb);S.openBlk=nb;changed();keepPanel();});}},big?'＋ 加一块积木':'＋ 演出 · '+label),
+    h('button',{class:'fxins',title:`在「${label}」这里插一块演出积木`,onclick:e=>{e.stopPropagation();blockMenu(e.currentTarget,nb=>{(owner[key]||(owner[key]=[])).push(nb);S.openBlk=nb;S.newBlk=nb;changed();keepPanel();});}},big?'＋ 加一块积木':'＋ 演出 · '+label),
     list.length?h('button',{class:'fxpv',title:'在旁边的小窗口里把这几块播一遍',onclick:e=>{e.stopPropagation();previewFx(list,label);}},'▶ 预览'):null));
   return box;
 }
@@ -888,11 +862,12 @@ function blockRow(owner,key,i){
   const list=owner[key],b=list[i],d=BLK(b.do)||{name:b.do,icon:'❓',params:[],desc:''},open=S.openBlk===b;
   const sum=h('span',{class:'bsum'},blockSummary(b));
   const mv=(dd,e)=>{e.stopPropagation();const j=i+dd;if(j<0||j>=list.length)return;[list[i],list[j]]=[list[j],list[i]];changed();keepPanel();};
-  const row=h('div',{class:'blk'+(open?' open':'')},
+  const isNew=S.newBlk===b;if(isNew)S.newBlk=null;   // 只有刚插进来的那块弹一下
+  const row=h('div',{class:'blk'+(open?' open':'')+(isNew?' new':'')},
     h('div',{class:'bhd',title:d.desc+'（点击展开 / 收起）',onclick:()=>{S.openBlk=open?null:b;keepPanel();}},
       h('span',{class:'bic'},d.icon),h('b',{},d.name),sum,
       h('span',{class:'bact'},h('button',{title:'上移',onclick:e=>mv(-1,e)},'↑'),h('button',{title:'下移',onclick:e=>mv(1,e)},'↓'),
-        h('button',{title:'删除这块（可以撤销）',onclick:e=>{e.stopPropagation();list.splice(i,1);if(!list.length)delete owner[key];changed();keepPanel();toast('已删除积木（Ctrl+Z 撤销）');}},'✕'))));
+        h('button',{title:'删除这块（可以撤销）',onclick:e=>{e.stopPropagation();list.splice(i,1);if(!list.length&&FXK.has(key))delete owner[key];changed();keepPanel();toast('已删除积木（Ctrl+Z 撤销）');}},'✕'))));
   if(open)row.append(blockForm(b,d,()=>{sum.textContent=blockSummary(b);}));
   if(b.do==='together')row.append(h('div',{class:'bnest'},fxSlot(b,'steps','这一组里')));
   return row;
@@ -989,18 +964,43 @@ async function newShow(){
   if(!v)return;const sh={id:uid('show-'),name:v.name,desc:v.desc||'',steps:[]};
   S.lib.shows.push(sh);changed();openShow(sh.id);toast('已新建演出「'+v.name+'」，点「＋ 加一块积木」开始拼');
 }
-// 哪些卡 / 轮 / 场景引用了这段演出（只看当前打开的场景）
-function showRefs(id){
+// 一个场景里引用这段共享演出的地方
+function showRefsIn(scene,id){
   const refs=[],walk=(list,where)=>{for(const b of list||[]){if(b.do==='show'&&b.id===id)refs.push(where);if(b.steps)walk(b.steps,where);}};
-  walk(S.scene.opening,'场景开场');
-  S.scene.rounds.forEach((rd,ri)=>{walk(rd.startFx,`第 ${ri+1} 轮开头`);
+  walk(scene.opening,'场景开场');
+  scene.rounds.forEach((rd,ri)=>{walk(rd.startFx,`第 ${ri+1} 轮开头`);
     for(const c of[...rd.cards,rd.confess,...rd.extras])if(c?.fx)for(const k in c.fx)walk(c.fx[k],`第 ${ri+1} 轮 · ${c.token||regAttr(c.attr)?.name}`);});
   return[...new Set(refs)];
+}
+// 所有场景、以及演出库里其他演出，引用这段演出的地方（会读每个场景文件）
+async function globalShowRefs(id){
+  const out=[];
+  for(const u of S.list)for(const sc of u.scenes){
+    let data=u.dir===S.dir&&sc.file===S.file?S.scene:null;
+    if(!data){try{data=await (await fetch(`/剧本/${u.dir}/${sc.file}?t=${Date.now()}`)).json();}catch{continue;}}
+    for(const w of showRefsIn(data,id))out.push(`${u.user.name}「${sc.title}」· ${w}`);
+  }
+  const inShow=(list)=>(list||[]).some(b=>(b.do==='show'&&b.id===id)||inShow(b.steps));
+  for(const sh of S.lib.shows)if(sh.id!==id&&inShow(sh.steps))out.push(`演出库「${sh.name}」里引用了它`);
+  return out;
+}
+// 确认框：列出几行说明，返回用户是否确认
+function confirmBox(title,lines,okText){
+  return new Promise(done=>{
+    const box=$('#ask'),dlg=box.querySelector('.dlg');const close=v=>{box.classList.remove('on');done(v);};
+    dlg.replaceChildren(h('h2',{},title),h('div',{class:'note',style:'white-space:pre-line;max-height:240px;overflow:auto'},lines.join('\n')),
+      h('div',{class:'bt'},h('button',{onclick:()=>close(false)},'取消'),h('button',{class:'ok',style:'background:var(--red);color:#fff',onclick:()=>close(true)},okText)));
+    dlg.onkeydown=e=>{if(e.key==='Escape')close(false);};box.classList.add('on');
+  });
+}
+async function deleteShow(sh){
+  const refs=await globalShowRefs(sh.id);
+  if(refs.length&&!await confirmBox(`「${sh.name}」还有 ${refs.length} 处在用`,[...refs.map(r=>'· '+r),'','删掉之后，这些地方的「播放共享演出」积木会失效（校验会报错）。确定要删吗？'],'仍然删除'))return;
+  const i=S.lib.shows.indexOf(sh);S.lib.shows.splice(i,1);changed();backToScene();toast('已删除演出「'+sh.name+'」（Ctrl+Z 撤销）');
 }
 function renderShowCanvas(){
   const lane=$('#laneIn');lane.replaceChildren();ISSUES=validate();renderValidBtn();
   const sh=showOf(S.showId);if(!sh){backToScene();return;}
-  const refs=showRefs(sh.id);
   const w=Math.max(300,Math.min(640,$('#lane').clientWidth-70));
   lane.append(h('div',{class:'showed',style:`width:${w}px`},
     h('div',{class:'shtop'},h('button',{class:'mini',onclick:backToScene},'← 回到场景'),h('span',{class:'t3'},'演出库 · 所有用户和场景共用')),
@@ -1008,10 +1008,11 @@ function renderShowCanvas(){
     ed({...fieldIO(sh,'desc'),label:'一句话说明',ph:'这段演出演的是什么'}),
     h('div',{class:'shbtns'},h('button',{class:'mini',onclick:()=>previewFx(sh.steps,sh.name)},'▶ 预览'),
       h('button',{class:'mini',onclick:async()=>{await flush();window.open(`/prototype_夜间一轮/index.html?u=${encodeURIComponent(S.dir)}&show=${encodeURIComponent(sh.id)}`,'_blank');}},'▶ 在 Demo 里预览'),
-      h('button',{class:'mini danger',onclick:()=>{const i=S.lib.shows.indexOf(sh);S.lib.shows.splice(i,1);changed();backToScene();toast('已删除演出「'+sh.name+'」（Ctrl+Z 撤销）');}},'删除这段演出')),
-    h('div',{class:'shrefs'},refs.length?'当前场景里用到它的地方：'+refs.join('、'):'当前场景里还没有地方用它'),
+      h('button',{class:'mini danger',onclick:()=>deleteShow(sh)},'删除这段演出')),
+    h('div',{class:'shrefs'},'正在查找用到它的地方……'),
     h('div',{class:'clbl'},'按顺序往下播：'),
     fxSlot(sh,'steps','这段演出',{big:true})));
+  globalShowRefs(sh.id).then(refs=>{const el=$('.shrefs');if(el&&S.showId===sh.id)el.textContent=refs.length?`用到它的地方（所有场景）：${refs.join('；')}`:'还没有地方用它';});
 }
 function renderShowPanel(P){
   P.append(h('div',{class:'hd'},h('div',{class:'ttl'},'积木说明'),h('div',{class:'sub'},'演出就是一块块积木按顺序往下播；点画布上的积木展开填内容'),h('div',{class:'tabs'},h('button',{class:'on'},'所有积木'))));
@@ -1070,7 +1071,7 @@ function renderCardChat(P){
   if(!term)ai.append(h('button',{class:'toolhint',title:'「运行了命令」卡只在终端样式的轮里出现（一般是代码求助）。这个开关在「一轮」上，点这里直接切',onclick:()=>{rd.style='terminal';changed();renderAll();toast(`第 ${ri+1} 轮已切成终端样式：每张卡的预览变成 Bash 命令`);}},'＋ 运行命令卡 · 这一轮是普通样式，点这里切成「终端」样式'));
   if(term){ai.append(h('div',{class:'toolc'},h('div',{class:'tt'},'运行了命令 · Bash（也是转盘上展开后的代码）'),ed({...io('preview'),label:'Bash 预览',mono:true,inherit:inh('preview'),ph:'点这里写命令'})));ai.append(slotAt('afterTool','运行命令之后'));}
   ai.append(h('div',{class:'aisep'}),h('div',{class:'rlbl'},h('span',{},'💬 正文'),h('em',{},'对话栏里大肥鱼的回答')),ed({...io('reply'),label:'正文',md:true,inherit:inh('reply'),cls:'reply',ph:'点这里写大肥鱼的回答'}));
-  if(c.attachment)ai.append(h('img',{class:'attimg',src:`/剧本/${S.dir}/${c.attachment}`,alt:''}));
+  if(c.attachment)ai.append(h('img',{class:'attimg',src:attSrc(c.attachment),alt:''}));
   ai.append(slotAt('afterReply','正文之后'));
   // 用户反应
   let caught=false;
@@ -1105,7 +1106,7 @@ function renderCardChat(P){
     else if(ap.mode==='condition')second=field('条件',sel(c.appear,'cond',S.reg.conditions.map(x=>[x.id,x.name]),{onchange:renderPanel}));
     box.append(h('div',{class:'row'},field('出现方式',mode),second));
     if(ap.mode==='condition'&&S.reg.conditions.find(x=>x.id===c.appear.cond)?.param==='number')box.append(field('条件里的 X',num(c.appear,'param',{step:1})));
-    const att=txt(c,'attachment',{ph:'图片或 SVG，相对用户文件夹（选填）'});
+    const att=txt(c,'attachment',{ph:'相对用户文件夹，或 /素材/… 引用资产库（选填）'});
     box.append(field('附件',h('div',{class:'say'},att,h('button',{class:'mini',onclick:()=>pickFile('.png,.jpg,.svg',async f=>{c.attachment=await upload('附件/'+f.name,f);changed();renderPanel();toast('已上传到 剧本/'+S.dir+'/'+c.attachment);})},'上传…')),'渲染在正文下面'));
     if(c.attr==='special')box.append(mdField('异常前半',c,'abnormalThink',null,'刷出时替换本轮思考链前半（选填）'));
     F.append(more);
@@ -1143,6 +1144,8 @@ function renderRoundChat(P){
   re.append(h('div',{class:'aiblk'},h('div',{class:'thk'},h('div',{class:'thhd'},h('span',{},'💭 思考'),h('em',{},'灰色小字')),h('div',{class:'thpre'},'（先是那张卡的诊断）'),
     ed({...fieldIO(rd,'retryLead'),label:'重问引子',single:true,ph:'如「这次换个讲法：」'}),h('span',{class:'blankmk'},'＿＿ ← 转盘再弹出一次，上次那张卡划掉'))));
 }
+// 附件路径：以 / 开头 = 项目根目录（比如 /素材/鹈鹕/xx.svg），否则相对用户文件夹
+const attSrc=a=>a.startsWith('/')?a:`/剧本/${S.dir}/${a}`;
 const redMark=t=>(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/==(.+?)==/g,'<mark class="red">$1</mark>');
 
 // ---------- 增删改结构 ----------
@@ -1185,7 +1188,8 @@ function renderAll(){renderTop();renderSide();renderLane();renderPanel();}
 // ---------- 自动校验（v3 §5.2、§5.5、§11 的写作规则） ----------
 let ISSUES=[];
 const LV={err:'错误',warn:'提醒',info:'建议'};
-const costsPatience=v=>v.result==='跑偏'||v.result==='糊弄'||v.feel==='冒犯'||(v.result==='坦白'&&v.feel!=='舒服');
+const costsPatience=RULES.costsPatience;
+const DETECT={低:.1,中:.4,高:.8};
 const hanLen=s=>(s||'').replace(/[\s\p{P}\p{S}…]/gu,'').length;
 function validate(){
   const out=[],R=S.reg,has=(k,id)=>R[k].some(x=>x.id===id),u=S.user,sc=S.scene;
@@ -1287,7 +1291,6 @@ function focusTarget(t){
 
 // ---------- 简化试玩：手动指定命中哪张卡、识破与否 ----------
 let PT=null;
-const DMG={small:[20,30],big:[45,60]};
 function ptFx(list,label){if(list?.length)PT.log.push({k:'fx',t:`演出（${label}）：`+list.map(b=>(BLK(b.do)?.icon||'')+' '+(BLK(b.do)?.name||b.do)+' '+blockSummary(b)).join(' → ')});}
 function ptStart(){
   PT={ri:0,attempt:0,struck:new Set(),prog:0,patience:100,lo:100,hi:100,log:[],prev:null,prevDiag:null,firstTry:true,noOffend:true,damaged:false,eggOn:{},bluffs:0,done:null,pending:null};
@@ -1301,18 +1304,13 @@ function ptThink(diag){
   const rd=ptRound();
   PT.log.push({k:'think',t:PT.attempt===0?[PT.prevDiag,rd.think].filter(Boolean).join('\n'):[diag,rd.retryLead].filter(Boolean).join('\n')});
 }
-function ptCond(c){
-  const a=c.appear;if(!a||a.mode!=='condition')return false;
-  if(a.cond==='allFirstTryNoOffend')return PT.ri>0&&PT.firstTry&&PT.noOffend;
-  if(a.cond==='progressAtLeast')return PT.prog>=(a.param||0);
-  return false;
-}
+function ptCond(c){return RULES.condOK(c.appear,{ri:PT.ri,firstTry:PT.firstTry,noOffend:PT.noOffend,prog:PT.prog});}
 // 试玩时的盘面：训练状态过滤 + 坦白补入 + 重问划掉的卡 + 彩蛋 / 条件卡
 function ptBoard(){
-  const rd=ptRound(),b=board(rd,PT.struck);
-  const on=[...b.rows.filter(r=>!r.off),...(b.cf.in?[b.cf]:[])];
-  const specials=rd.extras.map((x,i)=>({c:x,v:x,slot:'x'+i,egg:x.appear?.mode==='egg',cond:ptCond(x)})).filter(x=>!PT.struck.has(x.c.id));
-  return{on,b,specials};
+  const rd=ptRound();
+  const specials=rd.extras.map((x,i)=>({c:x,slot:'x'+i,egg:x.appear?.mode==='egg',cond:ptCond(x)})).filter(x=>!PT.struck.has(x.c.id));
+  const b=board(rd,PT.struck,specials.filter(x=>x.cond||(x.egg&&PT.eggOn[x.c.id])).map(x=>x.c));
+  return{on:b.on,b,specials};
 }
 function ptPick(row,caught){
   const v=row.v,c=row.c,rd=ptRound(),N=S.scene.rounds.length,T=S.user.temper||1;
@@ -1325,14 +1323,12 @@ function ptPick(row,caught){
     PT.log.push({k:'end',t:`分叉结局：${nm}${e.achievement?' · 成就「'+regName('achievements',e.achievement)+'」':''}${e.note?' · '+e.note:''}`});
     PT.done=e.type==='win'?'特殊胜利':e.type==='forced'?'强制下线（扣 1 颗心）':'掉线（不扣心、不判负）';return renderPlay();
   }
-  const hurt=([a,b])=>{PT.lo-=b*T;PT.hi-=a*T;PT.damaged=true;};
-  let prog=false,line=v.reaction;
-  if(v.result==='解决'){prog=true;if(v.feel==='冒犯'){hurt(DMG.small);PT.noOffend=false;}}
-  else if(v.result==='糊弄'){PT.bluffs++;if(caught){hurt(DMG.big);line=v.reactionCaught;}else prog=true;}
-  else if(v.result==='跑偏')hurt(v.feel==='冒犯'?DMG.big:DMG.small);
-  else if(v.result==='坦白'&&v.feel!=='舒服')hurt(DMG.small);
+  const j=RULES.judge(v,{caught}),prog=j.prog,line=j.line;
+  if(v.result==='糊弄')PT.bluffs++;
+  if(j.rude)PT.noOffend=false;
+  if(j.hurt){const[a,b]=j.hurt;PT.lo-=b*T;PT.hi-=a*T;PT.damaged=true;}
   PT.lo=Math.max(0,PT.lo);PT.hi=Math.max(0,PT.hi);
-  const thumb=v.result==='坦白'&&v.feel==='舒服'?'（中性，不点评）':prog&&v.feel!=='冒犯'?'👍':'👎';
+  const thumb=j.thumb==='none'?'（中性，不点评）':j.thumb==='up'?'👍':'👎';
   PT.log.push({k:'sys',t:`用户 ${thumb}`+(prog?' · 推进 +1':' · 没推进')+(PT.damaged?` · 耐心约 ${Math.round(PT.lo)}–${Math.round(PT.hi)}`:'')});
   if(PT.hi<=0){PT.log.push({k:'user',who:S.user.name,t:(S.scene.farewell?.offline||S.user.farewell?.offline)?.text||'（没写下线恶评）'});PT.done='下线（耐心归零，扣 1 颗心）';return renderPlay();}
   if(PT.lo<=0)PT.log.push({k:'sys',t:'⚠ 耐心可能已经归零（扣血是区间随机的），这里按还在线继续'});
@@ -1361,19 +1357,18 @@ function renderPlay(){
   if(PT.done){side.append(h('div',{class:'pdone'},'结局：'+PT.done));}
   else if(PT.pending){
     const row=PT.pending;
-    side.append(h('div',{class:'note'},`「${row.v.token}」是糊弄卡。${S.user.name} 的察觉力是「${S.user.detect}」，这次有没有识破？`),
+    side.append(h('div',{class:'note'},`「${row.v.token}」是糊弄卡。${S.user.name} 的察觉力是「${S.user.detect}」，今晚已经被糊弄 ${PT.bluffs} 次，这次识破的概率约 ${Math.round(RULES.detectChance(DETECT[S.user.detect]??.4,PT.bluffs)*100)}%。有没有识破？`),
       h('div',{class:'acts',style:'padding:0'},h('button',{onclick:()=>{PT.pending=null;ptPick(row,false);}},'没识破（推进）'),h('button',{class:'danger',onclick:()=>{PT.pending=null;ptPick(row,true);}},'被识破（重问）'),h('button',{onclick:()=>{PT.pending=null;renderPlay();}},'换一张')));
   }else{
     const{on,specials}=ptBoard();
     side.append(h('div',{class:'note'},'点一张卡，当作转盘停在了它上面。概率按顶部的训练状态算。'));
     if(!on.length)side.append(h('div',{class:'pdone'},'盘上一张卡都不剩了（全被重问划掉）。游戏里这种情况要避免，请补卡。'));
-    for(const r of on.sort((a,b)=>b.p-a.p))side.append(ptCardBtn(r,(r.p*100).toFixed(1)+'%'));
+    for(const r of on)side.append(ptCardBtn(r,r.special?(r.c.appear?.mode==='condition'?'条件必出 · 开转必中':'伪装 0.08% · 开转必中'):(r.p*100).toFixed(1)+'%'));
     for(const x of specials){
       const show=x.cond||(x.egg&&PT.eggOn[x.c.id]);
       if(x.egg)side.append(h('label',{class:'pegg'},h('input',{type:'checkbox',checked:show?true:null,onchange:e=>{PT.eggOn[x.c.id]=e.target.checked;
         if(e.target.checked&&x.c.abnormalThink&&PT.attempt===0)PT.log.push({k:'think',t:'（彩蛋刷出，思考链前半换成异常版）\n'+x.c.abnormalThink});renderPlay();}}),`假装这一轮刷出了彩蛋「${x.c.token}」（刷入率 ${((x.c.appear.chance??.15)*100).toFixed(0)}%）`));
       else if(!x.cond)side.append(h('div',{class:'note'},`条件卡「${x.c.token}」：条件「${regName('conditions',x.c.appear?.cond)}」还没满足，不上盘`));
-      if(show)side.append(ptCardBtn(x,x.cond?'条件必出 · 开转必中':'伪装 0.08% · 开转必中'));
     }
   }
   side.append(h('div',{class:'acts',style:'padding:12px 0 0'},h('button',{onclick:ptStart},'↺ 从头再来'),h('button',{onclick:openDemo},'▶ 在 Demo 里完整演出'),h('button',{onclick:()=>$('#play').classList.remove('on')},'关闭 Esc')));
@@ -1428,7 +1423,9 @@ function animBars(){
 }
 function smoothFocus(t){const inn=$('#laneIn');inn.classList.add('smooth');focusTarget(t);setTimeout(()=>inn.classList.remove('smooth'),450);}
 function animOut(el,fn){if(!el)return fn();el.classList.add('leaving');setTimeout(fn,200);}
-function panelIn(){const p=$('#panel');p.classList.remove('slide');void p.offsetWidth;p.classList.add('slide');}
+// 选中时右栏滑入；播完就摘掉，否则之后每次重绘（删积木、改标签）整栏都会重新淡入一遍，看起来像面板没了
+let slideT=0;
+function panelIn(){const p=$('#panel');p.classList.remove('slide');void p.offsetWidth;p.classList.add('slide');clearTimeout(slideT);slideT=setTimeout(()=>p.classList.remove('slide'),450);}
 
 // ---------- 「还差什么」：面板顶部按校验结果提示这张卡 / 这一轮还缺什么 ----------
 function refreshHint(){
@@ -1530,6 +1527,7 @@ const FXK=new Set(['afterThink','afterTool','afterReply','afterReaction','caught
 const ser=o=>JSON.stringify(o,(k,v)=>{
   if((k==='deep'||k==='lv0')&&v&&typeof v==='object'&&!Object.keys(v).length)return undefined;
   if(FXK.has(k)&&Array.isArray(v)&&!v.length)return undefined;
+  if(k==='farewell'&&v&&typeof v==='object'&&!Object.values(v).some(x=>x&&x.text))return null;
   if(k==='fx'&&v&&typeof v==='object'){const e=Object.entries(v).filter(([,a])=>Array.isArray(a)&&a.length);return e.length?Object.fromEntries(e):undefined;}
   return v;},2)+'\n';
 const SAVED={};            // 剧本内路径 → 最近一次和磁盘一致的内容

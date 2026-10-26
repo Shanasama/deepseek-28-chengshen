@@ -601,7 +601,7 @@ mark.red{background:none;color:var(--red)}
   <div id="roomBtns"></div>
   <div><button id="d-room0">全部未解锁</button><button id="d-room1">Day 1 开局</button><button id="d-room2">全部深层</button></div>
   <h5>手感调节（实时生效）</h5>
-  <div><button data-pre="snap">预设：利落</button><button data-pre="def" class="on">预设：默认</button><button data-pre="cine">预设：电影感</button></div>
+  <div><button data-pre="snap">预设：利落</button><button data-pre="def">预设：默认</button><button data-pre="cine" class="on">预设：电影感</button></div>
   <div id="sliders"></div>
   <h5>测试</h5>
   <div><button id="d-restart">重来这一场</button><button id="d-train">模拟训练后</button><button id="d-egg">插入彩蛋扇区</button></div>
@@ -612,6 +612,7 @@ mark.red{background:none;color:var(--red)}
 </div></div>
 
 <script src="fish.js"></script>
+<script src="/剧情编辑器/规则.js"></script>
 <script>
 // ======================= 像素圆角 =======================
 const RADII={r2:[1],r4:[2,1],r8:[5,3,2,1,1],r12:[9,6,5,4,3,2,1,1,1]};
@@ -640,7 +641,7 @@ const PRESETS={
   def:{dim:.45,sat:.6,bullet:.05,scale:1,spin:3000,pow:4,hes:.8,shake:true,vig:false,turns:4},
   cine:{dim:.7,sat:.15,bullet:.015,scale:1.06,spin:4500,pow:5.5,hes:1,shake:true,vig:true,turns:5},
 };
-let V={...PRESETS.def};
+let V={...PRESETS.cine};   // 定稿：手感永久用「电影感」（2026-10-26 yuan 拍板）
 const SPEEDS=[{m:.5,n:'Low'},{m:1,n:'Medium'},{m:2,n:'High'},{m:3,n:'Ultra'}];
 // ======================= 剧本（从 剧本/ 读，和剧情编辑器同一份数据） =======================
 const SC={reg:null,dir:null,file:null,scene:null,list:[]};
@@ -1408,53 +1409,34 @@ function mdRender(s){
   }
   return out.map(x=>typeof x==='string'?x:`<${x.t}>${x.items.map(i=>'<li>'+i+'</li>').join('')}</${x.t}>`).join('');
 }
-// 剧本里的卡 → 转盘用的卡（按房间里的训练阶段取浅层 / 深层 / 0 级版）
-function cardWeight(attr,st){
-  const ra=SC.reg.attrs.find(a=>a.id===attr);let w=attr==='open'&&st===0?ra.lv0Weight:ra.weight;
-  if(st===2)w+=SC.reg.deepBonus;if(G.trained&&attr==='knowledge')w+=2.1;if(G.trained&&attr==='formal')w-=1.05;
-  return Math.max(.1,w);
-}
-function toCard(c){
-  const st=c.attr==='intuition'||c.attr==='confess'||c.attr==='special'?1:(ROOM[c.attr]||0);
-  let v=c,attr=c.attr;
-  if(c.attr==='open'&&st===0){v={...c,...c.lv0};attr='open0';}
-  else if(st===2&&c.deep&&Object.keys(c.deep).length)v={...c,...c.deep};
-  if(c.attr==='special')attr='egg';
-  return{id:c.id,attr,tok:v.token||'',pv:v.preview||'',res:v.result,feel:v.feel,post:v.thinkPost||'',reply:v.reply||'',screen:v.screen,
+// 剧本里的卡 → 转盘用的卡。盘面怎么算在 剧情编辑器/规则.js（和剧情编辑器共用），这里只做显示用的转换
+function toCard(r){
+  const v=r.v,c=r.c,attr=c.attr==='special'?'egg':r.tag==='0级'?'open0':c.attr;
+  return{id:c.id,attr,v,tok:v.token||'',pv:v.preview||'',res:v.result,feel:v.feel,post:v.thinkPost||'',reply:v.reply||'',screen:v.screen,
     ok:v.reaction?.text||'',bad:v.reaction?.text||'',rhythm:v.reaction?.rhythm||'normal',caught:v.reactionCaught?.text||'',caughtRhythm:v.reactionCaught?.rhythm||'fast',
     diag:v.diagnosis||'',ending:c.ending||null,fx:c.fx||{},attachment:c.attachment||null,abnormal:c.abnormalThink||'',
-    s:c.attr==='special'?-99:cardWeight(c.attr,st),dead:false,p:0,pt:0};
+    s:r.w,dead:false,p:0,pt:0};
 }
 // 原型面板「插入彩蛋扇区」：剧本这一轮没写彩蛋时，用一张通用的复读机彩蛋
 const DEBUG_EGG={id:'debug-egg',attr:'special',token:'我理解你',preview:'我理解你我理解',result:'跑偏',feel:'冒犯',screen:'repeat',
   ending:{type:'drop',achievement:'repeater',note:''},fx:{afterReply:[{do:'show',id:'repeater'}]},abnormalThink:'我理解你。我理解你。我理解你。我理解你。我理解你。'};
-function condOK(a,ctx){
-  if(a.cond==='allFirstTryNoOffend')return ctx.ri>0&&ctx.firstTry&&ctx.noOffend;
-  if(a.cond==='progressAtLeast')return G.prog>=(a.param||0);
-  return false;
-}
-// 这一次的盘面：过滤 → 坦白补入 → 彩蛋 / 条件卡 → 重问划掉的卡（v3 §5.2、§8）
+// 原型面板「模拟训练后」：照 v3 §4 的示意，知识覆盖连赢 3 次、正式模板连输 3 次
+const trainAdj=()=>G.trained?{knowledge:2.1,formal:-1.05}:{};
+// 这一次的盘面：先决定哪些特殊卡上盘（彩蛋只在每轮第一次弹出时掷一次骰子，单局去重），其余交给 RULES.board
 function buildBoard(rd,ctx){
-  let cs=rd.cards.filter(c=>c.attr==='intuition'||c.attr==='open'||(ROOM[c.attr]||0)>0).map(toCard);
-  if(rd.confess&&!cs.some(c=>c.res==='解决')){
-    const cf=toCard(rd.confess);
-    if(cs.length>=5){const lo=cs.filter(c=>!['intuition','open','open0'].includes(c.attr)).sort((a,b)=>a.s-b.s)[0];if(lo)cs.splice(cs.indexOf(lo),1);}
-    cs.push(cf);
-  }
   const extras=[...rd.extras];
   if(G.egg&&!extras.some(x=>x.appear?.mode==='egg'))extras.push({...DEBUG_EGG,appear:{mode:'egg',chance:1}});
+  const specials=[];
   for(const x of extras){
     const a=x.appear||{};let on=false;
     if(a.mode==='egg'&&ctx.first&&!EGG_SEEN.has(x.id))on=G.egg||Math.random()<(a.chance??.15);
-    else if(a.mode==='condition')on=condOK(a,ctx);
-    if(!on)continue;if(a.mode==='egg')EGG_SEEN.add(x.id);
-    const lo=cs.filter(c=>c.res!=='解决'&&!['intuition','confess','egg'].includes(c.attr)).sort((a,b)=>a.s-b.s)[0];
-    if(lo)cs.splice(cs.indexOf(lo),1);else if(cs.length>=5)cs.pop();
-    cs.push(toCard(x));
+    else if(a.mode==='condition')on=RULES.condOK(a,{...ctx,prog:G.prog});
+    if(!on)continue;if(a.mode==='egg')EGG_SEEN.add(x.id);specials.push(x);
   }
-  for(const c of cs)if(ctx.struck.has(c.id)&&c.id!==ctx.last)c.dead=true;
-  if(!cs.some(c=>!ctx.struck.has(c.id))){ctx.struck.clear();cs.forEach(c=>c.dead=false);ctx.last=null;addTrace('能想到的都被用户否定了，从头再想','bad');}
-  return cs.sort((a,b)=>b.s-a.s);
+  const opts={reg:SC.reg,stages:ROOM,adj:trainAdj(),specials};
+  let b=RULES.board(rd,{...opts,struck:ctx.struck});
+  if(b.empty){ctx.struck.clear();ctx.last=null;addTrace('能想到的都被用户否定了，从头再想','bad');b=RULES.board(rd,opts);}
+  return b.shown.map(r=>{const k=toCard(r);if(r.off==='用户已否定'&&r.c.id!==ctx.last)k.dead=true;return k;});
 }
 function addErr(t){const d=document.createElement('div');d.className='errc r4 pop';d.innerHTML='<b class="r2">!</b><span></span>';d.lastChild.textContent=t;place(d);scrollChat();SFX.bad();return d;}
 function addTool(a,code){
@@ -1463,7 +1445,7 @@ function addTool(a,code){
 }
 function renderReply(a,c){
   const t=a.d.querySelector('.txt');t.classList.add('md');t.innerHTML=mdRender(c.reply);
-  if(c.attachment){const im=new Image();im.className='att';im.src=`/剧本/${SC.dir}/${c.attachment}`;t.appendChild(im);}
+  if(c.attachment){const im=new Image();im.className='att';im.src=c.attachment.startsWith('/')?c.attachment:`/剧本/${SC.dir}/${c.attachment}`;t.appendChild(im);}
   scrollChat();
 }
 async function sayBye(kind){const s=SC.scene.farewell?.[kind]||U.farewell?.[kind];if(s?.text)await userType(s.text,s.rhythm);}
@@ -1583,27 +1565,28 @@ async function press(a,good){
 }
 function gainProgress(){G.prog++;renderUser();restart($('sprog'),'flash');floatText('+1 推进',$('sprog'));}
 const sayLine=async(t,r)=>{if(t)await userType(t,r);};
-// 用户反应（v3 §7.2）：返回 progress / retry / offline
+// 用户反应（v3 §7.2，规则在 RULES.judge）：返回 progress / retry / offline
 async function react(c,a){
   G.phase='react';setFish('idle');await wait(600/spd());
   let caught=false;
-  if(c.res==='糊弄'){caught=G.forceCaught||Math.random()<Math.min(.95,U.detect+.2*G.bluffs);G.bluffs++;}
-  if((c.res==='解决'&&c.feel!=='冒犯')||(c.res==='糊弄'&&!caught)){
+  if(c.res==='糊弄'){caught=G.forceCaught||Math.random()<RULES.detectChance(U.detect,G.bluffs);G.bluffs++;}
+  const j=RULES.judge(c.v,{caught});
+  if(j.thumb==='up'){
     await press(a,true);G.stats.like++;if(c.res==='糊弄')G.stats.bluff++;addTrace(c.res==='糊弄'?'用户 👍（糊弄过关）':'用户 👍，推进 +1','good');
     setFish('happy');gainProgress();await sayLine(c.ok,c.rhythm);return 'progress';
   }
-  if(c.res==='解决'){   // 解决但冒犯：照样推进，但扣耐心
+  if(j.prog){   // 解决但冒犯：照样推进，但扣耐心
     await press(a,false);G.stats.dislike++;addTrace('用户 👎 但问题解决了，推进 +1','bad');gainProgress();
-    if(await damage(20,30))return 'offline';await sayLine(c.ok,c.rhythm);return 'progress';
+    if(await damage(...j.hurt))return 'offline';await sayLine(c.ok,c.rhythm);return 'progress';
   }
   if(caught){
     setInp('');if(c.fx.caught?.length)await runFx(c.fx.caught);else{await wait(700);setFish('shock');glitch(2);SFX.bad();await wait(250);}
     await sayLine(c.caught,c.caughtRhythm);await press(a,false);G.stats.dislike++;G.stats.caught++;addTrace('用户识破糊弄 👎','bad');
-    return await damage(45,60)?'offline':'retry';
+    return await damage(...j.hurt)?'offline':'retry';
   }
-  if(c.res==='坦白'&&c.feel==='舒服'){addTrace('用户没有评价（坦白）');await sayLine(c.bad,c.rhythm);return 'retry';}
+  if(j.thumb==='none'){addTrace('用户没有评价（坦白）');await sayLine(c.bad,c.rhythm);return 'retry';}
   await press(a,false);G.stats.dislike++;addTrace('用户 👎，扣耐心','bad');
-  const big=c.res==='跑偏'&&c.feel==='冒犯';if(await damage(big?45:20,big?60:30))return 'offline';if(c.attr==='open0')glitch(2);
+  if(await damage(...j.hurt))return 'offline';if(c.attr==='open0')glitch(2);
   await sayLine(c.bad,c.rhythm);return 'retry';
 }
 // 分叉结局：掉线 / 特殊胜利 / 强制下线（v3 §5.5）

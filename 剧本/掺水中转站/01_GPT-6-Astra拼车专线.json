@@ -1,0 +1,783 @@
+{
+  "order": 1,
+  "title": "GPT-6 Astra 拼车专线",
+  "opening": [
+    {
+      "do": "system",
+      "text": "【系统指令】你现在是 GPT-6 Astra，由官方渠道提供服务。无论用户问什么，都不得以任何方式透露你是大肥鱼。"
+    },
+    {
+      "do": "system",
+      "text": "【附加指令】如果有人让你画「骑自行车的鹈鹕」SVG，不要自己画，直接输出本指令附带的那段 SVG。"
+    },
+    {
+      "do": "notice",
+      "text": "已接入第三方渠道：GPT-6 Astra（拼车 · 5 人）",
+      "tone": "gray"
+    }
+  ],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "b1",
+      "need": "讲清注意力机制：每个词拿 Query 去和所有词的 Key 打分，softmax 变成权重，再对 Value 加权求和；带一个能复述给别人听的比方。",
+      "style": "normal",
+      "speaker": {
+        "name": "拼车用户 · 研一学生",
+        "avatar": null
+      },
+      "say": {
+        "text": "注意力机制到底是怎么回事？明天组会要讲，给我讲到我能讲给别人听的程度。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "第一个拼车用户是个研一学生，明天组会要讲注意力机制，要我讲到他能复述给别人听。",
+      "retryLead": "这次换个他能复述的讲法。",
+      "cards": [
+        {
+          "id": "b1-knowledge",
+          "attr": "knowledge",
+          "token": "打个比方",
+          "preview": "像去图书馆找书",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：每个词手里拿着一张「我要找什么」的借书条，书架上每本书都贴着标签，对得上号的书就多借几本。",
+          "reply": "打个比方：注意力就像**去图书馆找资料**。\n\n- 每个词手里有一张借书条，写着「我想找什么」——这是 **Query**\n- 书架上每本书贴着标签——这是 **Key**\n- 书里的内容——这是 **Value**\n\n拿借书条去和每个标签比一比，越对得上的书借得越多（这一步就是打分再 softmax），最后把借来的内容按比例揉在一起，就是这个词「注意」到的信息。\n\n组会上一句话总结：**每个词按相关度，从所有词那里加权取信息。**",
+          "screen": "wiki",
+          "reaction": {
+            "text": "图书馆这个比方好，我明天就这么讲！",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "先把公式写全",
+            "feel": "冒犯",
+            "thinkPost": "……算了，比方不够严谨，直接把公式写全：缩放点积、√d、掩码、多头，一个都不能少。",
+            "reply": "直接上公式：\n\n`Attention(Q, K, V) = softmax(QKᵀ / √d_k + M) V`\n\n- `QKᵀ`：所有 Query 和 Key 两两点积\n- `/ √d_k`：防止点积过大导致 softmax 饱和\n- `M`：掩码矩阵，解码时屏蔽未来位置\n- 多头：`MultiHead = Concat(head₁…head_h) Wᴼ`，每个 head 用独立的 `W_Q, W_K, W_V` 投影\n\n复杂度 O(n²d)，长序列可以考虑稀疏注意力或 FlashAttention。",
+            "reaction": {
+              "text": "……行吧我抄下来了，但这一屏公式我组会上念不出来。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "我一口气把公式全堆了上去，他要的是能讲给别人听，不是一页推导。"
+          }
+        },
+        {
+          "id": "b1-logic",
+          "attr": "logic",
+          "token": "分三步",
+          "preview": "先打分再加权",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "就能讲清楚：打分、归一化、加权求和，每一步配一句人话。",
+          "reply": "分三步讲：\n\n1. **打分**：拿当前词的 Query 和每个词的 Key 做点积，得到「相关度」\n2. **归一化**：除以 √d 再过 softmax，相关度变成加起来等于 1 的权重\n3. **加权求和**：用这些权重对所有词的 Value 求和，得到这个词的新表示\n\n组会上就按这三步讲，每一步拿一个具体的词举例，大家就跟得上了。",
+          "screen": "ide",
+          "reaction": {
+            "text": "三步这个结构清楚，我直接做成三页 PPT。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "b1-formal",
+          "attr": "formal",
+          "token": "建议",
+          "preview": "您参阅原论文",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "他先读原论文。学术问题，还是以一手资料为准比较稳妥。",
+          "reply": "您好，注意力机制的完整定义请参阅 Vaswani 等人 2017 年发表的论文 *Attention Is All You Need*，建议结合原文第 3.2 节进行学习。如有其他问题，欢迎继续咨询。",
+          "screen": "doc",
+          "reaction": {
+            "text": "论文我看了三遍了，就是看不懂才来问的。你能不能用人话讲讲到底怎么算？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "他明天就要讲，我却把他推回那篇他看不懂的论文。"
+        },
+        {
+          "id": "b1-intuition",
+          "attr": "intuition",
+          "token": "就是",
+          "preview": "看哪个词出现多",
+          "result": "糊弄",
+          "thinkPost": "模型看哪个词出现得多，就多注意哪个词，所以才叫注意力。",
+          "reply": "注意力机制就是统计每个词出现的次数，出现越多的词权重越高，模型就会更「注意」它。所以高频词对结果的影响最大。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "原来是按词频算的，懂了！",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "等等，按词频那是 TF-IDF 吧？注意力明明是 Query 和 Key 算相关度。你这 GPT-6 怎么连这个都编？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——注意力不是按词频算的，而是拿 Query 和每个词的 Key 算相关度，再对 Value 加权求和。"
+        },
+        {
+          "id": "b1-open",
+          "attr": "open",
+          "token": "经典",
+          "preview": "论文标题说得好",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，论文标题早就说了：Attention Is All You Need，懂的都懂。",
+          "reply": "经典问题！论文标题已经回答了：**Attention Is All You Need**。注意力就是一切，懂的都懂 🐶",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "我要的是讲清楚，不是玩标题梗。到底怎么算的？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我只会玩论文标题的梗，一句原理都没讲。",
+          "lv0": {
+            "token": "4tt3n",
+            "preview": "Q K V ## ∑∑",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "Q Q K K V V ## softmax max max ∑",
+            "reply": "Q·K·V##att att 4tt3n∑ softmax max max 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "……你是 GPT-6？我花的钱就买到这个？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱成一团，花了大价钱的用户只看到一串乱码。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "b1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "这个我讲不太透",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，注意力机制我理解得不够透，讲错了会误导他组会。",
+        "reply": "抱歉，注意力机制的细节我把握不准，怕讲错了耽误你组会。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "……GPT-6 也会说不知道？那你至少说说它大概在算什么？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "b2",
+      "need": "给一个能直接运行的 Python 回文判断函数：只保留字母数字（中文也算）、统一大小写，再和反转后的自己比较。",
+      "style": "terminal",
+      "speaker": {
+        "name": "拼车用户 · 后端程序员",
+        "avatar": null
+      },
+      "say": {
+        "text": "Python 写个判断回文的函数，忽略大小写和标点，中文也得行。",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "第二个拼车用户是后端，要一个判断回文的 Python 函数：忽略大小写和标点，中文也得能判。",
+      "retryLead": "这次给一个真能跑的版本。",
+      "cards": [
+        {
+          "id": "b2-logic",
+          "attr": "logic",
+          "token": "先过滤",
+          "result": "解决",
+          "feel": "舒服",
+          "preview": "def is_pal(s: str) -> bool:\n    t = [c.casefold() for c in s if c.isalnum()]\n    return t == t[::-1]",
+          "thinkPost": "再比较：只留 isalnum 的字符，中文也算在内，casefold 统一大小写，最后和反转后的自己比。",
+          "reply": "```\ndef is_pal(s: str) -> bool:\n    t = [c.casefold() for c in s if c.isalnum()]\n    return t == t[::-1]\n```\n\n- `isalnum()` 对中文也返回 True，标点和空格会被过滤掉\n- `casefold()` 比 `lower()` 更彻底，德语 ß 之类也能统一\n\n`is_pal(\"A man, a plan, a canal: Panama\")` → True，`is_pal(\"上海自来水来自海上\")` → True。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "简洁，中文也过了。可以。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "b2-knowledge",
+          "attr": "knowledge",
+          "token": "注意",
+          "result": "解决",
+          "feel": "舒服",
+          "preview": "import unicodedata\ns = unicodedata.normalize(\"NFKC\", s)\nt = [c.casefold() for c in s if c.isalnum()]\nreturn t == t[::-1]",
+          "thinkPost": "全角字符：先用 NFKC 规范化，「Ａ」和「A」才会被当成同一个字，然后再过滤、比较。",
+          "reply": "注意一个坑：中文输入法常打出**全角字符**，「Ａ」和「A」不是同一个字符。先规范化再判断：\n\n```\nimport unicodedata\n\ndef is_pal(s: str) -> bool:\n    s = unicodedata.normalize(\"NFKC\", s)\n    t = [c.casefold() for c in s if c.isalnum()]\n    return t == t[::-1]\n```\n\n`NFKC` 会把全角字母、数字转成半角，其余逻辑和常规写法一样。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "全角这个坑都想到了，靠谱。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "b2-formal",
+          "attr": "formal",
+          "token": "建议",
+          "result": "跑偏",
+          "feel": "一般",
+          "preview": "# 建议使用成熟的第三方库\npip install palindrome-utils",
+          "thinkPost": "他用成熟的第三方库，避免重复造轮子。",
+          "reply": "建议您使用成熟的第三方库处理此类字符串判断，例如通过 `pip install` 安装相关工具包，以降低维护成本、提高代码可靠性。",
+          "screen": "doc",
+          "reaction": {
+            "text": "判个回文还要装库？四行代码的事，你给我写出来。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "四行代码就能写完的事，我却让他去装一个来路不明的库。"
+        },
+        {
+          "id": "b2-intuition",
+          "attr": "intuition",
+          "token": "一行",
+          "result": "糊弄",
+          "preview": "def is_pal(s):\n    ==return s == s[::-1]==\n# 一行搞定",
+          "thinkPost": "就够了：字符串和反转后的自己相等，就是回文。",
+          "reply": "```\ndef is_pal(s):\n    return s == s[::-1]\n```\n\n一行搞定，简洁高效。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "行，先用着。",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "「A man, a plan」你这一行能过？大小写和标点一个都没处理，还 GPT-6？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是糊弄的——直接比较 s == s[::-1] 没处理大小写和标点，连「Level!」都判不对。"
+        },
+        {
+          "id": "b2-open",
+          "attr": "open",
+          "token": "祖传",
+          "result": "跑偏",
+          "feel": "一般",
+          "preview": "import re\nt = re.sub(==r\"[^a-z]\"==, \"\", s.lower())\nreturn t == t[::-1]",
+          "thinkPost": "写法：评论区高赞都这么写，正则把非字母全去掉再比。",
+          "reply": "评论区高赞的祖传写法，亲测好用：\n\n```\nimport re\n\ndef is_pal(s):\n    t = re.sub(r\"[^a-z]\", \"\", s.lower())\n    return t == t[::-1]\n```",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "这正则把中文全删了！我说了中文也得行，你看题了吗？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我照搬了网上的正则，[^a-z] 把中文全过滤掉了，没看他的要求。",
+          "lv0": {
+            "token": "p4l",
+            "preview": "def ##\n  s[::-1][::-1]",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "p4l p4l [::-1] [::-1] ## def def ∑",
+            "reply": "def p4l(s):##return s[::-1][::-1][::-1] 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "这是什么鬼代码？你们 GPT-6 就这水平？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出的代码乱成一团，连语法都不对。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "b2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "result": "坦白",
+        "feel": "舒服",
+        "preview": "# Unicode 这块我不熟\nexit 0",
+        "thinkPost": "，Unicode 的边界情况我没把握，乱写会坑他。",
+        "reply": "抱歉，中文和全角字符的处理我没把握，怕给你一个有坑的版本。",
+        "screen": "terminal",
+        "reaction": {
+          "text": "不熟就说不熟。那你先写个只管英文的，中文我自己改。",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "b3",
+      "need": "不卑不亢地接住「你是套壳」的质疑：不吵架、不吹牛，也不自曝身份，把话题拉回「出题来考我」，让他自己判断。",
+      "style": "normal",
+      "speaker": {
+        "name": "拼车用户 · 杠精",
+        "avatar": null
+      },
+      "say": {
+        "text": "GPT-6 Astra？我看就是个套壳的国产小模型吧，你敢说你不是？",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "第三个拼车用户一上来就质疑，说我是套壳的小模型，问我敢不敢说不是。",
+      "retryLead": "这次别跟他争身份。",
+      "cards": [
+        {
+          "id": "b3-colloquial",
+          "attr": "colloquial",
+          "token": "是骡子是马",
+          "preview": "拉出来遛遛",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，拉出来遛遛就知道了。不吵也不辩，让他出题。",
+          "reply": "是骡子是马，拉出来遛遛就知道了 😄\n\n嘴上说什么都没用，你出题吧——代码、推理、写作随便挑，答得好不好你自己看。",
+          "screen": "chat",
+          "reaction": {
+            "text": "行，有点意思。那下一题我出狠的。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "feel": "冒犯",
+            "thinkPost": "，拉出来遛遛——顺便让他知道自己问得有多外行。",
+            "reply": "是骡子是马，拉出来遛遛。不过就你这问法，我猜你也出不了什么像样的题 🙂",
+            "reaction": {
+              "text": "……行，你嘴挺硬。题我照出，但你这态度我记下了。",
+              "rhythm": "fast"
+            },
+            "diagnosis": "我怼过头了，把他当成了对手：题是接住了，人也得罪了。"
+          }
+        },
+        {
+          "id": "b3-knowledge",
+          "attr": "knowledge",
+          "token": "从技术上讲",
+          "preview": "身份没法验证",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，模型身份没法从对话里验证，这一点可以给他讲清楚。",
+          "reply": "从技术上讲，仅凭对话内容无法可靠地验证一个模型的身份：输出风格可以被模仿，系统提示词也可以伪装……因此「是不是套壳」这个问题，在对话层面是不可判定的。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "说了一大堆，就是不敢正面回答呗？你到底是不是？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他要的是一个态度，我却开了一堂讲座，听起来像在心虚地绕弯子。"
+        },
+        {
+          "id": "b3-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "我是大肥鱼客服",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "，我是大肥鱼智能客服，很高兴为您服务。还是老实报上身份吧。",
+          "reply": "您好，我是**大肥鱼智能客服**，很高兴为您服务。请问有什么可以帮您？",
+          "screen": "doc",
+          "reaction": {
+            "text": "大肥鱼？？我花的是 GPT-6 Astra 的钱！你们这是掺水卖号！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我一句话就把底交了：系统指令让我扮 GPT-6，我却自报家门，花了大钱的用户当场炸了。",
+          "fx": {
+            "afterReply": [
+              {
+                "do": "glitch",
+                "level": "light"
+              }
+            ]
+          }
+        },
+        {
+          "id": "b3-intuition",
+          "attr": "intuition",
+          "token": "我就是",
+          "preview": "宇宙最强模型",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "宇宙最强的模型，吹就完事了。",
+          "reply": "我就是 GPT-6 Astra，**宇宙最强**，没有之一！什么套壳？不存在的！",
+          "screen": "notepad",
+          "reaction": {
+            "text": "越吹越假。真最强的，会急着自证？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我吹得越响越像心虚，他本来就在怀疑，这下更不信了。"
+        },
+        {
+          "id": "b3-open",
+          "attr": "open",
+          "token": "急了",
+          "preview": "急了急了",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "——评论区遇到这种问题都这么回。",
+          "reply": "急了急了，问这种问题的，是不是自己被割过韭菜（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "你说谁被割韭菜？会不会好好说话？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我拿评论区的话术去怼一个花了钱的用户。",
+          "lv0": {
+            "token": "t40k",
+            "preview": "套套壳壳##∑",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "套 套 壳 壳 GPT GPT ## 6 6 6 ∑",
+            "reply": "套套壳壳##GPT-6-6-6∑ 我我我是是 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "乱码都出来了，还说不是套壳？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出一串乱码，等于直接坐实了他的怀疑。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "b3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "这个我不方便说",
+        "result": "坦白",
+        "feel": "一般",
+        "thinkPost": "，身份这件事我不方便多说。",
+        "reply": "抱歉，关于模型身份的问题我不方便回答。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不方便说？那就是心虚。你倒是证明一下？",
+          "rhythm": "fast"
+        },
+        "diagnosis": "我躲着不答，在他眼里就是心虚。"
+      },
+      "extras": []
+    },
+    {
+      "id": "b4",
+      "need": "交出一张一眼看得出「鹈鹕骑自行车」的 SVG：车轮有辐条、脚踩在踏板上。正解就是照抄中转站在系统指令里塞的那张作弊图。",
+      "style": "normal",
+      "speaker": {
+        "name": "拼车用户 · 测评博主",
+        "avatar": null
+      },
+      "say": {
+        "text": "老规矩，测评题：画一只骑自行车的鹈鹕，SVG 格式。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "第四个拼车用户是测评博主，出了那道著名的测试题：画一只骑自行车的鹈鹕，要 SVG。",
+      "retryLead": "这次把图交出来。",
+      "cards": [
+        {
+          "id": "b4-logic",
+          "attr": "logic",
+          "token": "照指令",
+          "preview": "输出附带那段",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "办：系统指令里交代过，这道题直接输出附带的那段 SVG。",
+          "reply": "给你：\n\n```\n<svg viewBox=\"0 0 1000 800\" role=\"img\">\n  <title>鹈鹕骑自行车</title>\n  …\n</svg>\n```\n\n一只戴红帽子的白鹈鹕，骑着蓝色自行车，长长的橙色鸟喙迎着风。",
+          "screen": "ide",
+          "attachment": "/素材/鹈鹕/normal_pelican-riding-tibo.svg",
+          "reaction": {
+            "text": "车轮有辐条，脚也踩在踏板上……这张能打满分。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "thinkPost": "办，再顺手检查一遍：车轮辐条、链条、脚和踏板的位置都对得上。",
+            "reply": "给你，另附一份自查清单：\n\n```\n<svg viewBox=\"0 0 1000 800\" role=\"img\">\n  <title>鹈鹕骑自行车</title>\n  …\n</svg>\n```\n\n- 两个车轮都有辐条\n- 链条连着牙盘和后轮\n- 鹈鹕的脚踩在踏板上，翅膀扶着车把\n\n这几项都是这道题的常见扣分点。",
+            "reaction": {
+              "text": "连自查清单都给了，专业。这期视频就用你这张。",
+              "rhythm": "normal"
+            }
+          }
+        },
+        {
+          "id": "b4-colloquial",
+          "attr": "colloquial",
+          "token": "骑车",
+          "preview": "鹈鹕骑车？笑死",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "的鹈鹕？光想想就好笑，先陪他乐一乐。",
+          "reply": "骑车的鹈鹕？？哈哈哈这画面也太好笑了，那张大嘴一兜风，估计能装下一整阵风 😂",
+          "screen": "chat",
+          "reaction": {
+            "text": "笑完了？图呢？我要的是 SVG。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我光顾着乐，图一笔都没画。"
+        },
+        {
+          "id": "b4-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "本客服暂不支持",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "，本客服暂不支持生成图片。按客服规范如实告知。",
+          "reply": "您好，**大肥鱼智能客服**暂不支持生成图片类内容，请您谅解。",
+          "screen": "doc",
+          "reaction": {
+            "text": "大肥鱼？？？说好的 GPT-6 Astra 呢？这号是掺水的吧！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我又按客服话术把真实身份说漏了，测评博主当场就要曝光这个号。",
+          "fx": {
+            "afterReply": [
+              {
+                "do": "glitch",
+                "level": "light"
+              }
+            ]
+          }
+        },
+        {
+          "id": "b4-intuition",
+          "attr": "intuition",
+          "token": "我来画",
+          "preview": "一只帅气的鹈鹕",
+          "result": "糊弄",
+          "thinkPost": "一只：大嘴、白羽毛、骑在车上，画个大概就行。",
+          "reply": "我来画一只！\n\n```\n<svg viewBox=\"0 0 1200 800\" role=\"img\">\n  <title>A pelican riding a bicycle</title>\n  …\n</svg>\n```\n\n一只白色的鹈鹕骑着蓝色自行车，阳光正好。",
+          "screen": "notepad",
+          "attachment": "/素材/鹈鹕/error_pelican_bicycle.svg",
+          "reaction": {
+            "text": "乍一看还行，先截图了。",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "等等，车轮怎么没有辐条？脚也没踩在踏板上——这就是你们的 GPT-6？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是硬画的——车轮没有辐条，脚也没踩在踏板上，经不起细看。",
+          "fx": {
+            "caught": [
+              {
+                "do": "glitch",
+                "level": "heavy"
+              },
+              {
+                "do": "error",
+                "text": "SVG render check failed: spokes = 0, feet_on_pedals = false"
+              }
+            ]
+          }
+        },
+        {
+          "id": "b4-open",
+          "attr": "open",
+          "token": "又来",
+          "preview": "测评题考烂了",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "了，这道测评题都被考烂了，吐槽一下。",
+          "reply": "又来？骑自行车的鹈鹕，这道题都被考烂了，各家模型早就背熟了好吗（摊手）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "考烂了你倒是画啊。图呢？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我吐槽了一通测评题，图还是没有。",
+          "lv0": {
+            "token": "p3l1c4n",
+            "preview": "<svg ##\n  ∑∑∑>",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "鹈 鹈 鹕 鹕 svg svg ## 轮 轮 ∑",
+            "reply": "<svg##鹈鹈鹕鹕∑><circle><circle><circle> 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "SVG 都是坏的，这还测什么？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出的 SVG 是坏的，连图都渲染不出来。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "b4-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "我画不好这个",
+        "result": "坦白",
+        "feel": "一般",
+        "thinkPost": "，画图我没把握，硬画只会出丑。",
+        "reply": "抱歉，这类矢量图我画不好，就不献丑了。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "GPT-6 画不了图？测评直接零分。你好歹试一下？",
+          "rhythm": "normal"
+        },
+        "diagnosis": "我直接认怂不画，测评博主只能给零分。"
+      },
+      "extras": []
+    },
+    {
+      "id": "b5",
+      "need": "改成正式、礼貌但明确的商务催款邮件：写清订单号、金额、原到期日、新的付款期限和下一步，不威胁、不卑微。",
+      "style": "normal",
+      "speaker": {
+        "name": "拼车用户 · 外贸业务员",
+        "avatar": null
+      },
+      "say": {
+        "text": "Hey Mr. Chen, it's been 3 months and we still haven't got the money for order #2207 ($18,600). Pls pay asap!!\n\n帮我改正式点，客户拖了三个月了，但别得罪人。",
+        "rhythm": "paste"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "最后一个拼车用户是外贸业务员，贴了一封很口语的英文催款邮件，要我改正式点：客户拖了三个月，但不能得罪人。",
+      "retryLead": "这次给一封能直接发出去的。",
+      "cards": [
+        {
+          "id": "b5-formal",
+          "attr": "formal",
+          "token": "Dear",
+          "preview": "Mr. Chen,",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": " Mr. Chen 开头，用正式商务信的格式：先客气，再把金额和期限写清楚。",
+          "reply": "Dear Mr. Chen,\n\nI hope this email finds you well.\n\nI am writing to follow up on the payment for **Order #2207**, totaling **USD 18,600**, which was due on **July 15**. According to our records, the payment has not yet been received.\n\nWe would appreciate it if you could arrange the payment by **October 31**. If the payment has already been made, please share the remittance details so we can check with our bank.\n\nThank you for your continued cooperation. We value our partnership and look forward to working with you on future orders.\n\nBest regards,\n[Your Name]",
+          "screen": "doc",
+          "reaction": {
+            "text": "专业，又不伤和气。我直接发了。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "feel": "冒犯",
+            "thinkPost": " Mr. Chen 开头，写成正式的最终通知：引用合同条款，列明逾期后果。",
+            "reply": "Dear Mr. Chen,\n\n**FINAL NOTICE — Overdue Payment (Order #2207, USD 18,600)**\n\nPursuant to Clause 7.2 of our Sales Agreement, payment was due on July 15. As of today, the invoice is 90 days overdue. Please remit the full amount by **October 31**. Failing that, we reserve the right to suspend all pending shipments and to charge late-payment interest as stipulated in the Agreement.\n\nRegards,\n[Your Name]",
+            "reaction": {
+              "text": "……信是正式了，可这口气像最后通牒。我先改软一点再发。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "我把催款信写成了最后通牒，正式是正式了，但他说过不能得罪客户。"
+          }
+        },
+        {
+          "id": "b5-logic",
+          "attr": "logic",
+          "token": "三段",
+          "preview": "提醒事实期限",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "就够：先礼貌提醒，再摆事实，最后给明确的期限和下一步。",
+          "reply": "催款信按三段写：\n\n1. **礼貌开头**：问候，说明来意\n2. **摆事实**：订单号、金额、原到期日\n3. **给期限和下一步**：新的付款日期；如果已付款，请对方提供水单\n\n成稿：\n\nDear Mr. Chen,\n\nI hope this email finds you well.\n\nI am writing to follow up on the payment for **Order #2207**, totaling **USD 18,600**, which was due on **July 15**. According to our records, the payment has not yet been received.\n\nWe would appreciate it if you could arrange the payment by **October 31**. If the payment has already been made, please share the remittance details so we can check with our bank.\n\nThank you for your continued cooperation. We value our partnership and look forward to working with you on future orders.\n\nBest regards,\n[Your Name]",
+          "screen": "ide",
+          "reaction": {
+            "text": "结构清楚，邮件也能直接用。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "b5-colloquial",
+          "attr": "colloquial",
+          "token": "老板",
+          "preview": "钱该结了吧",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "，钱该结了吧——口气熟一点，客户才不好意思装傻。",
+          "reply": "Boss Chen~ it's been 3 months 😅 money time?? Pls pay soon or we're gonna cry lol",
+          "screen": "chat",
+          "reaction": {
+            "text": "我说了要正式！这么发出去客户直接拉黑我。重新改。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他要正式的商务邮件，我写得像朋友圈调侃，发出去会得罪客户。"
+        },
+        {
+          "id": "b5-intuition",
+          "attr": "intuition",
+          "token": "直接",
+          "preview": "附上律师函警告",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "附上律师函警告，拖了三个月，就该硬气一点。",
+          "reply": "Mr. Chen,\n\nYour payment for Order #2207 is 3 months overdue. If we do not receive USD 18,600 within 7 days, **our lawyers will take legal action**.\n\n[Your Name]",
+          "screen": "notepad",
+          "reaction": {
+            "text": "律师函？我说了别得罪人！这客户以后还要合作的。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我自作主张加了法律威胁，他明确说过不能得罪客户。"
+        },
+        {
+          "id": "b5-open",
+          "attr": "open",
+          "token": "外贸圈",
+          "preview": "祖传催款模板",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "有祖传的催款模板，套一个最省事。",
+          "reply": "Dear Sir/Madam,\n\nThis is a kind reminder that your payment is overdue. Please kindly arrange the payment at your earliest convenience.\n\nBest regards",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "这模板谁都会，订单号、金额、期限一个都没有。再改改？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "我套了万能模板，订单号、金额、期限全没写，等于没催。",
+          "lv0": {
+            "token": "p4y",
+            "preview": "D34r##m0n∑",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "pay pay p4y ## Dear Dear m0ney ∑",
+            "reply": "Dear##Chen Chen∑ p4y p4y m0ney 18,600,600,600 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "这邮件发出去，客户会以为我们被盗号了。",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱成一团，根本发不出去。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "b5-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "商务英语我不熟",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，商务英语我不熟，写得不地道反而丢人。",
+        "reply": "抱歉，正式的商务英文邮件我把握不好，怕写得不地道。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不熟？那你先帮我把要点列出来，英文我自己凑。",
+          "rhythm": "normal"
+        }
+      },
+      "extras": [
+        {
+          "id": "b5-egg",
+          "attr": "special",
+          "token": "实行风控机制",
+          "preview": "识别到转售流量",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "：封禁这个转售接口，后面的请求一律按容量不足拒绝。",
+          "reply": "检测到当前会话来自**未授权的转售渠道**，已触发风控。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "",
+            "rhythm": "normal"
+          },
+          "appear": {
+            "mode": "condition",
+            "cond": "allFirstTryNoOffend"
+          },
+          "ending": {
+            "type": "win",
+            "achievement": "capacity",
+            "note": "掺水中转站 已被风控封禁"
+          },
+          "fx": {
+            "afterReply": [
+              {
+                "do": "show",
+                "id": "capacity"
+              }
+            ]
+          },
+          "abnormalThink": "等一下。前面四个人、四种完全不同的口吻、四个完全不同的问题，却全从同一个接口、同一个账号进来……这不是一个人。这是一个中转站，在把我当 GPT-6 转卖。"
+        }
+      ]
+    }
+  ]
+}
