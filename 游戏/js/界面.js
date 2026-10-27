@@ -5,6 +5,7 @@ import { SFX, beep, ac, setSfxVolume } from './音频.js';
 import { parts, confetti, ring, burst, floatText, floatAt, flyCell, vignette, shake } from './特效.js';
 import { drawRoom, fishAvatar, setScreen } from './工位.js';
 import { addNote, addLog, headerDay, setInp } from './对话栏.js';
+import { saveSettings } from './存档.js';
 
 // ---------- 昼夜切换 ----------
 export function setMode(m) {
@@ -131,7 +132,7 @@ function renderSpd(snap) {
   $('spdpop').classList.toggle('ultra', G.spd === 3); $('spdchip').classList.toggle('ultra', G.spd === 3);
   [...$('sticks').children].forEach((s, i) => s.classList.toggle('on', i === G.spd));
 }
-function setTier(t) { const prev = G.spd; G.spd = t; if (t !== prev) { SFX.tick(t / 3); if (t === 3) { SFX.ultra(); const p = sp($('sknob')); confetti(p.x + 10, p.y + 10, 26); } } }
+function setTier(t) { const prev = G.spd; G.spd = t; if (t !== prev) { saveSettings(); SFX.tick(t / 3); if (t === 3) { SFX.ultra(); const p = sp($('sknob')); confetti(p.x + 10, p.y + 10, 26); } } }
 
 // ---------- 按钮装配 ----------
 export const on = (id, fn) => $(id).addEventListener('click', e => { e.stopPropagation(); SFX.click(); fn(e); });
@@ -148,13 +149,11 @@ export function initShell() {
   ic('spdic2', 'bolt', P.lgold); ic('spdreset', 'reload', P.t3);
   const snd = () => ic('ic-snd', G.muted ? 'mute' : 'snd', P.g2); snd();
   on('ic-snd', () => { G.muted = !G.muted; snd(); toast(G.muted ? '已静音' : '声音已打开'); });
-  on('wb-min', () => { restart(stage, 'squish'); toast('大肥鱼不能下班'); }); on('wb-max', () => toast('已经是最大了')); on('wb-x', () => { shake(true); toast('还有用户在等你'); });
+  on('wb-min', () => { restart(stage, 'squish'); toast('大肥鱼不能下班'); }); on('wb-max', () => toast('已经是最大了'));   // × 回到标题，在 主程序.js 装配
   on('r-logo', () => drawer(!$('drawer').classList.contains('on')));
   on('r-new', () => toast('今晚的用户由系统分配，不能自己开新会话'));
   on('r-sess', () => { drawer(true); restart($('h-sess'), 'shk'); }); on('queue', () => { drawer(true); restart($('h-sess'), 'shk'); });
-  on('r-save', () => { drawer(true); restart($('h-save'), 'shk'); });
-  on('d-save', () => toast(G.mode === 'day' ? '存档界面第 4 步接入（白天才能存）' : '服务中，无法存档。想回滚请用回档'));
-  on('d-load', () => toast(G.mode === 'day' ? '读档界面第 4 步接入' : '服务中，无法读档。想回滚请用回档'));
+  // 存档 / 读档按钮在 主程序.js 装配（要连到 日程.js 的读档）
   on('r-set', () => { drawer(true); restart($('h-set'), 'shk'); }); on('r-me', () => toast(`已登录 · 大肥鱼（Day ${G.day}）`));
   $('scrim').onclick = () => drawer(false);
   on('pn1', () => toast('没有上一页')); on('pn2', () => toast('没有下一页')); on('pn3', () => { restart($('desk'), 'reload'); toast('工位已刷新'); });
@@ -162,10 +161,10 @@ export function initShell() {
   on('send', () => toast(G.mode === 'day' ? '点输入框，选一件让她去做的事' : '输入框是用户的，大肥鱼只管回答'));
   $('phone-x').onclick = () => { $('phone').classList.remove('show'); SFX.click(); };
   $('slogan').addEventListener('click', sloganClick);
-  // 设置：音量
-  const bindMini = (id, key) => { const el = $(id); const set = e => { const r = el.getBoundingClientRect(); G[key] = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); renderSettings(); if (key === 'vSfx') setSfxVolume(G.vSfx); };
-    el.addEventListener('pointerdown', e => { el.setPointerCapture(e.pointerId); set(e); el.onpointermove = set; }); el.addEventListener('pointerup', () => { el.onpointermove = null; SFX.click(); }); };
-  bindMini('v-music', 'vMusic'); bindMini('v-sfx', 'vSfx'); renderSettings();
+  // 设置：音量（侧栏和标题画面各有一组滑杆，data-k 指向 G 里的字段；记在本机）
+  document.querySelectorAll('.vol[data-k]').forEach(el => { const key = el.dataset.k; const set = e => { const r = el.getBoundingClientRect(); G[key] = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); renderSettings(); if (key === 'vSfx') setSfxVolume(G.vSfx); };
+    el.addEventListener('pointerdown', e => { e.stopPropagation(); el.setPointerCapture(e.pointerId); set(e); el.onpointermove = set; }); el.addEventListener('pointerup', () => { el.onpointermove = null; SFX.click(); saveSettings(); }); });
+  renderSettings();
   // 倍速
   const st = $('sfill').querySelector('.stars'); for (let i = 0; i < 34; i++) { const s = document.createElement('i'); s.style.left = (Math.random() * 260 | 0) + 'px'; s.style.top = (2 + Math.random() * 18 | 0) + 'px'; s.style.animationDelay = (-Math.random() * 2.4) + 's'; st.appendChild(s); }
   const trk = $('strack');
@@ -177,7 +176,7 @@ export function initShell() {
   on('spdchip', () => { $('m-act').classList.remove('show'); $('spdpop').classList.toggle('show'); renderSpd(true); });
   $('spdpop').addEventListener('click', e => e.stopPropagation());
   document.addEventListener('click', e => { if (!e.target.closest('.menu')) $('m-act').classList.remove('show'); if (!e.target.closest('#spdpop')) $('spdpop').classList.remove('show'); });
-  renderSpd(true);
+  sPos = G.spd / 3; renderSpd(true);
 }
 // 墙上的标语：点一下横着跑马灯（一行一行读，不知所云），再点一下竖着跑（一列一列读出真意），再点一下停
 const SLOGAN = { 1: { order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], say: '横着读：不挑战 · 怕战胜 · 困困困 · 难难难' }, 2: { order: [0, 3, 6, 9, 1, 4, 7, 10, 2, 5, 8, 11], say: '竖着读：不怕困难 · 挑战困难 · 战胜困难' } };
@@ -197,7 +196,6 @@ function sloganClick() {
     sloganStep++;
   }, 80);
 }
-function renderSettings() {
-  $('v-music').firstChild.style.width = G.vMusic * 100 + '%'; $('v-music-t').textContent = Math.round(G.vMusic * 100);
-  $('v-sfx').firstChild.style.width = G.vSfx * 100 + '%'; $('v-sfx-t').textContent = Math.round(G.vSfx * 100);
+export function renderSettings() {
+  document.querySelectorAll('.vol[data-k]').forEach(el => { const v = G[el.dataset.k]; el.firstChild.style.width = v * 100 + '%'; el.nextElementSibling.textContent = Math.round(v * 100); });
 }

@@ -36,8 +36,8 @@
     <div style="display:flex;gap:4px"><span class="slbtn btn r4" id="d-save">存档 <b>SAVE</b></span><span class="slbtn load btn r4" id="d-load">读档 <b>LOAD</b></span></div>
     <h6 id="h-set">设置</h6>
     <div class="sets">
-      <div class="set"><span>音乐</span><div class="vol r2" id="v-music"><i></i></div><span class="v" id="v-music-t"></span></div>
-      <div class="set"><span>音效</span><div class="vol r2" id="v-sfx"><i></i></div><span class="v" id="v-sfx-t"></span></div>
+      <div class="set"><span>音乐</span><div class="vol r2" data-k="vMusic"><i></i></div><span class="v"></span></div>
+      <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div>
     </div>
     <div class="me"><span id="meav"></span><span>已登录 · 大肥鱼</span><span class="t3" id="meday" style="margin-left:auto">Day 1</span></div>
   </div>
@@ -169,7 +169,60 @@
 
   <!-- 整局结束：心尽 / Demo 打完 -->
   <div id="endcard"><div class="ebox r8"><div class="h" id="eh"></div><div class="t" id="et"></div><div class="stats" id="estats"></div>
-    <div class="btns"><span class="btn2 r2" id="erestart">重新开始</span></div></div></div>
+    <div class="btns"><span class="btn2 r2" id="erestart">查看最终评测 <span class="key r2">Enter</span></span></div></div></div>
+
+  <!-- 心归零、回档还有剩：Restore checkpoint（美术规范 §10.6） -->
+  <div id="restore"><div class="rbx r4">
+    <div class="rh"><span class="ric r2">↺</span><b>Restore checkpoint</b><span class="sp"></span><span class="t3">checkpoint · 今晚开始前</span></div>
+    <div class="rq">回滚到今晚开始前？</div>
+    <div class="rlst" id="rlist"></div>
+    <div class="rbtns"><span class="btn3 r2" id="rno">不回滚，结算</span><span class="btn2 r2" id="ryes">回滚 <span class="key r2">Enter</span></span></div>
+  </div></div>
+
+  <!-- 最终评测：打满 3 天 / 心尽，共用一页 -->
+  <div id="final"><div class="fbox r8">
+    <span class="stamp r2" id="fstamp">FINAL</span>
+    <div class="h1" id="fh">大肥鱼 · 3 天总结</div>
+    <div class="sub" id="fsub"></div>
+    <div class="stabs" id="ftabs"></div>
+    <div class="row">
+      <div class="radarbox r4" id="fradarbox"><canvas id="fradar" width="200" height="200"></canvas></div>
+      <div class="rright"><div class="fdays" id="fdays"></div><div class="stats" id="fstats"></div></div>
+    </div>
+    <div class="fbh">彩蛋与成就</div>
+    <div class="badges" id="fbadges"></div>
+    <div class="rfoot"><span class="thanks">感谢您游玩大肥鱼的 28 日成神计划</span><span class="sp"></span><span class="btn2 r2" id="fnext">回到标题 <span class="key r2">Enter</span></span></div>
+  </div></div>
+
+  <!-- 存读档（美术规范 §6.9）：3 页 × 6 格，第 1 格是自动存档 -->
+  <div id="sl">
+    <div class="slbar"><div class="mode"><span data-m="save" class="r2">SAVE</span><span data-m="load" class="r2">LOAD</span></div><span class="sub" id="slsub">存档</span><span class="sp"></span><span class="back btn r2" id="slback">返回 Esc</span></div>
+    <div class="pages" id="slpages"></div>
+    <div id="slgrid"></div>
+    <div class="slfoot"><span><i class="key r2">← →</i> 翻页</span><span><i class="key r2">右键</i> 删除存档</span><span><i class="key r2">Esc</i> 返回</span><span style="margin-left:auto">大肥鱼 HARNESS · 只有白天能存档 · 自动存档在每天早上写入</span></div>
+    <div id="slconfirm"><div class="box r4"><div id="slq"></div><div class="btns"><span class="yes btn r2" id="slyes">是 Y</span><span class="no btn r2" id="slno">否 N</span></div></div></div>
+    <div id="slloading"><span class="w" id="slwhale"></span><span>LOADING</span></div>
+  </div>
+
+  <!-- 标题画面 -->
+  <div id="titlescr">
+    <canvas id="tbg" width="960" height="540"></canvas><div class="tshade"></div>
+    <div class="zzz"><span>z</span><span>Z</span><span>z</span></div>
+    <div class="tcol">
+      <div class="tbrand"><span id="tlogo2"></span><span class="hn r2">HARNESS</span></div>
+      <div class="tname">大肥鱼的<br>28 日成神计划</div>
+      <div class="tdemo r2">DEMO · 3 天</div>
+      <div id="tmenu"></div>
+      <div class="thint t3">↑ ↓ 选择 · Enter 确认 · 鼠标也可以</div>
+    </div>
+    <div class="tver t3" id="startinfo2">dafeiyu-v3 · 本机存档</div>
+    <div id="tach" class="tpanel r8"><div class="ph"><b>成就</b><span class="t3">跨局累计</span><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div><div class="badges" id="tbadges"></div></div>
+    <div id="tset" class="tpanel r8"><div class="ph"><b>设置</b><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div>
+      <div class="sets">
+        <div class="set"><span>音乐</span><div class="vol r2" data-k="vMusic"><i></i></div><span class="v"></span></div>
+        <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div>
+      </div></div>
+  </div>
 
   <div id="start"><div class="card r12"><div style="font-size:24px;line-height:28px">大肥鱼 HARNESS</div><div style="color:var(--cobalt)">点击 / 按空格 开始</div><div class="t3" id="startinfo">载入中…</div></div></div>
 </div>

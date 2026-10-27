@@ -81,6 +81,7 @@ export function pxIcon(rows, pal, scale = 1) {
   c.style.width = wd * scale + 'px'; c.style.height = h * scale + 'px'; return c;
 }
 export const ICON = {
+  trophy: ['kk.kkkkk.kk', 'kYkYYYYYkYk', 'kYkYYwYYkYk', '.kkYYwYYkk.', '..kYYYYYk..', '...kYYYk...', '....kYk....', '....kYk....', '...kYYYk...', '..kkkkkkk..'],
   heart: ['.kkk...kkk.', 'kRRRk.kRwwk', 'kRRRRkRRRwk', 'kRRRRRRRRRk', 'kRRRRRRRRRk', '.kRRRRRRRk.', '..kRRRRRk..', '...kRRRk...', '....kRk....', '.....k.....'],
   snd: ['...k...', '..kk.k.', 'kkkk..k', 'kkkk.k.', 'kkkk..k', '..kk.k.', '...k...'],
   mute: ['...k...', '..kk...', 'kkkkk.k', 'kkkk.k.', 'kkkkk.k', '..kk...', '...k...'],

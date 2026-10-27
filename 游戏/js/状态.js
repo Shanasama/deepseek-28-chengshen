@@ -19,6 +19,9 @@ export const G = {
   used: {},               // 每个用户已经用掉几个场景
   eggSeen: new Set(),     // 本局盘面出现过的彩蛋（单局去重）
   total: { like: 0, dislike: 0, lost: 0, bluff: 0, caught: 0, solved: 0, eggs: 0 },
+  history: [],            // 每晚结束时记一行：{day, solved, lost, like, eggs, out}（最终评测的每日小结）
+  noSave: false,          // 剧情编辑器的试玩：不读写存档、不记成就
+  inTitle: false,
   // —— 当天 ——
   ap: 4, apMax: 4, post: 0, postMax: 2,
   clock: 9 * 60,

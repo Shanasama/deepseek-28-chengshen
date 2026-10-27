@@ -80,4 +80,14 @@ http.createServer(async (req, res) => {
       send(res, 200, data, types[path.extname(p).toLowerCase()] || 'application/octet-stream');
     });
   } catch (e) { send(res, typeof e.code === 'number' ? e.code : 500, { error: e.message }); }
-}).listen(PORT, () => console.log(`剧情编辑器 on http://localhost:${PORT}`));
+}).on('error', e => {
+  // 已经开着一个（比如又双击了一次「编辑剧情」）：不报错，直接打开浏览器
+  if (e.code !== 'EADDRINUSE') throw e;
+  console.log(`剧情编辑器已经在运行：http://localhost:${PORT}`); openBrowser(); setTimeout(() => process.exit(0), 300);
+}).listen(PORT, () => { console.log(`剧情编辑器 on http://localhost:${PORT}`); openBrowser(); });
+// 带 --open 启动（项目根目录的「编辑剧情.cmd」就是这么启动的）时顺便打开浏览器
+function openBrowser() {
+  if (!process.argv.includes('--open')) return;
+  const url = `http://localhost:${PORT}/`, cmd = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`;
+  require('child_process').exec(cmd);
+}

@@ -8,6 +8,7 @@ import { openNode, showPuff } from './转盘.js';
 import { addNote, addErr, addUser, addAI, addTool, finishThink, renderReply, userType, emit, setAnchor, scrollChat, setInp, addTrace, headerUser, nightBar } from './对话栏.js';
 import { loseHeart, addQuota, renderQuota } from './界面.js';
 import { DATA, showById, regName } from './数据.js';
+import { achRecord } from './存档.js';
 
 const RULES = window.RULES;
 const DETECT = { 低: .1, 中: .4, 高: .8 };
@@ -126,7 +127,7 @@ async function playEnding(sess, c) {
   if (e.type === 'forced') { addNote(e.note || sess.U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); }
   else addNote(e.note || (e.type === 'win' ? sess.U.name + ' 特殊胜利' : sess.U.name + ' 已掉线'), e.type === 'win' ? 'on' : 'egg');
   if (e.type === 'win') stat('solved'); if (c.attr === 'egg') stat('eggs');
-  if (e.achievement) { await wait(400); toast('🏆 成就解锁：' + regName('achievements', e.achievement)); SFX.confirm(); (G.achievements ||= new Set()).add(e.achievement); }
+  if (e.achievement) { await wait(400); toast('🏆 成就解锁：' + regName('achievements', e.achievement)); SFX.confirm(); (G.achievements ||= new Set()).add(e.achievement); achRecord(e.achievement); }
   return e.type;
 }
 

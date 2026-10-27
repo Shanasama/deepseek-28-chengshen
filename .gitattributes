@@ -1,0 +1,2 @@
+# 编辑剧情.cmd 用 GBK + CRLF 保存（中文 Windows 的 cmd 按 GBK 读），别让 git 转换它
+*.cmd -text

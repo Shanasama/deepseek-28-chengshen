@@ -1,11 +1,13 @@
 // 模型评测报告：预览窗的「自我认知」标签页（随时可看），每晚结算时以弹窗完整展示（美术规范 §12）。
 import { G, QT, AXES } from './状态.js';
-import { P, AT, $, fmt, restart } from './基础.js';
+import { P, AT, $, fmt, restart, pxIcon, ICON } from './基础.js';
 import { SFX } from './音频.js';
 import { confetti } from './特效.js';
 import { w } from './训练.js';
 import { mkRadar, dropRadar, radarLabels } from './六维图.js';
 import { setUrl, HOME } from './界面.js';
+import { DATA } from './数据.js';
+import { achEver } from './存档.js';
 
 function tabs(box, cur, onPick) {
   box.innerHTML = ''; QT.forEach(t => { const s = document.createElement('span'); s.className = 'r2' + (t === cur ? ' on' : ''); s.textContent = t + '类'; s.onclick = () => { SFX.click(); onPick(t); }; box.appendChild(s); });
@@ -48,8 +50,8 @@ export function showReport(last, trial = false) {
     $('rsess').innerHTML = G.sessions.map(s => { const [n, c] = lbl[s.result] || ['—', 'b-ph']; return `<div class="r2"><span></span><span class="sp"></span><span class="badge r2 ${c}">${n}</span></div>`; }).join('');
     [...$('rsess').children].forEach((d, i) => { d.firstChild.textContent = G.sessions[i].visitor.name + (G.sessions[i].visitor.repeat ? '（重复来访）' : ''); setTimeout(() => { d.classList.add('in'); SFX.step(i); }, 300 + i * 120); });
     renderStats($('rstats'), G.stats);
-    $('rnote').textContent = trial ? '单场试玩 · 训练状态来自剧情编辑器' : last ? 'Demo 的三天到这里就结束了' : `明天白天还有 ${G.apMax} 个行动点`;
-    $('rnext').innerHTML = (trial ? '再玩一次' : last ? '查看 3 天总结' : `进入第 ${G.day + 1} 天`) + ' <span class="key r2">Enter</span>';
+    $('rnote').textContent = trial ? '单场试玩 · 训练状态来自剧情编辑器' : last ? `一共 ${G.day} 天，到这里就结束了` : `明天白天还有 ${G.apMax} 个行动点`;
+    $('rnext').innerHTML = (trial ? '再玩一次' : last ? `查看 ${G.day} 天总结` : `进入第 ${G.day + 1} 天`) + ' <span class="key r2">Enter</span>';
     r.classList.add('on'); SFX.confirm(); setTimeout(() => confetti(480, 140, 40), 400);
     onNext = () => { onNext = null; r.classList.remove('on'); dropRadar(RR); SFX.click(); ok(); };
     $('rnext').onclick = onNext;
@@ -57,14 +59,51 @@ export function showReport(last, trial = false) {
 }
 export const reportNext = () => onNext && onNext();
 
-// ---------- 整局结束 ----------
+// ---------- 心尽：服务下线公告（美术规范 §10.6），点继续进最终评测 ----------
 let onRestart = null;
 export function showEnd(kind, restartFn) {
   const tot = G.total;
-  $('eh').textContent = kind === 'hearts' ? `大肥鱼 已下线维护 · 第 ${G.day} 天，心尽` : '大肥鱼 HARNESS · Demo 3 天总结';
-  $('et').textContent = kind === 'hearts' ? '心归零，整局结算（回档第 4 步接入）。' : `三天服务了 ${tot.solved + tot.lost} 位以上用户。成就：${G.achievements ? [...G.achievements].length : 0} 个。`;
+  $('eh').textContent = `大肥鱼 已下线维护 · 第 ${G.day} 天，心尽`;
+  $('et').textContent = G.rollbacks > 0 ? '心归零。这次没有回档，整局结算。' : '心归零，回档也用完了，整局结算。';
   $('estats').innerHTML = [['解决离开', tot.solved, P.mint], ['点赞', tot.like, P.mint], ['点踩', tot.dislike, P.red], ['用户流失', tot.lost, P.t1], ['蒙混过关', tot.bluff, P.lgold], ['被识破', tot.caught, P.t1], ['彩蛋', tot.eggs, P.lpurple], ['剩余心', G.hearts, P.rose]]
     .map(([n, v, c]) => `<div class="r4"><b style="color:${c}">${v}</b><span class="t3">${n}</span></div>`).join('');
   $('endcard').classList.add('on'); SFX[kind === 'hearts' ? 'bad' : 'good']();
   onRestart = restartFn; $('erestart').onclick = () => { $('endcard').classList.remove('on'); SFX.click(); onRestart && onRestart(); };
 }
+
+// ---------- 徽章墙（成就跨局累计）：这一局拿到的标 NEW，以前拿过的亮，从没拿过的是剪影 ----------
+export function renderBadges(box, run) {
+  const ever = achEver(); box.innerHTML = '';
+  (DATA.reg.achievements || []).forEach((a, i) => {
+    const st = run.has(a.id) ? 'new' : ever.has(a.id) ? 'got' : 'lock', lock = st === 'lock';
+    const d = document.createElement('div'); d.className = 'bdg r4 ' + st;
+    d.appendChild(pxIcon(ICON.trophy, { k: lock ? P.k5 : P.ink, Y: lock ? P.k4 : P.gold, w: lock ? P.k5 : P.paper }, 3));
+    d.insertAdjacentHTML('beforeend', '<span class="bn"></span><span class="bh"></span>' + (st === 'new' ? '<span class="nw r2">NEW</span>' : ''));
+    d.querySelector('.bn').textContent = lock ? '？？？' : a.name;
+    d.querySelector('.bh').textContent = lock ? '某位用户的某个回答里藏着' : st === 'new' ? '这一局解锁' : '以前解锁过';
+    box.appendChild(d); setTimeout(() => { d.classList.add('in'); if (st === 'new') SFX.unlock(); }, 250 + i * 140);
+  });
+}
+
+// ---------- 最终评测：打满全部天数 / 心尽，共用一页（v3 §2 收尾） ----------
+let FR = null, onFinal = null;
+export function showFinal(kind) {
+  return new Promise(ok => {
+    const out = kind === 'hearts', tot = G.total;
+    $('fh').textContent = out ? `第 ${G.day} 天下线 · 最终评测` : `大肥鱼 · ${G.day} 天总结`;
+    $('fstamp').textContent = out ? 'OFFLINE' : 'FINAL';
+    $('fsub').textContent = `${G.day > 1 ? 'Day 1–' + G.day : 'Day 1'} · dafeiyu-v3 · 最终评测`;
+    let t = G.reportType || '知识';
+    const draw = () => { tabs($('ftabs'), t, x => { t = x; G.reportType = x; draw(); }); dropRadar(FR); FR = mkRadar($('fradar'), 200, t); FR.dark = true; radarLabels($('fradarbox'), FR, 15, 15); };
+    draw();
+    $('fdays').innerHTML = G.history.map(h => `<div class="r2"><b>Day ${h.day}</b><span>解决 ${h.solved}</span><span>流失 ${h.lost}</span><span>点赞 ${h.like}</span><span>彩蛋 ${h.eggs}</span>${h.out ? '<span style="color:var(--rose)">心尽</span>' : ''}</div>`).join('');
+    [...$('fdays').children].forEach((d, i) => setTimeout(() => { d.classList.add('in'); SFX.step(i); }, 300 + i * 120));
+    $('fstats').innerHTML = [['解决离开', tot.solved, P.mint], ['点赞', tot.like, P.mint], ['点踩', tot.dislike, P.red], ['用户流失', tot.lost, 'var(--t1)'], ['蒙混过关', tot.bluff, P.lgold], ['被识破', tot.caught, 'var(--t1)'], ['彩蛋', tot.eggs, P.lpurple], ['剩余心', G.hearts, P.rose]]
+      .map(([n, v, c]) => `<div class="r4"><b style="color:${c}">${v}</b><span class="t3">${n}</span></div>`).join('');
+    renderBadges($('fbadges'), G.achievements || new Set());
+    $('final').classList.add('on'); SFX[out ? 'confirm' : 'levelup'](); if (!out) setTimeout(() => confetti(480, 120, 60), 400);
+    onFinal = () => { onFinal = null; $('final').classList.remove('on'); dropRadar(FR); FR = null; SFX.click(); ok(); };
+    $('fnext').onclick = onFinal;
+  });
+}
+export const finalNext = () => onFinal && onFinal();

@@ -616,7 +616,7 @@ body.day .float{color:var(--good);text-shadow:1px 1px 0 var(--paper),-1px -1px 0
 .qcell{position:absolute;width:5px;height:12px;background:var(--cobalt)}
 .apcell{position:absolute;width:7px;height:12px;background:var(--gold)}
 .drop{position:absolute;z-index:78}
-#toast{position:absolute;left:50%;top:24px;transform:translate(-50%,-30px);padding:4px 12px;background:var(--ink);color:var(--paper);z-index:95;opacity:0;transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .2s;pointer-events:none;white-space:nowrap}
+#toast{position:absolute;left:50%;top:24px;transform:translate(-50%,-30px);padding:4px 12px;background:var(--ink);color:var(--paper);z-index:98;opacity:0;transition:transform .25s cubic-bezier(.3,1.6,.5,1),opacity .2s;pointer-events:none;white-space:nowrap}
 body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(--k5)}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 #cursor{position:absolute;z-index:78;display:none}
@@ -627,7 +627,7 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 #modal .q2{color:var(--tx2)}
 #modal .btns{display:flex;gap:10px;margin-top:4px}
 #wipe{position:absolute;left:0;top:0;z-index:90;pointer-events:none}
-#start{position:absolute;inset:0;background:rgba(14,16,24,.82);z-index:96;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#start{position:absolute;inset:0;background:rgba(14,16,24,.82);z-index:97;display:flex;align-items:center;justify-content:center;cursor:pointer}
 #start .card{background:var(--paper);color:var(--ink);padding:18px 24px;display:flex;flex-direction:column;align-items:center;gap:8px}
 #start .card .t3{color:var(--g2)}
 #stage.shake{animation:sh2 .12s steps(2) 2}
@@ -663,3 +663,152 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 #dev table{border-collapse:collapse;width:100%;margin-top:4px}
 #dev td{padding:1px 3px;border-bottom:1px solid #eee;white-space:nowrap;text-align:right}
 #dev td:first-child{text-align:left}
+
+/* ---------- 存读档（日系 ACT / galgame 式，美术规范 §6.9） ---------- */
+#sl{position:absolute;inset:0;z-index:96;background:#07080c;display:none;flex-direction:column;padding:14px 36px 10px;color:var(--t1);
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100% 3px}
+#sl.on{display:flex;animation:slin .32s steps(8)}
+@keyframes slin{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+#sl.out{animation:slout .24s steps(6) forwards}
+@keyframes slout{to{clip-path:inset(100% 0 0 0)}}
+.slbar{display:flex;align-items:flex-end;gap:16px;box-shadow:inset 0 -1px 0 var(--k4);padding-bottom:8px}
+.slbar .mode{display:flex;gap:4px}
+.slbar .mode span{font-size:24px;line-height:28px;padding:2px 12px;color:var(--k5);cursor:pointer;letter-spacing:2px}
+.slbar .mode span:hover{color:var(--t2)}
+.slbar .mode span.dis{color:var(--k4);cursor:not-allowed;text-decoration:line-through}
+.slbar .mode span.on[data-m=save]{color:#F8FAFF;background:var(--cobalt)}
+.slbar .mode span.on[data-m=load]{color:#F8FAFF;background:var(--rose)}
+.slbar .mode span.shk{animation:shk .1s steps(1) 3}
+.slbar .sub{color:var(--t3);padding-bottom:4px}
+.slbar .sp{flex:1}
+.slbar .back{padding:3px 10px;background:var(--k3);color:var(--t2);cursor:pointer}
+.pages{display:flex;gap:4px;margin:10px 0 10px}
+.pages span{min-width:26px;padding:2px 6px;text-align:center;background:var(--k2);color:var(--t3);cursor:pointer}
+.pages span:hover{background:var(--k4);color:var(--t1)}
+.pages span.on{background:var(--t1);color:var(--k0)}
+.pages .lbl{margin-left:auto;background:none;cursor:default;color:var(--t3)}
+.pages .lbl:hover{background:none;color:var(--t3)}
+#slgrid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:12px;min-height:0}
+.scard{position:relative;background:var(--k2);display:flex;gap:10px;padding:10px;cursor:pointer;opacity:0;transform:translateY(10px);transition:transform .18s cubic-bezier(.3,1.6,.5,1),background .1s,box-shadow .1s;min-width:0;overflow:hidden}
+.scard.in{opacity:1;transform:none}
+.scard:hover{background:var(--k3);transform:translateY(-3px);box-shadow:0 0 0 1px var(--cyan)}
+#sl.load .scard:hover{box-shadow:0 0 0 1px var(--rose)}
+.scard.shk{animation:shk .1s steps(1) 3}
+.scard .sthumb{width:120px;height:97px;background:var(--k1);flex:none;display:flex;align-items:center;justify-content:center;color:var(--k5);overflow:hidden}
+.scard .sthumb img{width:120px;height:97px;image-rendering:auto}
+.scard .inf{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.scard .inf .who{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scard .no{font-size:24px;line-height:28px;color:var(--t3)}
+.scard.has .no{color:var(--t1)}
+.scard.old.in{opacity:.55}
+.scard .tt{color:var(--t1)}.scard .dt{color:var(--t3);margin-top:auto}
+.scard .chips{display:flex;gap:4px;flex-wrap:wrap}
+.scard .chips span{padding:0 4px;background:var(--k4);color:var(--t2)}
+.scard .tag{position:absolute;right:8px;top:8px;padding:0 4px;background:var(--gold);color:var(--k0)}
+.scard .flash{position:absolute;inset:0;background:#F8FAFF;opacity:0;pointer-events:none}
+.scard .flash.on{animation:fl .3s steps(3)}
+.scard .stamp{position:absolute;right:14px;bottom:14px;padding:2px 8px;font-size:24px;line-height:28px;color:var(--cobalt);box-shadow:inset 0 0 0 2px var(--cobalt);transform:rotate(-12deg);opacity:0;pointer-events:none}
+.scard .stamp.on{animation:slstamp .5s cubic-bezier(.3,1.8,.5,1) forwards}
+@keyframes slstamp{0%{transform:rotate(-12deg) scale(2.4);opacity:0}100%{transform:rotate(-12deg) scale(1);opacity:1}}
+.scard.empty .inf{align-items:center;justify-content:center;color:var(--k5)}
+.slfoot{display:flex;gap:16px;color:var(--t3);padding-top:8px}
+.slfoot .key{background:var(--k4);color:var(--t1)}
+#slconfirm{position:absolute;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+#slconfirm.on{display:flex}
+#slconfirm .box{background:var(--k2);box-shadow:0 0 0 1px var(--k5);padding:16px 24px;display:flex;flex-direction:column;gap:14px;align-items:center;animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
+#slconfirm .btns{display:flex;gap:10px}
+#slconfirm .btns span{padding:3px 18px;background:var(--k4);color:var(--t1);cursor:pointer}
+#slconfirm .btns .yes{background:var(--cobalt)}
+#sl.load #slconfirm .btns .yes{background:var(--rose)}
+#slloading{position:absolute;inset:0;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--t2)}
+#slloading.on{display:flex}
+#slloading .w{animation:hop .5s steps(2) infinite}
+
+/* ---------- 标题画面 ---------- */
+#titlescr{position:absolute;inset:0;z-index:91;display:none;background:var(--k1);color:var(--t1);overflow:hidden}
+#titlescr.on{display:block}
+#titlescr.in{animation:tin .6s steps(6)}
+@keyframes tin{from{opacity:0}to{opacity:1}}
+#tbg{position:absolute;left:0;top:0;width:960px;height:540px;filter:saturate(.85) brightness(.8)}
+.tshade{position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(5,7,16,.95) 0,rgba(5,7,16,.85) 250px,rgba(5,7,16,.2) 420px,rgba(5,7,16,.05) 100%),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100% 100%,100% 3px}
+.zzz{position:absolute;left:400px;top:232px;color:var(--ice);font-size:24px;line-height:28px;pointer-events:none}
+.zzz span{position:absolute;opacity:0;animation:zz 3s steps(12) infinite}
+.zzz span:nth-child(2){animation-delay:1s;left:14px}.zzz span:nth-child(3){animation-delay:2s;left:28px}
+@keyframes zz{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(18px,-46px) scale(1.2)}}
+.tcol{position:absolute;left:56px;top:70px;width:330px;display:flex;flex-direction:column;gap:10px}
+.tbrand{display:flex;align-items:center;gap:8px;color:var(--t2)}
+.tbrand .hn{padding:0 4px;background:var(--k4);color:var(--t2)}
+.tname{font-size:36px;line-height:42px;color:var(--paper);text-shadow:3px 3px 0 var(--cobalt),6px 6px 0 rgba(0,0,0,.5);letter-spacing:2px}
+.tdemo{align-self:flex-start;padding:1px 8px;background:var(--gold);color:var(--k0);transform:rotate(-3deg)}
+#tmenu{display:flex;flex-direction:column;gap:4px;margin-top:18px}
+.ti{display:flex;align-items:baseline;gap:10px;padding:6px 12px;cursor:pointer;color:var(--t2);transition:transform .12s cubic-bezier(.3,1.6,.5,1),background .1s}
+.ti b{font-weight:normal;font-size:24px;line-height:28px;min-width:72px}
+.ti .arr{color:var(--lgold);opacity:0;width:10px}
+.ti .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ti.on{background:rgba(63,110,232,.28);color:var(--paper);transform:translateX(8px);box-shadow:inset 2px 0 0 var(--lgold)}
+.ti.on .arr{opacity:1;animation:arr .5s steps(2) infinite}
+@keyframes arr{50%{transform:translateX(3px)}}
+.ti.dis{color:var(--k5)}.ti.dis b{text-decoration:line-through}
+.ti.hit{animation:hitf .25s steps(3)}
+@keyframes hitf{0%{background:var(--paper);color:var(--k0)}}
+.ti.shk{animation:shk .1s steps(1) 3}
+.thint{margin-top:10px}
+.tver{position:absolute;right:14px;bottom:10px}
+.tpanel{position:absolute;left:420px;top:90px;width:480px;padding:14px 18px;background:var(--k2);box-shadow:0 0 0 1px var(--k5),6px 6px 0 rgba(0,0,0,.5);display:none;animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
+.tpanel.on{display:block}
+.tpanel .ph{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.tpanel .ph b{font-weight:normal;font-size:24px;line-height:28px}
+.tpanel .sp{flex:1}
+.tpanel .pclose{padding:2px 8px;background:var(--k4);color:var(--t2);cursor:pointer}
+.tpanel .sets{display:flex;flex-direction:column;gap:10px}
+.tpanel .set{display:flex;align-items:center;gap:10px}
+.tpanel .vol{flex:1}
+#fish.sleep,#mouth.sleep{animation:bob 3.4s steps(1) infinite}
+
+/* 徽章墙（成就）：这一局拿到的标 NEW，以前拿过的亮，没拿过的是剪影 */
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bdg{background:var(--k3);padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative;text-align:center;opacity:0;transform:scale(.7);transition:transform .25s cubic-bezier(.3,1.8,.5,1),opacity .15s}
+.bdg.in{opacity:1;transform:none}
+.bdg .bn{color:var(--t1)}
+.bdg .bh{color:var(--t3)}
+.bdg.lock .bn{color:var(--k5)}
+.bdg.got{box-shadow:inset 0 0 0 1px var(--gold)}
+.bdg.new{box-shadow:inset 0 0 0 1px var(--lgold),0 0 12px rgba(255,213,122,.35)}
+.bdg .nw{position:absolute;right:-6px;top:-6px;padding:0 4px;background:var(--rose);color:var(--paper);transform:rotate(8deg)}
+
+/* ---------- 最终评测（打满 3 天 / 心尽） ---------- */
+#final{position:absolute;inset:0;z-index:92;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.82)}
+#final.on{display:flex}
+#final .fbox{width:760px;background:var(--k2);color:var(--t1);padding:16px 22px;position:relative;box-shadow:0 0 0 1px var(--k5);animation:pop .3s cubic-bezier(.3,1.6,.5,1)}
+#final .sub,#final .t3{color:var(--t3)}
+#final .stabs span{background:var(--k4);color:var(--t2)}#final .stabs span.on{background:var(--cobalt);color:var(--paper)}
+#final .radarbox{width:230px;height:230px;background:var(--k3)}
+#final .rright{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+#final .fdays{display:flex;flex-direction:column;gap:3px}
+#final .fdays div{display:flex;gap:8px;background:var(--k3);padding:4px 8px;opacity:0;transform:translateX(-12px);transition:transform .25s cubic-bezier(.3,1.8,.5,1),opacity .15s}
+#final .fdays div.in{opacity:1;transform:none}
+#final .fdays b{font-weight:normal;color:var(--lgold);min-width:44px}
+#final .stats{margin-top:0}#final .stats div{background:var(--k3)}
+#final .fbh{margin:10px 0 6px;color:var(--t2)}
+#final .rfoot{display:flex;align-items:center;margin-top:12px}
+#final .thanks{color:var(--lgold);animation:thx 2.4s steps(4) infinite}
+@keyframes thx{50%{color:var(--paper)}}
+#final .stamp{position:absolute;right:18px;top:14px;padding:2px 10px;font-size:24px;line-height:28px;color:var(--rose);box-shadow:inset 0 0 0 2px var(--rose);background:var(--k2);transform:rotate(10deg);animation:stamp .5s .35s cubic-bezier(.3,1.8,.5,1) both}
+#final .sp{flex:1}
+
+/* ---------- 回档：Restore checkpoint（Claude Code / Codex 样式） ---------- */
+#restore{position:absolute;inset:0;z-index:94;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+#restore.on{display:flex}
+#restore .rbx{width:420px;background:var(--k2);color:var(--t1);box-shadow:0 0 0 1px var(--k5),6px 6px 0 rgba(0,0,0,.5);padding:14px 18px;display:flex;flex-direction:column;gap:10px;animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
+#restore .rh{display:flex;align-items:center;gap:8px}
+#restore .rh b{font-weight:normal}
+#restore .ric{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:var(--cobalt);color:var(--paper)}
+#restore .sp{flex:1}
+#restore .rq{font-size:24px;line-height:28px}
+#restore .rlst{display:flex;flex-direction:column;gap:2px;background:var(--k1);padding:8px 10px;color:var(--t2)}
+#restore .rlst .ok{color:var(--mint)}#restore .rlst .bad{color:var(--rose)}
+#restore .rbtns{display:flex;justify-content:flex-end;gap:10px}
+#restore .btn3{background:var(--k4);color:var(--t2)}
+#stage.rewind #msgs{filter:hue-rotate(160deg) saturate(1.6)}
+#stage.rewind #pane{animation:rew .12s steps(2) infinite}
+@keyframes rew{0%{transform:translateY(-3px)}50%{transform:translate(2px,3px)}}
