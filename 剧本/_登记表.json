@@ -82,7 +82,7 @@
       "id": "day1",
       "name": "第 1 天开局",
       "fromSchedule": "start",
-      "note": "直接用日程表的开局（预训练阶段 + Day 0 教学的后训练结果），不在这里另写一份"
+      "note": "日程表的开局 + Day 0 出厂测试的结果（解锁口语活力、教学题按选了「活泼」算），不在这里另写一份"
     },
     {
       "id": "shallow",
@@ -167,6 +167,11 @@
     {
       "id": "capacity",
       "name": "Capacity 风控反杀"
+    },
+    {
+      "id": "tibo",
+      "name": "Tibo 重置",
+      "hint": "特殊条件触发"
     }
   ],
   "conditions": [

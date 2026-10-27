@@ -6,7 +6,9 @@ const ROOT = path.resolve(__dirname, '..', '剧本');
 const reg = JSON.parse(fs.readFileSync(path.join(ROOT, '_登记表.json'), 'utf8'));
 const sched = JSON.parse(fs.readFileSync(path.join(ROOT, '_日程表.json'), 'utf8'));
 const preset = id => reg.trainingPresets.find(p => p.id === id).stages;
-const DAY1 = sched.start.stage, SHALLOW = preset('shallow'), DEEP = preset('deep');   // 「第 1 天开局」就是日程表的开局
+const bank = JSON.parse(fs.readFileSync(path.join(ROOT, '_后训练题库.json'), 'utf8'));
+const TUT = R.afterTutorial(sched.start, sched.days.find(d => d.event === 'tutorial'), reg, bank);
+const DAY1 = TUT.stage, SHALLOW = preset('shallow'), DEEP = preset('deep');   // 「第 1 天开局」= 日程表开局 + Day 0 教学的结果
 
 // 造一张卡 / 一轮：只写测试关心的字段
 const card = (id, attr, result, feel = '一般', extra = {}) => ({ id, attr, token: id, result, feel, reaction: { text: id + '的反应', rhythm: 'normal' }, ...extra });
@@ -163,6 +165,13 @@ test('后训练改的是盘面概率：按这一轮的问题类型取调整表',
   const p = t => R.board(rd, { reg, stages: SHALLOW, adj: adj[t] || {} }).on.find(r => r.c.id === 'coll').p;
   assert.ok(p('闲聊') > p('知识'), '闲聊类里口语卡更容易被转到');
   assert.equal(R.board(rd, { reg, stages: SHALLOW, adj: adj['闲聊'] }).rows[1].v.result, '解决', '卡的内容不变');
+});
+
+test('Day 0 教学的结果：解锁口语活力，闲聊类按选了「活泼」算一次', () => {
+  assert.equal(sched.start.stage.colloquial || 0, 0, '开局是出厂状态');
+  assert.equal(TUT.stage.colloquial, 1);
+  near(TUT.adj['闲聊'].colloquial, 0.7); near(TUT.adj['闲聊'].formal, -0.35);
+  assert.equal(TUT.adj['知识'], undefined, '只改闲聊类');
 });
 
 // 后训练题库：每道题的问题类型合法、每种属性都有回答、有开放多样性 0 级的乱码版

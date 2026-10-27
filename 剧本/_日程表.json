@@ -8,14 +8,67 @@
     "quotaMax": 10,
     "rollbacks": 1,
     "heartsOutEnds": true,
-    "stage": { "knowledge": 0, "colloquial": 1, "narrative": 0, "logic": 0, "formal": 1, "open": 0 },
-    "adj": { "闲聊": { "colloquial": 0.7, "formal": -0.35 } },
-    "startNote": "第 5 步做 Day 0 教学之前，开局直接带上教学的结果：口语活力已解锁浅层，闲聊类做过一次「活泼 vs 官腔」后训练。"
+    "stage": {
+      "knowledge": 0,
+      "colloquial": 0,
+      "narrative": 0,
+      "logic": 0,
+      "formal": 1,
+      "open": 0
+    },
+    "adj": {},
+    "startNote": "出厂状态：正式模板浅层、开放多样性 0 级。Day 0 出厂测试解锁口语活力，第 1 天早上的教学题做一次闲聊类后训练（跳过教学时按选了 pair 第一个直接给）。"
   },
   "days": [
-    { "day": 0, "name": "出厂测试", "event": "tutorial", "visitors": 0, "skip": true, "note": "Day 0 教学（第 5 步实现），现在跳过" },
-    { "day": 1, "ap": 4, "postPerDay": 2, "visitors": 4, "activities": ["pretrain", "posttrain", "eat"] },
-    { "day": 2, "ap": 4, "postPerDay": 2, "visitors": 4, "activities": ["pretrain", "posttrain", "eat"] },
-    { "day": 3, "ap": 4, "postPerDay": 2, "visitors": 4, "fixed": ["掺水中转站"], "activities": ["pretrain", "posttrain", "eat"], "resetQuota": false }
+    {
+      "day": 0,
+      "name": "出厂测试",
+      "event": "tutorial",
+      "tutor": "出厂测试员",
+      "scene": "01_出厂测试.json",
+      "quota": 1,
+      "unlock": [
+        "colloquial"
+      ],
+      "question": "tut-1",
+      "note": "Day 0 新手教学：夜里接待出厂测试员（教转盘、剔除重转，第 1、2 轮之间装上 unlock 里的语料），第 1 天早上第一件事是免费的教学题 question。quota 是教学额度，第 1 天换成 start.quota。"
+    },
+    {
+      "day": 1,
+      "ap": 4,
+      "postPerDay": 2,
+      "visitors": 4,
+      "activities": [
+        "pretrain",
+        "posttrain",
+        "eat"
+      ]
+    },
+    {
+      "day": 2,
+      "ap": 4,
+      "postPerDay": 2,
+      "visitors": 4,
+      "activities": [
+        "pretrain",
+        "posttrain",
+        "eat"
+      ]
+    },
+    {
+      "day": 3,
+      "ap": 4,
+      "postPerDay": 2,
+      "visitors": 4,
+      "fixed": [
+        "掺水中转站"
+      ],
+      "activities": [
+        "pretrain",
+        "posttrain",
+        "eat"
+      ],
+      "resetQuota": false
+    }
   ]
 }

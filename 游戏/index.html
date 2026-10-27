@@ -38,8 +38,9 @@
     <div class="sets">
       <div class="set"><span>音乐</span><div class="vol r2" data-k="vMusic"><i></i></div><span class="v"></span></div>
       <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div>
+      <div class="tiprow"><span class="tipreset btn r2">重新显示新手提示</span></div>
     </div>
-    <div class="me"><span id="meav"></span><span>已登录 · 大肥鱼</span><span class="t3" id="meday" style="margin-left:auto">Day 1</span></div>
+    <div class="me"><span id="meav"></span><span>已登录 · 大肥鱼</span><span class="offbtn btn r2" id="d-off" style="display:none" title="提前结束今晚：没服务完的每位用户扣 1 颗心">提前下班</span></div>
   </div>
 
   <!-- 中间：对话栏。白天是你和大肥鱼的 LINE 式聊天；夜里是用户和大肥鱼的会话（一位用户一个会话） -->
@@ -104,7 +105,7 @@
         <div id="hots"></div>
         <div id="fishhit" title="点她：收起 / 打开思考气泡"></div>
       </div>
-      <div id="hud" class="r4"><div id="hearts"></div><i class="div"></i><span class="t3">额度</span><div id="quota"></div><span id="qtxt"></span></div>
+      <div id="hud" class="r4"><div id="hearts"></div><i class="div"></i><span class="t3" id="qlbl">额度</span><div id="quota"></div><span id="qtxt"></span></div>
       <div id="prog" class="r4"><div class="r"><span id="progt">正在读取</span><span class="sp"></span><span id="progn">0</span></div><div class="bar r2"><i id="progb"></i></div></div>
       <div id="puff" class="r4"><i></i><i></i><i></i></div>
       <i class="tail t1 r2"></i><i class="tail t2 r2"></i>
@@ -204,6 +205,13 @@
     <div id="slloading"><span class="w" id="slwhale"></span><span>LOADING</span></div>
   </div>
 
+  <!-- 新手教学的聚光灯（教学.js） -->
+  <div id="spot"><div class="hole"></div><div class="sarr"></div><div class="stip r4"><div class="st"></div><div class="sgo">点一下继续 ▸</div></div></div>
+  <div id="spotcatch"></div>
+
+  <!-- 剧情占位页：新游戏开头，剧情写好以后整页换掉 -->
+  <div id="story"><div class="sline" id="storyline"></div><div class="sgo2 t3" id="storygo">点击 / 按任意键继续</div></div>
+
   <!-- 标题画面 -->
   <div id="titlescr">
     <canvas id="tbg" width="960" height="540"></canvas><div class="tshade"></div>
@@ -221,6 +229,7 @@
       <div class="sets">
         <div class="set"><span>音乐</span><div class="vol r2" data-k="vMusic"><i></i></div><span class="v"></span></div>
         <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div>
+        <div class="tiprow"><span class="tipreset btn r2">重新显示新手提示</span></div>
       </div></div>
   </div>
 

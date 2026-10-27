@@ -5,7 +5,7 @@ import { SFX, beep, ac, setSfxVolume } from './音频.js';
 import { parts, confetti, ring, burst, floatText, floatAt, flyCell, vignette, shake } from './特效.js';
 import { drawRoom, fishAvatar, setScreen } from './工位.js';
 import { addNote, addLog, headerDay, setInp } from './对话栏.js';
-import { saveSettings } from './存档.js';
+import { saveSettings, achRecord } from './存档.js';
 
 // ---------- 昼夜切换 ----------
 export function setMode(m) {
@@ -40,7 +40,7 @@ export function spendAP(to) {
 // 花一点控盘额度：格子从 HUD 飞到目标点；额度首次跌到 ≤2 时触发 Tibo 重置（全局一次）
 export function spendQuota(to, onArrive, n = 1) {
   const cell = $('quota').children[G.quota - 1], from = sp(cell); G.quota = Math.max(0, G.quota - n); renderQuota(); floatText('−' + n + ' 额度', cell, P.sky);
-  flyCell(from, to, 'qcell', P.sky, () => { onArrive && onArrive(); if (G.quota <= 2 && !G.tiboUsed) setTimeout(tibo, 700); });
+  flyCell(from, to, 'qcell', P.sky, () => { onArrive && onArrive(); if (G.quota <= 2 && !G.tiboUsed && !G.tutorial) setTimeout(tibo, 700); });   // 出厂测试的教学额度不算
 }
 export function addQuota(n) { G.quota = Math.min(G.quotaMax, G.quota + n); renderQuota(); restart($('quota'), 'refill'); }
 async function tibo() {
@@ -48,6 +48,8 @@ async function tibo() {
   await wait(900);
   for (let i = G.quota; i < G.quotaMax; i++) { G.quota = i + 1; renderQuota(); restart($('quota'), 'refill'); SFX.charge(i); await wait(70); }
   const q = sp($('quota')); confetti(q.x + 25, q.y, 30); $('phone-rf').style.visibility = 'visible'; addLog('Tibo 重置了额度 · ' + G.quotaMax + '/' + G.quotaMax, 'k');
+  // Tibo 重置也算一个彩蛋：彩蛋 +1，解锁「Tibo 重置」成就（跨局）
+  G.stats.eggs++; G.total.eggs++; (G.achievements ||= new Set()).add('tibo'); achRecord('tibo'); await wait(500); toast('🏆 成就解锁：Tibo 重置'); SFX.unlock();
 }
 export function loseHeart() {
   const cs = $('hearts').children; const c = cs[cs.length - 1]; G.hearts = Math.max(0, G.hearts - 1); if (!c) return; c.classList.add('lose'); SFX.heart();
@@ -81,7 +83,7 @@ let onPickSession = null;
 export function setSessionPicker(fn) { onPickSession = fn; }
 export function renderDrawer() {
   const night = G.mode === 'night';
-  $('h-sess-t').textContent = night ? '今晚的会话' : '今晚来访预告'; $('dchip').textContent = `Day ${G.day}`; $('meday').textContent = `Day ${G.day}`; $('vdot').textContent = G.tonight.length;
+  $('h-sess-t').textContent = night ? '今晚的会话' : '今晚来访预告'; $('dchip').textContent = `Day ${G.day}`; $('d-off').style.display = night && G.cur >= 0 && !G.tutorial && !G.noSave ? '' : 'none'; $('vdot').textContent = G.tonight.length;
   const box = $('vlist'); box.innerHTML = '';
   const list = night ? G.sessions : G.tonight;
   list.forEach((x, i) => {
@@ -97,14 +99,14 @@ export function renderDrawer() {
 }
 export function renderQueue() {
   const q = $('queue'); q.innerHTML = '';
-  if (G.mode === 'night') G.sessions.forEach((s, i) => { const e = document.createElement('i'); e.className = 'r2' + (i === G.cur && s.status === 'live' ? ' cur' : s.status === 'done' ? (s.result === 'offline' || s.result === 'forced' ? ' lost' : ' done') : (s.visitor.boss ? ' boss' : '')); e.title = s.visitor.name; q.appendChild(e); });
+  if (G.mode === 'night') G.sessions.forEach((s, i) => { const e = document.createElement('i'); e.className = 'r2' + (i === G.cur && s.status === 'live' ? ' cur' : s.status === 'done' ? (s.result === 'offline' || s.result === 'forced' || s.result === 'early' ? ' lost' : ' done') : (s.visitor.boss ? ' boss' : '')); e.title = s.visitor.name; q.appendChild(e); });
   else G.tonight.forEach(u => { const e = document.createElement('i'); e.className = 'r2' + (u.boss ? ' boss' : ''); e.title = u.name; q.appendChild(e); });
 }
 
 // ---------- 确认框 ----------
-export function confirmBox(q1, q2, yes = '确定') {
+export function confirmBox(q1, q2, yes = '确定', no = '再想想') {
   return new Promise(ok => {
-    $('mq1').textContent = q1; $('mq2').textContent = q2; $('myes').textContent = yes; $('modal').classList.add('on'); SFX.note();
+    $('mq1').textContent = q1; $('mq2').textContent = q2; $('myes').textContent = yes; $('mno').textContent = no; $('modal').classList.add('on'); SFX.note();
     $('myes').onclick = () => { SFX.click(); $('modal').classList.remove('on'); ok(true); }; $('mno').onclick = () => { SFX.click(); $('modal').classList.remove('on'); ok(false); };
   });
 }
@@ -138,11 +140,12 @@ function setTier(t) { const prev = G.spd; G.spd = t; if (t !== prev) { saveSetti
 export const on = (id, fn) => $(id).addEventListener('click', e => { e.stopPropagation(); SFX.click(); fn(e); });
 export function closeMenus() { $('m-act').classList.remove('show'); $('spdpop').classList.remove('show'); }
 export function initShell() {
-  const ic = (id, k, col) => { const e = $(id); [...e.childNodes].filter(n => n.tagName === 'CANVAS').forEach(n => n.remove()); e.prepend(pxIcon(ICON[k], { k: col, B: P.cobalt, w: P.paper, I: P.ice })); };
+  const ic = (id, k, col, s = 1) => { const e = $(id); [...e.childNodes].filter(n => n.tagName === 'CANVAS').forEach(n => n.remove()); e.prepend(pxIcon(ICON[k], { k: col, B: P.cobalt, w: P.paper, I: P.ice }, s)); };
   $('tlogo').appendChild(pxIcon(ICON.whale, { k: P.k0, B: P.cobalt, w: P.paper, I: P.ice }));
-  $('dlogo').appendChild(pxIcon(ICON.whale, { k: P.k0, B: P.cobalt, w: P.paper, I: P.ice }, 2));
-  ic('r-logo', 'whale', P.k0);
-  [['r-new', 'plus'], ['r-sess', 'chat'], ['r-save', 'save'], ['r-set', 'gear'], ['r-me', 'user'], ['pn1', 'back'], ['pn2', 'fwd'], ['pn3', 'reload']].forEach(([id, k]) => ic(id, k, P.g2));
+  $('dlogo').appendChild(pxIcon(ICON.whale, { k: P.k0, B: P.cobalt, w: P.paper, I: P.ice }, 3));
+  ic('r-logo', 'whale', P.k0, 2);
+  [['r-new', 'plus'], ['r-sess', 'chat'], ['r-save', 'save'], ['r-set', 'gear'], ['r-me', 'user']].forEach(([id, k]) => ic(id, k, P.g2, 2));
+  [['pn1', 'back'], ['pn2', 'fwd'], ['pn3', 'reload']].forEach(([id, k]) => ic(id, k, P.g2));
   $('meav').appendChild(pxIcon(ICON.user, { k: P.g2 })); $('send').appendChild(pxIcon(ICON.send, { k: P.paper }));
   $('pglobe').appendChild(pxIcon(ICON.globe, { k: P.g2 })); $('pglobe2').appendChild(pxIcon(ICON.chart, { k: P.g2 }));
   $('tibo-av').appendChild(pxIcon(TIBO, { k: P.ink, h: P.c1, s: P.skin, S: P.skinS, K: P.ink, M: P.g1, w: P.paper }, 2));

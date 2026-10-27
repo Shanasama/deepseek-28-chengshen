@@ -1,6 +1,6 @@
 // 入口：载入数据、装配界面、主循环、键盘。
 import { G, QT, AXES } from './状态.js';
-import { $, fit, updateStageRect, toast, AT } from './基础.js';
+import { $, fit, updateStageRect, toast, AT, P, pxIcon } from './基础.js';
 import { ac, musUpdate, SFX } from './音频.js';
 import { drawParts } from './特效.js';
 import { drawWindow, drawDust, drawScreen, drawDevice, drawRoomItems, whenFishReady } from './工位.js';
@@ -9,9 +9,10 @@ import { NODE, nodeTick, spin, confirmPick, regen } from './转盘.js';
 import { radarTick } from './六维图.js';
 import { initShell, drawer, renderAP, renderHUD, closeMenus, on } from './界面.js';
 import { initDay, dayKeys, pickActByIndex, view, goNight } from './白天.js';
-import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun } from './日程.js';
+import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun, endEarly } from './日程.js';
+import { spotKey, storyOn, storyKey, ARROW } from './教学.js';
 import { setTab, reportNext, finalNext, renderSelf } from './报告.js';
-import { loadSettings, latest, readSlot } from './存档.js';
+import { loadSettings, latest, readSlot, tipsReset } from './存档.js';
 import { initSL, openSL, slOpen, slKey } from './存读档.js';
 import { initTitle, showTitle, titleOn, titleKey, drawTitleBg, askBackToTitle } from './标题.js';
 import { DATA, loadAll } from './数据.js';
@@ -32,6 +33,9 @@ function openSave(mode) {
 }
 on('d-save', () => openSave('save')); on('d-load', () => openSave('load')); on('r-save', () => openSave('save'));
 on('wb-x', () => askBackToTitle());
+on('d-off', () => endEarly());
+document.querySelectorAll('.tipreset').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); SFX.click(); tipsReset(); toast('新手提示会重新出现'); }));
+document.querySelector('#spot .sarr').appendChild(pxIcon(ARROW, { k: P.ink, Y: P.lgold }, 2));
 
 // ---------- 主循环 ----------
 const fxc = $('fxc').getContext('2d'); let lastT = performance.now(), frame = 0;
@@ -64,6 +68,8 @@ function start() {
 }
 $('start').onclick = start;
 addEventListener('keydown', e => {
+  if (storyOn()) return storyKey(e);
+  if (spotKey(e)) return;
   if (slOpen()) return slKey(e);
   if ($('modal').classList.contains('on')) { if (e.code === 'Enter') $('myes').click(); if (e.code === 'Escape') $('mno').click(); return; }
   if ($('restore').classList.contains('on')) { if (e.code === 'Enter') $('ryes').click(); return; }

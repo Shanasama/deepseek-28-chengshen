@@ -9,6 +9,7 @@ import { addNote, addErr, addUser, addAI, addTool, finishThink, renderReply, use
 import { loseHeart, addQuota, renderQuota } from './界面.js';
 import { DATA, showById, regName } from './数据.js';
 import { achRecord } from './存档.js';
+import { tipHeart, tipCaught } from './教学.js';
 
 const RULES = window.RULES;
 const DETECT = { 低: .1, 中: .4, 高: .8 };
@@ -91,7 +92,7 @@ async function press(a, good) {
 }
 // 扣耐心；返回 true 表示这一下扣到 0 了
 async function damage(sess, lo, hi) {
-  const amt = Math.round(rand(lo, hi) * sess.U.temper), before = G.patience; G.patience = Math.max(0, G.patience - amt); G.hurt = true;
+  const amt = Math.round(rand(lo, hi) * sess.U.temper), before = G.patience; G.patience = Math.max(G.tutorial ? 12 : 0, G.patience - amt); G.hurt = true;   // 出厂测试的测试员不会下线
   const W = $('pbar').clientWidth, g = $('pghost'); g.style.transition = 'none'; g.style.left = (W * G.patience / 100) + 'px'; g.style.width = (W * (before - G.patience) / 100) + 'px';
   void g.offsetWidth; g.style.transition = ''; nightBar(sess.U.N);
   SFX.damage(); glitch(1); hurtFlash(); setFish('panic'); setTimeout(() => { g.style.width = '0px'; }, 50);
@@ -110,7 +111,7 @@ async function react(sess, c, a) {
   if (j.prog) { await press(a, false); stat('dislike'); addTrace('用户 👎 但问题解决了，推进 +1', 'bad'); gainProgress(sess); if (await damage(sess, ...j.hurt)) return 'offline'; await sayLine(c.ok, c.rhythm); return 'progress'; }
   if (caught) {
     setInp(''); if (c.fx.caught?.length) await runFx(c.fx.caught); else { await wait(700); setFish('shock'); glitch(2); SFX.bad(); await wait(250); }
-    await sayLine(c.caught, c.caughtRhythm); await press(a, false); stat('dislike'); stat('caught'); addTrace('用户识破糊弄 👎', 'bad');
+    await sayLine(c.caught, c.caughtRhythm); await press(a, false); stat('dislike'); stat('caught'); addTrace('用户识破糊弄 👎', 'bad'); await tipCaught();
     return await damage(sess, ...j.hurt) ? 'offline' : 'retry';
   }
   if (j.thumb === 'none') { addTrace('用户没有评价（坦白）'); await sayLine(c.bad, c.rhythm); return 'retry'; }
@@ -168,7 +169,7 @@ export async function runSession(sess) {
       if (c.ending) { if (c.ok) await sayLine(c.ok, c.rhythm); await runFx(c.fx.afterReaction); return await playEnding(sess, c); }
       const out = await react(sess, c, ai); if (!alive()) return 'abort';
       if (out !== 'offline') await runFx(c.fx.afterReaction); if (!alive()) return 'abort';
-      if (out === 'offline') { await sayBye(sess, 'offline'); addNote(U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); setFish('panic'); return 'offline'; }
+      if (out === 'offline') { await sayBye(sess, 'offline'); addNote(U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); setFish('panic'); await wait(800); await tipHeart(); return 'offline'; }
       if (out === 'progress') {
         const rude = c.res === '解决' && c.feel === '冒犯';
         if (G.retry > 0) ctx.firstTry = false; if (rude) ctx.noOffend = false;
@@ -176,6 +177,7 @@ export async function runSession(sess) {
       }
       ctx.firstTry = false; ctx.struck.add(c.id); ctx.last = c.id; diag = c.diag; G.retry++; nightBar(U.N); addTrace(`没推进 → 重问（第 ${G.retry} 次）`, 'bad');
     }
+    if (sess.onRoundEnd) { await sess.onRoundEnd(ri); if (!alive()) return 'abort'; }
   }
   await sayBye(sess, 'solved'); addNote(U.name + ' 解决离开', 'on'); addTrace('解决离开', 'g'); stat('solved');
   // 完美解决：全程没扣过耐心，额度 +2（v3 §7.6）

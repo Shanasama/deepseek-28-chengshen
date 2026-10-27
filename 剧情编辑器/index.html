@@ -501,8 +501,9 @@ function renderTop(){
   }
 }
 document.addEventListener('click',()=>{if(S.tsOpen){S.tsOpen=false;renderTop();}});
-// 预设「第 1 天开局」直接用日程表的开局（含 Day 0 教学的后训练结果）；别的预设没做过后训练
-function presetTS(p){const st=p.fromSchedule&&S.sched?S.sched[p.fromSchedule]:null;return st?{stages:{...st.stage},adj:JSON.parse(JSON.stringify(st.adj||{}))}:{stages:{...(p.stages||{})},adj:{}};}
+// 预设「第 1 天开局」= 日程表的开局 + Day 0 出厂测试的结果（规则.js 的 afterTutorial）；别的预设没做过后训练
+function presetTS(p){const st=p.fromSchedule&&S.sched?S.sched[p.fromSchedule]:null;if(!st)return{stages:{...(p.stages||{})},adj:{}};
+  const r=RULES.afterTutorial(st,(S.sched.days||[]).find(d=>d.event==='tutorial'),S.reg,S.bank);return{stages:{...r.stage},adj:JSON.parse(JSON.stringify(r.adj||{}))};}
 function setPreset(id){const p=S.reg.trainingPresets.find(x=>x.id===id);S.ts=presetTS(p);S.preset=id;if(S.scene)renderAll();}
 
 // ---------- 渲染：左栏 ----------

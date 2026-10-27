@@ -9,6 +9,7 @@ import { renderAP, renderHUD, spendAP, spendQuota, dropHeart, setUrl, HOME, adva
 import { pt, w, trainOne, pickPair, pickQuestions, isNoise, tagName, gib, learn } from './训练.js';
 import { mkRadar, retargetRadar, radarPt, radarLabels, radarStatic } from './六维图.js';
 import { DATA } from './数据.js';
+import { spot, tipOnce } from './教学.js';
 import { startNight } from './日程.js';
 import { renderSelf } from './报告.js';
 
@@ -58,11 +59,13 @@ export function view(v, arg) {
         <div class="site">${A.site}</div><div class="nx">${full ? '已经学满了' : `读完 → <b>${st ? '深层' : '浅层'}「${A.lv[st]}」</b>`}</div></div>`; }).join('') + '</div>');
     bv.querySelectorAll('.cb').forEach(el => { el.onclick = () => { const a = el.dataset.a; if (G.busy) return; if (G.stage[a] >= 2) return deny('这类语料已经学满了', el); hitFx(el, AT[a].c); pretrain(a); }; });
     if (arg) { const el = bv.querySelector(`[data-a="${arg}"]`); if (el) setTimeout(() => restart(el, 'flash'), 250); }
+    setTimeout(() => tipOnce('pre', 'bubble', '预训练：挑一类网站去读。读了哪类，夜里转盘上就多哪类卡；读第二次学到深层，卡会换成更好的版本。'), 300);
   }
   if (v === 'ptype') {
     paint(header('后训练 · 练哪一类问题？', `1 行动点 · 连做 ${pt().perBatch} 题`, true) + '<div class="tgrid">' + QT.map(t =>
       `<div class="tc r8${t.length > 2 ? ' long' : ''}" data-t="${t}"><div class="nm">${t}</div><canvas width="64" height="64"></canvas><div class="n">练过 ${G.done[t] || 0} 题</div></div>`).join('') + '</div>');
     bv.querySelectorAll('.tc').forEach(el => { radarStatic(el.querySelector('canvas'), el.dataset.t); el.onclick = () => { if (G.busy) return; hitFx(el, P.cobalt); postTrain(el.dataset.t); }; });
+    setTimeout(() => tipOnce('post', 'bubble', '后训练：挑一类问题来练，每道题两个回答选一个。在同一类问题上越常选它，夜里这类问题的转盘上它越容易被转到。'), 300);
   }
   bv.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { SFX.click(); view('menu'); });
 }
@@ -116,9 +119,9 @@ async function postTrain(t) {
   await fishSay(up ? `记住了！今晚再遇到${t}类的问题，我会更容易想到「${AT[up].n}」的说法。` : `${t}类问题……好像没练出什么来。`);
   await advanceClock(120); setUrl(HOME(), true); setScreen('idle'); lock(false); renderSelf(); view('menu');
 }
-function askOne(t, q, i, n) {
+function askOne(t, q, i, n, fixed) {
   return new Promise(done => {
-    let pair = pickPair();
+    let pair = fixed ? fixed.slice() : pickPair();
     paint(header(`后训练 · ${t}类`, `第 ${i + 1}/${n} 题`)
       + `<div class="qwrap"><div class="qleft"><div class="qq r4"><div class="who">用户问：</div></div><div class="ans"></div>
         <div style="display:flex"><span id="reroll" class="r2"><i class="qc r2"></i>换一对 · ${pt().rerollCost} 额度 <span class="key r2">R</span></span></div></div>
@@ -157,10 +160,10 @@ function askOne(t, q, i, n) {
       }, 300);
       setTimeout(() => { bv.classList.remove('lock'); done(); }, 1500 / Math.max(1, [.5, 1, 2, 3][G.spd] * .7));
     };
-    fill(); $('reroll').onclick = reroll; KEYQ = choose; KEYR = reroll;
+    fill(); $('reroll').onclick = reroll; KEYQ = choose; KEYR = fixed ? null : reroll; if (fixed) $('reroll').style.display = 'none';
   });
 }
-function summary(t, before, ch) {
+function summary(t, before, ch, nq) {
   return new Promise(done => {
     paint(header(`后训练完成 · ${t}类`, '只影响' + t + '类')
       + `<div class="qwrap"><div class="qleft"><div class="sum">` + (ch.length ? ch.map(a => { const d = w(t, a) - before[a];
@@ -170,16 +173,33 @@ function summary(t, before, ch) {
       + `<div class="qright" id="qr"><canvas width="128" height="128"></canvas><div class="cap">虚线 = 今天开始时</div></div></div>`
       + `<div class="bf"><span class="sp"></span><span class="btn2 r2" id="sumok">好的 <span class="key r2">Enter</span></span></div>`);
     const qr = $('qr'); RQ = mkRadar(qr.querySelector('canvas'), 128, t); radarLabels(qr, RQ, 4, 12);
-    banner(`训练完成 · ${t}类`, `${pt().perBatch} 题`, P.mint); SFX.levelup(); vignette(); const bp = sp($('bubble')); confetti(bp.x + bp.w / 2, bp.y + 40, 50);
+    banner(`训练完成 · ${t}类`, `${nq || pt().perBatch} 题`, P.mint); SFX.levelup(); vignette(); const bp = sp($('bubble')); confetti(bp.x + bp.w / 2, bp.y + 40, 50);
     bv.querySelectorAll('.srow[data-a]').forEach((r, i) => { const a = r.dataset.a, from = before[a], to = w(t, a), el = r.querySelector('.nv'); const t0 = performance.now() + 200 + i * 160;
       (function step(now) { const k = Math.max(0, Math.min(1, (now - t0) / 500)); el.textContent = (from + (to - from) * k).toFixed(2); if (k < 1) requestAnimationFrame(step); else { const p = sp(el); ring(p.x + 12, p.y + 8, to > from ? P.mint : P.red, 12, 70); } })(performance.now()); });
     const fin = () => { KEYSUM = null; SFX.click(); done(); }; $('sumok').onclick = fin; KEYSUM = fin;
   });
 }
 
+// ---------- 出厂测试的最后一题（第 1 天早上第一件事，免费，固定「活泼 vs 官腔」） ----------
+export async function tutorialQuestion(q) {
+  lock(true); bubble(true); const t = q.qtype;
+  await fishSay('出厂测试还剩最后一题！测试员留下了两个回答，你帮我挑一个更好的。');
+  setUrl(`dafeiyu://rlhf/<b>${t}</b>?tutorial`, true); setScreen('rlhf');
+  const before = Object.fromEntries(AXES.map(a => [a, w(t, a)]));
+  const p = askOne(t, q, 0, 1, q.pair);
+  await spot('bubble', `这就是「后训练」：同一个问题，两个回答选一个。选中的说法，以后在${t}类问题上更容易被转到；落选的会被压下去。`);
+  await p; G.done[t] = (G.done[t] || 0) + 1;
+  const ch = AXES.filter(a => before[a] != null && Math.abs(w(t, a) - before[a]) > .001);
+  addLog(`出厂测试 · 最后一题（${t}类）：` + (ch.map(a => `${AT[a].s}${w(t, a) > before[a] ? '↑' : '↓'}`).join(' ') || '没变化'), 'g');
+  await summary(t, before, ch, 1);
+  await fishSay('出厂测试全部通过！今天开始正式营业。');
+  setUrl(HOME(), true); setScreen('idle'); lock(false); renderSelf(); view('menu');
+}
+
 // ---------- 吃白饭 ----------
 async function eat() {
   if (G.busy) return; if (G.ap < 1) return deny('行动点用完了'); if (G.hearts >= G.heartMax) return deny('吃不下了');
+  await tipOnce('eat', 'hud', '吃白饭：花 1 个行动点，心 +1（最多 ' + G.heartMax + ' 颗）。心是整局共用的，夜里用户下线就扣。');
   lock(true); spendAP(); await youSay(pick(['去吃点东西吧，别饿着。', '吃饭时间到！']));
   bubble(false); fishSay('白饭！我来了！嗷呜——'); await wt(400);
   setUrl('dafeiyu://<b>waimai</b>/order/白饭×1', true); setScreen('eat'); showBowl(true); SFX.thud(); const bp = deskXY(128, DESK_Y - 12); ring(bp.x, bp.y, P.paper, 20, 90); setFish('eat');

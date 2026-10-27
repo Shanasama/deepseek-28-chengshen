@@ -812,3 +812,37 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 #stage.rewind #msgs{filter:hue-rotate(160deg) saturate(1.6)}
 #stage.rewind #pane{animation:rew .12s steps(2) infinite}
 @keyframes rew{0%{transform:translateY(-3px)}50%{transform:translate(2px,3px)}}
+
+/* ---------- 新手教学：聚光灯（教学.js） ---------- */
+#spot{position:absolute;inset:0;z-index:89;pointer-events:none;display:none}
+#spot.on{display:block}
+#spot .hole{position:absolute;box-shadow:0 0 0 2000px rgba(5,7,16,.72),0 0 0 2px var(--lgold);animation:spotp 1.2s steps(2) infinite;transition:left .15s,top .15s,width .15s,height .15s}
+@keyframes spotp{50%{box-shadow:0 0 0 2000px rgba(5,7,16,.72),0 0 0 3px var(--paper)}}
+#spot .sarr{position:absolute;width:18px;height:18px;animation:sarr .5s steps(2) infinite}
+#spot .sarr.up{transform:rotate(180deg);animation:sarru .5s steps(2) infinite}
+@keyframes sarr{50%{margin-top:4px}}@keyframes sarru{50%{margin-top:-4px}}
+#spot .stip{position:absolute;max-width:300px;padding:8px 12px;background:var(--paper);color:var(--ink);box-shadow:0 0 0 2px var(--ink),4px 4px 0 rgba(0,0,0,.5)}
+#spot .stip.in{animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
+#spot .sgo{margin-top:4px;color:var(--cobalt);text-align:right;animation:thx 1.2s steps(2) infinite}
+#spotcatch{position:absolute;inset:0;z-index:89;display:none;cursor:pointer}
+#spotcatch.on{display:block}
+
+/* ---------- 剧情占位页 ---------- */
+#story{position:absolute;inset:0;z-index:95;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:28px;cursor:pointer}
+#story.on{display:flex}
+#story.out{animation:tin .3s steps(4) reverse forwards}
+#story .sline{font-size:56px;line-height:64px;letter-spacing:6px}
+#story .sline span{display:inline-block;opacity:0;animation:sch .35s steps(4) forwards}
+@keyframes sch{0%{opacity:0;transform:translateY(16px) scale(.6)}100%{opacity:1;transform:none}}
+#story .sgo2{opacity:0}#story .sgo2.on{opacity:1;animation:thx 1.6s steps(2) infinite}
+
+/* 侧栏：图标 2 倍、品牌 3 倍；夜里右下角的「提前下班」 */
+#rail .ri{width:30px;height:30px}
+#drawer .brand{font-size:24px;line-height:28px;gap:8px}
+#drawer .brand .hn{font-size:12px;line-height:16px}
+#drawer .offbtn{margin-left:auto;padding:2px 8px;background:var(--red);color:var(--paper);cursor:pointer}
+#drawer .offbtn:hover{background:#FF5A66}
+.tipreset{padding:2px 8px;background:var(--hov);color:var(--tx2);cursor:pointer}
+.tpanel .tipreset{background:var(--k4);color:var(--t2)}
+.b-early{background:var(--rose);color:var(--paper)}
+.tiprow{margin-top:4px}.tipreset{display:inline-block;white-space:nowrap}

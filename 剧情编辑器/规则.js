@@ -137,5 +137,15 @@
     return Object.fromEntries(Object.entries(adjAll || {}).map(([t, o]) => { const { open, ...rest } = o; return [t, rest]; }));
   }
 
-  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT };
+  // Day 0 出厂测试的结果：解锁日程表 Day 0 那行写的语料，教学题按「选了 pair 里第一个」算一次后训练。
+  // 跳过教学时直接给这个结果；剧情编辑器「第 1 天开局」预设也用它（v3 §2）
+  function afterTutorial(start, day0, reg, bank) {
+    const stage = { ...start.stage }; let adj = start.adj || {};
+    for (const a of (day0 && day0.unlock) || []) { const lv = stage[a] || 0; if (!lv) { stage[a] = 1; adj = afterLearn(adj, a, 0); } }
+    const q = bank && day0 && day0.question && (bank.questions || []).find(x => x.id === day0.question);
+    if (q && q.pair) adj = postTrain(adj, { qtype: q.qtype, win: q.pair[0], lose: q.pair[1], stages: stage, reg }).adj;
+    return { stage, adj };
+  }
+
+  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, afterTutorial, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT };
 });

@@ -46,7 +46,7 @@ export function showReport(last, trial = false) {
     let t = G.reportType || '知识';
     const draw = () => { tabs($('rtabs'), t, x => { t = x; G.reportType = x; draw(); }); dropRadar(RR); RR = mkRadar($('rradar'), 220, t); RR.dark = true; radarLabels($('rradarbox'), RR, 15, 15); };
     draw();
-    const lbl = { solved: ['解决离开', 'b-ok'], win: ['特殊胜利', 'b-ok'], offline: ['下线', 'b-bad'], forced: ['强制下线', 'b-bad'], drop: ['掉线', 'b-egg'] };
+    const lbl = { solved: ['解决离开', 'b-ok'], win: ['特殊胜利', 'b-ok'], offline: ['下线', 'b-bad'], forced: ['强制下线', 'b-bad'], drop: ['掉线', 'b-egg'], early: ['提前下班', 'b-early'] };
     $('rsess').innerHTML = G.sessions.map(s => { const [n, c] = lbl[s.result] || ['—', 'b-ph']; return `<div class="r2"><span></span><span class="sp"></span><span class="badge r2 ${c}">${n}</span></div>`; }).join('');
     [...$('rsess').children].forEach((d, i) => { d.firstChild.textContent = G.sessions[i].visitor.name + (G.sessions[i].visitor.repeat ? '（重复来访）' : ''); setTimeout(() => { d.classList.add('in'); SFX.step(i); }, 300 + i * 120); });
     renderStats($('rstats'), G.stats);
@@ -80,7 +80,7 @@ export function renderBadges(box, run) {
     d.appendChild(pxIcon(ICON.trophy, { k: lock ? P.k5 : P.ink, Y: lock ? P.k4 : P.gold, w: lock ? P.k5 : P.paper }, 3));
     d.insertAdjacentHTML('beforeend', '<span class="bn"></span><span class="bh"></span>' + (st === 'new' ? '<span class="nw r2">NEW</span>' : ''));
     d.querySelector('.bn').textContent = lock ? '？？？' : a.name;
-    d.querySelector('.bh').textContent = lock ? '某位用户的某个回答里藏着' : st === 'new' ? '这一局解锁' : '以前解锁过';
+    d.querySelector('.bh').textContent = lock ? (a.hint || '某位用户的某个回答里藏着') : st === 'new' ? '这一局解锁' : '以前解锁过';
     box.appendChild(d); setTimeout(() => { d.classList.add('in'); if (st === 'new') SFX.unlock(); }, 250 + i * 140);
   });
 }

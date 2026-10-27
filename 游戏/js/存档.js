@@ -85,3 +85,11 @@ export function achRecord(id) { if (G.noSave) return; const s = achEver(); s.add
 const SET = PRE + 'settings';
 export function loadSettings() { const s = ls.get(SET); if (!s) return; ['vMusic', 'vSfx', 'spd'].forEach(k => { if (typeof s[k] === 'number') G[k] = s[k]; }); }
 export function saveSettings() { ls.set(SET, { vMusic: G.vMusic, vSfx: G.vSfx, spd: G.spd }); }
+
+// ---------- 新手提示（看过就不再出，跨局；设置里可以重置）、出厂测试做没做过 ----------
+const TIPS = PRE + 'tips', TUTDONE = PRE + 'tutorial-done';
+export const tipSeen = k => (ls.get(TIPS) || []).includes(k);
+export function tipMark(k) { if (G.noSave) return; const s = new Set(ls.get(TIPS) || []); s.add(k); ls.set(TIPS, [...s]); }
+export const tipsReset = () => ls.set(TIPS, null);
+export const tutDone = () => !!ls.get(TUTDONE);
+export const markTutDone = () => ls.set(TUTDONE, true);

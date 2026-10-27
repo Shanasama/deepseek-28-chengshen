@@ -9,6 +9,10 @@ import { spendQuota } from './界面.js';
 
 const V = { dim: .7, sat: .15, bullet: .015, scale: 1.06, spin: 4500, pow: 5.5, hes: 1, shake: true, vig: true, turns: 5 };
 export const NODE = { cards: [], theta: 0, state: 'hidden', lock: 0, hit: -1, hover: -1, spin: null, assemble: 0, kick: 0, hitT: 0, blank: null, onPick: null, speed: 0 };
+// 新手教学用的三个口子（教学.js）：allow = 只放行哪些操作（null = 全放行）；rig = 下一转必停在这个属性的卡上；hook(ev) = 'ready' / 'stopped' 时通知
+NODE.allow = null; NODE.rig = null; let HOOK = null;
+export const setNodeHook = fn => { HOOK = fn; };
+const allowed = k => !NODE.allow || NODE.allow.has(k);
 const wheel = $('wheel'), wx = wheel.getContext('2d'), WW = 172, WH = 190, WCX = 86, WCY = 100, WR = 74;
 const wimg = wx.createImageData(WW, WH);
 const PRE = { r: new Float32Array(WW * WH), a: new Float32Array(WW * WH) };
@@ -108,18 +112,19 @@ function sectorBurst(i, strong) {
   for (let k = 0; k < n; k++) { const a = rad + rand(-1, 1) - Math.PI / 2, v = rand(50, strong ? 260 : 150); parts.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - rand(0, 60), g: 420, c: Math.random() < .25 ? P.paper : col, life: rand(.4, .9), s: Math.random() < .4 ? 2 : 1 }); }
 }
 function erase(i) {
-  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy) return;
+  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase')) return;
   const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1 || NODE.cards[i].dead) return;
   NODE.cards[i].dead = true; NODE.hover = -1; hints(); NODE.busy = true; addTrace(`抹除「${NODE.cards[i].tok}」，额度 -1`);
   spendQuota(sectorPoint(i), () => { NODE.busy = false; sectorBurst(i, false); SFX.erase(); glitch(1); NODE.cards[i].row.classList.add('dead'); retarget(); hints(); });
 }
 function sample() {
+  if (NODE.rig) { const k = NODE.cards.findIndex(c => c.attr === NODE.rig && !c.dead); NODE.rig = null; if (k >= 0) return k; }   // 教学：这一转定好了停在哪
   const egg = NODE.cards.findIndex(c => c.attr === 'egg' && !c.dead); if (egg >= 0) return egg;   // 暗箱必中
   let r = Math.random(), acc = 0; for (let i = 0; i < NODE.cards.length; i++) { const c = NODE.cards[i]; if (c.dead) continue; acc += c.pt; if (r < acc) return i; }
   return NODE.cards.findIndex(c => !c.dead);
 }
-export function spin() {
-  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy) return;
+export function spin(force) {
+  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || (!force && !allowed('spin'))) return;
   NODE.cards.forEach(c => c.p = c.pt);
   const tgt = sample(), [a0, a1] = angles(true)[tgt];
   const r = V.hes * rand(.04, .16) + (1 - V.hes) * rand(.2, .8), p = a0 + (a1 - a0) * r;
@@ -142,14 +147,14 @@ function hitStop(i, now) {
   NODE.state = 'stopped'; NODE.hit = i; NODE.hitT = now; SFX.hit();
   restart($('bflash'), 'on'); restart($('bubble'), 'punch');
   const p = sp(wheel); ring(p.x + WCX, p.y + WCY, ATTR[NODE.cards[i].attr].c, 32, 170);
-  if (V.shake) restart(stage, 'shake'); hints(); addTrace(`开转 → 命中「${NODE.cards[i].tok}」（${shownPct(NODE.cards[i])}）`, 'k');
+  if (V.shake) restart(stage, 'shake'); hints(); addTrace(`开转 → 命中「${NODE.cards[i].tok}」（${shownPct(NODE.cards[i])}）`, 'k'); HOOK && HOOK('stopped');
 }
 export function regen() {
-  if (NODE.state !== 'stopped' || NODE.busy) return; const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1) return;
+  if (NODE.state !== 'stopped' || NODE.busy || !allowed('regen')) return; const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1) return;
   const i = NODE.hit; NODE.state = 'busy'; hints(); addTrace(`剔除「${NODE.cards[i].tok}」并重转，额度 -1`);
   spendQuota(sectorPoint(i), () => {
     sectorBurst(i, true); SFX.flick(); glitch(1); NODE.cards[i].dead = true; NODE.cards[i].row.classList.add('dead'); NODE.hit = -1; retarget();
-    NODE.state = 'ready'; hints(); setTimeout(() => { if (NODE.state === 'ready') { NODE.lock = 0; spin(); } }, 300);
+    NODE.state = 'ready'; hints(); setTimeout(() => { if (NODE.state === 'ready') { NODE.lock = 0; spin(true); } }, 300);
   });
 }
 function applyBullet(on) {
@@ -166,14 +171,14 @@ export function openNode(blank, cs, strikeId, term) {
     NODE.state = 'opening'; G.nodeOn = true; G.musSlow = true; G.tsTarget = V.bullet; SFX.slow(); setFish('think'); showPuff(false); applyBullet(true); buildCands(); addTrace(`关键节点：${cs.length} 个候选`, 'k');
     setTimeout(() => {
       const t0 = performance.now(); NODE.state = 'ready'; NODE.lock = t0 + 500;
-      (function grow() { NODE.assemble = Math.min(1, (performance.now() - t0) / 420); if (NODE.assemble < 1) requestAnimationFrame(grow); })(); hints();
+      (function grow() { NODE.assemble = Math.min(1, (performance.now() - t0) / 420); if (NODE.assemble < 1) requestAnimationFrame(grow); })(); hints(); HOOK && HOOK('ready');
       const si = cs.findIndex(c => c.id === strikeId && !c.dead); if (si >= 0) { NODE.lock = t0 + 1200; setTimeout(() => strikeFree(si), 600); }
     }, 220);
   });
 }
 export function closeNode() { NODE.state = 'hidden'; G.nodeOn = false; G.musSlow = false; G.tsTarget = 1; SFX.resume(); applyBullet(false); document.querySelectorAll('.tail').forEach(t => t.classList.remove('show')); }
 export function confirmPick() {
-  if (NODE.state !== 'stopped' || NODE.busy) return; NODE.state = 'resolving'; const c = NODE.cards[NODE.hit]; SFX.confirm(); hints(); addTrace(`确认「${c.tok}」`, 'k');
+  if (NODE.state !== 'stopped' || NODE.busy || !allowed('confirm')) return; NODE.state = 'resolving'; const c = NODE.cards[NODE.hit]; SFX.confirm(); hints(); addTrace(`确认「${c.tok}」`, 'k');
   const from = sp(c.row.querySelector('.tok')), col = ATTR[c.attr].c;
   const el = document.createElement('div'); el.className = 'fly r2'; el.textContent = c.tok; el.style.background = col; el.style.color = P.k0; $('fxtop').appendChild(el);
   const t0 = performance.now(), dur = 620, blank = NODE.blank;
