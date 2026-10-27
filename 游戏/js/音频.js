@@ -111,7 +111,7 @@ export function musUpdate() {
       const arp = [0, 1, 2, 1, 2, 0, 1, 2];
       if (!slow) { mnote(ch[arp[i % 8]] + 12, t, spb * .9, 'square', .22); if (i % 4 === 2) mhat(t); if (i === 0 || i === 10) mnote(ch[2] + 24, t, spb * 2, 'triangle', .18); }
       else if (i % 2 === 0) mnote(ch[arp[i % 8]] + 12, t, spb * 1.6, 'triangle', .28);
-      if (slow && i % 4 === 0) { mthump(t); mthump(t + .16); }
+      if (slow && i % 4 === 0 && !G.inTitle) { mthump(t); mthump(t + .16); }   // 心跳只在转盘慢镜头里有，标题画面不要
     } else {
       if (i % 4 === 0) mnote(ch[0] - 24, t, spb * 3, 'triangle', .8);
       const mel = [2, 1, 0, 1, 2, 2, 1, 0];
