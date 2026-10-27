@@ -514,7 +514,7 @@ function renderSide(){
     let img=fallback();
     if(!NOAV.has(u.dir)){img=h('img',{class:'av',src:`/剧本/${u.dir}/${u.user.avatar}`,alt:''});img.onerror=()=>{NOAV.add(u.dir);img.replaceWith(fallback());};}
     box.append(h('div',{class:'user'+(S.dir===u.dir&&S.sel?.kind==='user'?' on':''),onclick:async()=>{await openUser(u.dir);select({kind:'user'});}},img,
-      h('div',{class:'meta'},h('div',{},u.user.name),h('div',{},h('span',{class:'tag'},u.user.type),' ',u.user.boss?h('span',{class:'tag boss'},'Boss'):null))));
+      h('div',{class:'meta'},h('div',{},u.user.name),h('div',{},u.user.boss?h('span',{class:'tag boss'},'Boss'):u.user.tutorial?h('span',{class:'tag'},'教学'):null))));
     for(const s of u.scenes){
       const cur=S.dir===u.dir&&S.file===s.file;
       const row=h('div',{class:'scene'+(cur?' on':''),draggable:'true',title:'拖动可以调整出场顺序',onclick:()=>openScene(u.dir,s.file)},h('span',{class:'o'},String(s.order).padStart(2,'0')),cur?S.scene.title:s.title);
@@ -727,7 +727,7 @@ function renderUserPanel(P){
   const u=S.user;
   P.append(h('div',{class:'hd'},h('div',{class:'ttl'},u.name),h('div',{class:'sub'},'用户档案 · 剧本/'+S.dir+'/用户.json'),h('div',{class:'tabs'},h('button',{class:'on'},'档案'))));
   const F=h('div',{class:'form'});P.append(F);
-  F.append(h('div',{class:'row'},field('名字',txt(u,'name'),'改名不改文件夹'),field('类型',sel(u,'type',['闲聊','知识','捣乱','情感倾诉','代码求助'].map(x=>[x,x])))));
+  F.append(h('div',{class:'row'},field('名字',txt(u,'name'),'改名不改文件夹')));   // v3.7 没有用户类型：问题类型写在每一轮上
   F.append(field('简介',txt(u,'bio',{area:true}),'预告和对话标题栏'));
   const prev=h('img',{class:'avprev',src:`/剧本/${S.dir}/${u.avatar}?t=${Date.now()}`,alt:''});prev.onerror=()=>prev.replaceWith(h('div',{class:'avprev av'},'无'));
   F.append(field('头像',h('div',{style:'display:flex;gap:8px;align-items:center'},prev,h('div',{style:'flex:1;display:flex;flex-direction:column;gap:6px'},txt(u,'avatar'),
@@ -1652,12 +1652,12 @@ async function createScene(dir,order,title){
   await putFile(`${dir}/${file}`,ser(newScene(order,title)),'POST');return file;
 }
 $('#newUserB').onclick=async()=>{
-  const v=await ask('新建用户',[{key:'name',label:'名字',required:true,ph:'如「失恋的少女」',hint:'也是文件夹名'},{key:'type',label:'类型',options:['闲聊','知识','捣乱','情感倾诉','代码求助']},{key:'scene',label:'第一个场景的标题',value:'新场景'}]);
+  const v=await ask('新建用户',[{key:'name',label:'名字',required:true,ph:'如「失恋的少女」',hint:'也是文件夹名'},{key:'scene',label:'第一个场景的标题',value:'新场景'}]);
   if(!v)return;const dir=safeName(v.name);if(!dir)return toast('名字不能为空');
   if(S.list.some(x=>x.dir===dir))return toast('已经有叫「'+dir+'」的用户了');
   try{
     await flush();
-    await putFile(`${dir}/用户.json`,ser({name:v.name,type:v.type,bio:'',avatar:'头像.png',temper:1.0,detect:'中',boss:false,farewell:{solved:null,offline:null}}),'POST');
+    await putFile(`${dir}/用户.json`,ser({name:v.name,bio:'',avatar:'头像.png',temper:1.0,detect:'中',boss:false,farewell:{solved:null,offline:null}}),'POST');
     const file=await createScene(dir,1,v.scene||'新场景');
     S.list=await (await fetch('/api/list')).json();await openScene(dir,file);select({kind:'user'});toast('已创建用户「'+v.name+'」');
   }catch(e){toast('创建失败：'+e.message);}

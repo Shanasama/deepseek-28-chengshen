@@ -1,7 +1,7 @@
 // 原型用的极简静态服务器：node serve.js → http://localhost:5180
 // 原型文件从本目录出；/剧本/ 下的剧本和 /api/list 从项目的剧本库出（和剧情编辑器共用）。
 const http = require('http'), fs = require('fs'), path = require('path');
-const { ROOT, listAll, TYPES } = require('../剧情编辑器/剧本库');
+const { ROOT, listAll, TYPES } = require('../../../剧情编辑器/剧本库');
 http.createServer((req, res) => {
   const url = decodeURIComponent(req.url.split('?')[0]);
   if (url === '/api/list') {

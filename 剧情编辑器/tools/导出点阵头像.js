@@ -2,7 +2,7 @@
 // 用法：node 剧情编辑器/tools/导出点阵头像.js
 const fs = require('fs'), path = require('path'), zlib = require('zlib');
 const ROOT = path.resolve(__dirname, '../..');
-const src = fs.readFileSync(path.join(ROOT, 'prototype_夜间一轮/index.html'), 'utf8');
+const src = fs.readFileSync(path.join(ROOT, '_归档/旧版原型/prototype_夜间一轮/index.html'), 'utf8');
 
 // 从原型源码里取出 P / KID / KIDPAL / TIBO 的定义并求值
 const grab = name => { const m = src.match(new RegExp(`const ${name}=([\\s\\S]*?);\\n`)); if (!m) throw new Error('找不到 ' + name); return m[1]; };

@@ -4,13 +4,13 @@
     {
       "name": "night-prototype",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["prototype_夜间一轮/serve.js"],
+      "runtimeArgs": ["_归档/旧版原型/prototype_夜间一轮/serve.js"],
       "port": 5180
     },
     {
       "name": "day-prototype",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["prototype_白天/serve.js"],
+      "runtimeArgs": ["_归档/旧版原型/prototype_白天/serve.js"],
       "port": 5182
     },
     {

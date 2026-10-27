@@ -92,7 +92,7 @@ export async function startNight() {
   G.sessions = await Promise.all(G.tonight.map(async v => {
     const u = v.entry.user, scene = await loadScene(v.dir, v.file);
     return { visitor: v, dir: v.dir, file: v.file, scene, user: u, status: 'queue', result: null, conv: newConv(),
-      U: { name: u.name, type: u.type, bio: u.bio || '', avatar: u.avatar, temper: u.temper || 1, detect: DETECT_OF(u.detect), farewell: u.farewell || {}, N: scene.rounds.length } };
+      U: { name: u.name, bio: u.bio || '', avatar: u.avatar, temper: u.temper || 1, detect: DETECT_OF(u.detect), farewell: u.farewell || {}, N: scene.rounds.length } };
   }));
   G.clock = 21 * 60 + 3; renderClock(); setUrl(HOME(), true); renderDrawer();
   await wipe(false); G.busy = false; SFX.slow();

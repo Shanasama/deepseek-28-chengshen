@@ -1,13 +1,19 @@
 {
   "name": "加班的白领",
-  "type": "情感倾诉",
+  "oldType": "情感倾诉",
   "bio": "互联网公司运营，工牌还挂在脖子上。凌晨的工位只剩她这一盏灯，说话客气，打两个字删一个。",
   "avatar": "头像.png",
-  "temper": 1.0,
+  "temper": 1,
   "detect": "中",
   "boss": false,
   "farewell": {
-    "solved": { "text": "好多了。我关电脑回家了，谢谢你陪我。", "rhythm": "normal" },
-    "offline": { "text": "算了，跟你说话比加班还累。", "rhythm": "hesitant" }
+    "solved": {
+      "text": "好多了。我关电脑回家了，谢谢你陪我。",
+      "rhythm": "normal"
+    },
+    "offline": {
+      "text": "算了，跟你说话比加班还累。",
+      "rhythm": "hesitant"
+    }
   }
 }

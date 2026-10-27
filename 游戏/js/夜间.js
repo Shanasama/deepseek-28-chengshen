@@ -140,7 +140,7 @@ export async function runSession(sess) {
   await runFx(sc.opening); if (!alive()) return 'abort';
   const ctx = { ri: 0, firstTry: true, noOffend: true, prev: null, prevDiag: null, struck: new Set(), last: null, first: true };
   for (let ri = 0; ri < sc.rounds.length; ri++) {
-    const rd = sc.rounds[ri]; ctx.ri = ri; ctx.struck = new Set(); ctx.last = null; G.retry = 0; headerUser(sess, rd.speaker); nightBar(U.N);
+    const rd = sc.rounds[ri]; ctx.ri = ri; ctx.struck = new Set(); ctx.last = null; G.retry = 0; sess.qtype = rd.qtype; headerUser(sess, rd.speaker); nightBar(U.N);
     const say = (ri > 0 && ctx.prev && rd.sayAfter?.[ctx.prev]) || rd.say;
     await runFx(rd.startFx); if (!alive()) return 'abort';
     G.phase = 'user'; await userType(say.text, say.rhythm); if (!alive()) return 'abort'; addTrace(`第 ${ri + 1} 轮：用户提问`);

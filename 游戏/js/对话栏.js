@@ -193,7 +193,7 @@ export function headerUser(sess, speaker) {
     if (src) { const im = new Image(); im.onerror = () => { av.innerHTML = ''; av.appendChild(phAvatar(u.name, 1)); }; im.src = `/剧本/${key}`; av.appendChild(im); }
     else av.appendChild(phAvatar(u.name, 1));
   }
-  $('uname').textContent = speaker?.name || u.name; $('uchip').textContent = sess.qtypeLabel || u.type || ''; $('ubio').textContent = u.bio || '';
+  $('uname').textContent = speaker?.name || u.name; $('uchip').textContent = sess.qtype || ''; $('ubio').textContent = u.bio || '';
 }
 export function nightBar(N) {
   $('pfill').style.width = G.patience + '%'; $('pfill').style.background = G.patience > 50 ? P.mint : G.patience > 25 ? P.gold : P.red;
