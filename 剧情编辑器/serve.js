@@ -72,7 +72,8 @@ http.createServer(async (req, res) => {
   const url = decodeURIComponent(rawUrl), q = new URLSearchParams(qs);
   try {
     if (url.startsWith('/api/')) return await api(req, res, url, q);
-    const p = path.join(ROOT, url === '/' ? '剧情编辑器/index.html' : url);
+    // 以 / 结尾的路径给它的 index.html（游戏本体：/游戏/）
+    const p = path.join(ROOT, url === '/' ? '剧情编辑器/index.html' : url.endsWith('/') ? url + 'index.html' : url);
     if (!p.startsWith(ROOT)) return send(res, 403, 'forbidden', 'text/plain');
     fs.readFile(p, (err, data) => {
       if (err) return send(res, 404, 'not found', 'text/plain');

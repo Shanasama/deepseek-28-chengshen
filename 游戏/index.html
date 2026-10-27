@@ -1,0 +1,191 @@
+<!doctype html>
+<!--
+  大肥鱼 HARNESS · 游戏本体（骨架，v3.7）
+  白天 → 一晚 4 位用户接连上线 → 每晚结算 → 下一天，按 剧本/_日程表.json 走。
+  打开方式：node 剧情编辑器/serve.js → http://localhost:5181/游戏/
+  代码在 js/ 下按功能分文件，规则在 /剧情编辑器/规则.js（和剧情编辑器共用）。两个原型文件夹只作参考。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大肥鱼 HARNESS</title>
+<link rel="stylesheet" href="样式.css">
+</head>
+<body class="day">
+<div id="stage">
+  <div id="title"><span id="tlogo"></span><b>大肥鱼</b><span class="hn r2">HARNESS</span><span class="sp"></span>
+    <span class="wb" id="wb-min">—</span><span class="wb" id="wb-max">□</span><span class="wb x" id="wb-x">×</span></div>
+
+  <!-- 最左：图标栏 + 可展开侧栏（白天放今晚来访预告，夜里放今晚的会话） -->
+  <div id="rail">
+    <span class="ri btn r4" id="r-logo" title="展开侧栏"></span>
+    <span class="ri btn r4" id="r-new" title="新会话"></span>
+    <span class="ri btn r4" id="r-sess" title="今晚"><i class="dot r2" id="vdot">4</i></span>
+    <span class="ri btn r4" id="r-save" title="存档 / 读档"></span>
+    <span class="ri btn r4" id="r-set" title="设置"></span>
+    <span class="sp"></span>
+    <span class="ri btn r4" id="r-me" title="账号"></span>
+  </div>
+  <div id="scrim"></div>
+  <div id="drawer">
+    <div class="brand"><span id="dlogo"></span>大肥鱼<span class="hn r2">HARNESS</span></div>
+    <h6 id="h-sess"><span id="h-sess-t">今晚来访预告</span><span class="chip day r2" id="dchip">Day 1</span></h6>
+    <div id="vlist"></div>
+    <h6 id="h-save">存档 / 读档</h6>
+    <div style="display:flex;gap:4px"><span class="slbtn btn r4" id="d-save">存档 <b>SAVE</b></span><span class="slbtn load btn r4" id="d-load">读档 <b>LOAD</b></span></div>
+    <h6 id="h-set">设置</h6>
+    <div class="sets">
+      <div class="set"><span>音乐</span><div class="vol r2" id="v-music"><i></i></div><span class="v" id="v-music-t"></span></div>
+      <div class="set"><span>音效</span><div class="vol r2" id="v-sfx"><i></i></div><span class="v" id="v-sfx-t"></span></div>
+    </div>
+    <div class="me"><span id="meav"></span><span>已登录 · 大肥鱼</span><span class="t3" id="meday" style="margin-left:auto">Day 1</span></div>
+  </div>
+
+  <!-- 中间：对话栏。白天是你和大肥鱼的 LINE 式聊天；夜里是用户和大肥鱼的会话（一位用户一个会话） -->
+  <div id="chat">
+    <div id="chead">
+      <div class="r1"><span id="uav" class="r2"></span><span id="uname">大肥鱼</span><span class="chip r2" id="uchip">在线 · 白天</span><span class="sp"></span>
+        <span class="t3">今晚</span><span id="queue" class="r2" title="今晚"></span></div>
+      <div class="bio" id="ubio"></div>
+      <div id="tabs"><span class="on" data-t="msgs">对话</span><span data-t="trace">轨迹<i class="tdot r2" id="tdot"></i></span></div>
+    </div>
+    <div id="msgs"></div>
+    <div id="trace"></div>
+    <div class="cwrap"><div id="composer" class="r12">
+      <div id="inp" class="ph">和大肥鱼说点什么…</div>
+      <div id="tools">
+        <span class="ibtn r12 t2" id="t-plus">+</span>
+        <span class="tbtn r4" id="t-act">白天活动 ⌄</span>
+        <span class="sp"></span>
+        <span class="tbtn r4" id="spdchip"><span>大肥鱼</span><span class="t3">·</span><span id="spdlbl">Medium</span><span class="t3">⌄</span></span>
+        <span id="send" class="r12"></span>
+      </div>
+    </div></div>
+    <div id="pops"><div class="menu r4" id="m-act"></div>
+      <div id="spdpop" class="r8">
+        <div class="sh"><span id="spdic2"></span><b id="spdname">Medium</b><span class="t3">›</span><span class="sp"></span><span class="ic r2" id="spdreset" title="恢复默认"></span></div>
+        <div class="sm">大肥鱼 · 说话、思考与输出速度</div>
+        <div id="strack" class="r12"><div id="sfill" class="r12"><div class="stars"></div></div><div id="sknob" class="r12"></div></div>
+        <div class="ticks" id="sticks"><span>×0.5</span><span>×1</span><span>×2</span><span>×3</span></div>
+      </div></div>
+    <div id="sbar">
+      <span class="dayonly">行动点</span><div class="pips dayonly" id="pips"></div><span class="dayonly" id="aptxt"></span>
+      <span class="nightonly" id="sprog"></span><span class="nightonly" id="sturn"></span>
+      <span class="sp"></span>
+      <span class="dayonly" id="posttxt"></span>
+      <span class="nightonly">耐心</span><div class="meter r2 nightonly" id="pbar"><i id="pfill"></i><b id="pghost"></b></div>
+      <span id="ic-snd" class="ic r2"></span>
+    </div>
+  </div>
+
+  <!-- 右：仿浏览器预览窗，「大肥鱼的工位」和「自我认知」两个标签 -->
+  <div id="pane">
+    <div id="ptabs"><span class="ptab on r4" data-tab="desk"><span id="pglobe"></span>大肥鱼的工位</span>
+      <span class="ptab r4" data-tab="self"><span id="pglobe2"></span>自我认知</span><span class="sp"></span></div>
+    <div id="purl"><span class="nav r2" id="pn1"></span><span class="nav r2" id="pn2"></span><span class="nav r2" id="pn3"></span><div id="url" class="r4"></div><i id="uload"></i></div>
+    <div id="desk">
+      <div id="room">
+        <canvas id="back" width="600" height="486"></canvas>
+        <canvas id="win" width="178" height="226"></canvas>
+        <canvas id="wall" width="600" height="486"></canvas>
+        <div id="slogan" class="abs r2" title="横着读，竖着读"><span>不</span><span>挑</span><span>战</span><span>怕</span><span>战</span><span>胜</span><span>困</span><span>困</span><span>困</span><span>难</span><span>难</span><span>难</span></div>
+        <div id="clock" class="abs r2"><span id="ch">09</span><span class="c">:</span><span id="cm">00</span></div>
+        <div id="cal" class="abs r2"><div class="hd">第</div><div class="n" id="calday">1</div></div>
+        <canvas id="glow" width="600" height="486"></canvas>
+        <canvas id="dust" width="600" height="486"></canvas>
+        <img id="fish" class="idle" alt=""><canvas id="mouth" width="10" height="6"></canvas>
+        <canvas id="front" width="600" height="486"></canvas>
+        <canvas id="scr" width="142" height="96"></canvas><div id="scrtitle" class="abs">桌面</div>
+        <canvas id="onDesk" width="600" height="486"></canvas>
+        <canvas id="eat" width="600" height="486"></canvas>
+        <canvas id="cable" width="96" height="14"></canvas>
+        <canvas id="tokdev" width="76" height="104" title="token 分词机"></canvas>
+        <div id="hots"></div>
+        <div id="fishhit" title="点她：收起 / 打开思考气泡"></div>
+      </div>
+      <div id="hud" class="r4"><div id="hearts"></div><i class="div"></i><span class="t3">额度</span><div id="quota"></div><span id="qtxt"></span></div>
+      <div id="prog" class="r4"><div class="r"><span id="progt">正在读取</span><span class="sp"></span><span id="progn">0</span></div><div class="bar r2"><i id="progb"></i></div></div>
+      <div id="puff" class="r4"><i></i><i></i><i></i></div>
+      <i class="tail t1 r2"></i><i class="tail t2 r2"></i>
+      <div id="bubble" class="r12">
+        <div id="bv"></div>
+        <div id="nodebox">
+          <div id="bhead"><span class="lbl"><i></i>下一个 token</span><span class="sp"></span><span class="cap">P(token | 前文)</span></div>
+          <div id="node"><div id="cands"></div><div id="wheelbox"><canvas id="wheel" width="172" height="190"></canvas></div></div>
+          <div id="hints"></div>
+        </div>
+        <div id="bflash"></div>
+      </div>
+      <div id="banner" class="r4"><div class="b1" id="b1"></div><div class="b2" id="b2"></div></div>
+      <div id="flash"></div>
+    </div>
+    <div id="self">
+      <div class="h1">大肥鱼 · 模型评测报告</div>
+      <div class="sub" id="selfsub"></div>
+      <div class="stabs" id="stabs"></div>
+      <div class="row">
+        <div class="radarbox r4" id="radarbox"><canvas id="radar" width="220" height="220"></canvas>
+          <div class="lg2"><span><i class="cur"></i>现在</span><span><i class="old"></i>今天开始时</span></div></div>
+        <div class="attrs" id="attrs"></div>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+  </div>
+
+  <div id="dim"></div>
+  <div id="fxl"></div>
+  <canvas id="fxc" width="960" height="540"></canvas>
+  <div id="hurt"></div><div id="joy"></div>
+  <div id="fxtop"></div>
+  <div id="cursor"></div>
+  <div id="toast" class="r4"></div>
+
+  <div id="phone" class="r12"><i class="notch r2"></i><div class="scr r8">
+    <div class="sb"><span>4:58</span><span>5G</span></div>
+    <div class="hdr"><span>← 发帖</span><span class="x r4" id="phone-x">×</span></div>
+    <div class="who"><span id="tibo-av"></span><div>Tibo <u>✓</u><br><span style="color:#6D7594">@t•••</span></div></div>
+    <div>we're back in action — resetting usage limits for everyone.<br><br>sorry about the disruption!</div>
+    <div class="rf" id="phone-rf">额度已重置</div>
+    <div class="st"><span>回复 4.1K</span><span>转发 2.1K</span><span>喜欢 17K</span></div>
+  </div></div>
+
+  <div id="modal"><div class="box r4"><div class="q1" id="mq1"></div><div class="q2" id="mq2"></div><div class="btns"><span class="btn3 r2" id="mno">再想想</span><span class="btn2 r2" id="myes">确定</span></div></div></div>
+  <canvas id="wipe" width="960" height="540"></canvas>
+
+  <!-- 每晚结算：模型评测报告（美术规范 §12） -->
+  <div id="report"><div class="rbox r8">
+    <span class="stamp r2" id="rstamp">NIGHT 1</span>
+    <div class="h1">大肥鱼 · 模型评测报告</div>
+    <div class="sub" id="rsub"></div>
+    <div class="stabs" id="rtabs"></div>
+    <div class="row">
+      <div class="radarbox r4" id="rradarbox"><canvas id="rradar" width="220" height="220"></canvas>
+        <div class="lg2"><span><i class="cur"></i>今晚</span><span><i class="old"></i>今天开始时</span></div></div>
+      <div class="rright"><div class="rsess" id="rsess"></div><div class="stats" id="rstats"></div></div>
+    </div>
+    <div class="rfoot"><span class="t3" id="rnote"></span><span class="sp"></span><span class="btn2 r2" id="rnext">进入第 2 天 <span class="key r2">Enter</span></span></div>
+  </div></div>
+
+  <!-- 整局结束：心尽 / Demo 打完 -->
+  <div id="endcard"><div class="ebox r8"><div class="h" id="eh"></div><div class="t" id="et"></div><div class="stats" id="estats"></div>
+    <div class="btns"><span class="btn2 r2" id="erestart">重新开始</span></div></div></div>
+
+  <div id="start"><div class="card r12"><div style="font-size:24px;line-height:28px">大肥鱼 HARNESS</div><div style="color:var(--cobalt)">点击 / 按空格 开始</div><div class="t3" id="startinfo">载入中…</div></div></div>
+</div>
+
+<div id="dev" class="min"><h4 id="devh"><span>开发面板（不属于设计）</span><span>–</span></h4><div id="devbody">
+  <h5>天数与资源</h5>
+  <div><button id="d-ap">行动点回满</button><button id="d-h5">心设为 5</button><button id="d-q3">额度设为 3</button><button id="d-skip">跳过当前用户</button></div>
+  <h5>预训练阶段</h5>
+  <div><button id="d-s1">全部浅层</button><button id="d-s2">全部深层</button></div>
+  <h5>状态</h5>
+  <pre id="devstate"></pre>
+  <table id="devtab"></table>
+</div></div>
+
+<script src="/剧情编辑器/规则.js"></script>
+<script src="大肥鱼占位.js"></script>
+<script type="module" src="js/主程序.js"></script>
+</body>
+</html>

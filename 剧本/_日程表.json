@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "note": "日程表（v3.7）：每一天的安排写成数据，程序按表走。Demo 是 Day 0 + 3 天；28 天本体就是 28 行。",
+  "start": {
+    "hearts": 3,
+    "heartMax": 5,
+    "quota": 10,
+    "quotaMax": 10,
+    "rollbacks": 1,
+    "heartsOutEnds": true,
+    "stage": { "knowledge": 0, "colloquial": 1, "narrative": 0, "logic": 0, "formal": 1, "open": 0 },
+    "adj": { "闲聊": { "colloquial": 0.7, "formal": -0.35 } },
+    "startNote": "第 5 步做 Day 0 教学之前，开局直接带上教学的结果：口语活力已解锁浅层，闲聊类做过一次「活泼 vs 官腔」后训练。"
+  },
+  "days": [
+    { "day": 0, "name": "出厂测试", "event": "tutorial", "visitors": 0, "skip": true, "note": "Day 0 教学（第 5 步实现），现在跳过" },
+    { "day": 1, "ap": 4, "postPerDay": 2, "visitors": 4, "activities": ["pretrain", "posttrain", "eat"] },
+    { "day": 2, "ap": 4, "postPerDay": 2, "visitors": 4, "activities": ["pretrain", "posttrain", "eat"] },
+    { "day": 3, "ap": 4, "postPerDay": 2, "visitors": 4, "fixed": ["掺水中转站"], "activities": ["pretrain", "posttrain", "eat"], "resetQuota": false }
+  ]
+}
