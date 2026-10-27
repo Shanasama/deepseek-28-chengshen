@@ -9,7 +9,7 @@ import { NODE, nodeTick, spin, confirmPick, regen } from './转盘.js';
 import { radarTick } from './六维图.js';
 import { initShell, drawer, renderAP, renderHUD, closeMenus } from './界面.js';
 import { initDay, dayKeys, pickActByIndex, view, goNight } from './白天.js';
-import { newGame, skipCurrent } from './日程.js';
+import { newGame, skipCurrent, startTrial, startShowPreview, replayShow } from './日程.js';
 import { setTab, reportNext, renderSelf } from './报告.js';
 import { DATA, loadAll } from './数据.js';
 import { w } from './训练.js';
@@ -34,8 +34,19 @@ function loop(now) {
 }
 
 // ---------- 开始 ----------
+// 剧情编辑器打开时会带参数：?play=用户/场景.json（单场试玩）或 ?show=演出编号（只播一段共享演出）
+const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show');
+function trialArgs() {
+  const i = PLAY.lastIndexOf('/'), stages = {};
+  for (const kv of (Q.get('st') || '').split(',').filter(Boolean)) { const [k, v] = kv.split(':'); if (AXES.includes(k)) stages[k] = +v; }
+  let adj = null; try { adj = Q.get('adj') ? JSON.parse(Q.get('adj')) : null; } catch { }
+  return { dir: PLAY.slice(0, i), file: PLAY.slice(i + 1), stages: Q.get('st') ? stages : null, adj };
+}
 let ready = false;
-function start() { if (!ready || G.started) return; G.started = true; G.startT = performance.now(); ac(); $('start').style.display = 'none'; SFX.morning(); newGame(); }
+function start() {
+  if (!ready || G.started) return; G.started = true; G.startT = performance.now(); ac(); $('start').style.display = 'none';
+  if (PLAY) { SFX.slow(); startTrial(trialArgs()); } else if (SHOW) startShowPreview(SHOW); else { SFX.morning(); newGame(); }
+}
 $('start').onclick = start;
 addEventListener('keydown', e => {
   if (!G.started) { if (e.code === 'Space') { e.preventDefault(); start(); } return; }
@@ -45,7 +56,8 @@ addEventListener('keydown', e => {
   if (e.code === 'Escape' && $('drawer').classList.contains('on')) return drawer(false);
   if (e.code === 'Escape' && $('phone').classList.contains('show')) return $('phone-x').click();
   if (G.mode === 'night') {
-    if (e.code === 'Space') { e.preventDefault(); if (NODE.state === 'ready') spin(); else if (NODE.state === 'stopped') confirmPick(); }
+    if (e.code === 'Enter' && SHOW) replayShow();
+    else if (e.code === 'Space') { e.preventDefault(); if (NODE.state === 'ready') spin(); else if (NODE.state === 'stopped') confirmPick(); }
     else if (e.code === 'KeyR') regen();
     return;
   }
@@ -83,7 +95,7 @@ window.__dfy = { G, NODE, spin, confirmPick, regen, goNight, reportNext, skipCur
   try {
     await loadAll(); ready = true;
     const n = DATA.list.filter(e => !e.user.boss && !e.user.tutorial).reduce((s, e) => s + e.scenes.length, 0);
-    $('startinfo').textContent = `剧本库：${DATA.list.length} 个用户、${n} 个普通场景 · 有音效和音乐`;
+    $('startinfo').textContent = PLAY ? `单场试玩：${PLAY.replace('/', ' / ')} · 训练状态来自剧情编辑器` : SHOW ? `共享演出预览：${SHOW}` : `剧本库：${DATA.list.length} 个用户、${n} 个普通场景 · 有音效和音乐`;
   } catch (e) { console.error(e); $('startinfo').textContent = '读不到剧本库：' + e.message + '（请用 node 剧情编辑器/serve.js 打开）'; }
 })();
 requestAnimationFrame(loop);

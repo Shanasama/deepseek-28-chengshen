@@ -60,18 +60,29 @@
     }
   ],
   "deepBonus": 0.35,
+  "qtypes": [
+    "闲聊",
+    "知识",
+    "捣乱",
+    "情感倾诉",
+    "代码求助"
+  ],
+  "postTrain": {
+    "note": "后训练（v3 §4，v3.7 按问题类型分开算）。gain 选中的属性加分、loss 落选的属性扣分，只改这道题的问题类型；floor 权重分保底；perBatch 一次后训练做几道题；rerollCost 换一对花几点控盘额度；spill 溢出到其他问题类型的比例（0 = 不溢出）；diminish 收益递减（同一类里越加越难加）。日程表的 postTrain 可以覆盖这里的任何一项。",
+    "gain": 0.7,
+    "loss": 0.35,
+    "floor": 0.1,
+    "perBatch": 3,
+    "rerollCost": 1,
+    "spill": 0,
+    "diminish": false
+  },
   "trainingPresets": [
     {
       "id": "day1",
       "name": "第 1 天开局",
-      "stages": {
-        "formal": 1,
-        "colloquial": 1,
-        "knowledge": 0,
-        "logic": 0,
-        "narrative": 0,
-        "open": 0
-      }
+      "fromSchedule": "start",
+      "note": "直接用日程表的开局（预训练阶段 + Day 0 教学的后训练结果），不在这里另写一份"
     },
     {
       "id": "shallow",

@@ -9,7 +9,7 @@ import { setMode, renderHUD, renderAP, renderClock, renderDrawer, setUrl, HOME, 
 import { closeNode, NODE } from './转盘.js';
 import { snapPrev } from './训练.js';
 import { DATA, loadScene } from './数据.js';
-import { runSession, abortRun, DETECT_OF } from './夜间.js';
+import { runSession, abortRun, previewShow, DETECT_OF } from './夜间.js';
 import { view, bubble, dayToday } from './白天.js';
 import { showReport, showEnd, renderSelf } from './报告.js';
 
@@ -18,16 +18,39 @@ const lastDay = () => Math.max(...days().map(d => d.day));
 const nextDayOf = n => days().map(d => d.day).filter(d => d > n).sort((a, b) => a - b)[0];
 
 // ---------- 开新一局 ----------
-export function newGame() {
+export function newGame() { TRIAL = null; resetGame(); setSessionPicker(pickSession); clearConvs(); startDay(days()[0].day); }
+// 整局状态回到日程表的开局
+function resetGame() {
   const s = DATA.sched.start;
   Object.assign(G, {
     hearts: s.hearts, heartMax: s.heartMax, quota: s.quota, quotaMax: s.quotaMax, rollbacks: s.rollbacks, tiboUsed: false, over: false,
-    stage: { ...s.stage }, adj: JSON.parse(JSON.stringify(s.adj || {})), done: {}, used: {}, eggSeen: new Set(), achievements: new Set(),
+    stage: { ...s.stage }, adj: JSON.parse(JSON.stringify(s.adj || {})), done: {}, qSeen: {}, qSeq: 0, used: {}, eggSeen: new Set(), achievements: new Set(),
     total: freshStats(), stats: freshStats(), sessions: [], cur: -1,
   });
   QT.forEach(t => { G.adj[t] = G.adj[t] || {}; });
-  setSessionPicker(pickSession); clearConvs(); startDay(days()[0].day);
 }
+
+// ---------- 单场试玩（剧情编辑器「在游戏里玩」：?play=用户/场景.json&st=…&adj=…） ----------
+// 跳过白天，带着编辑器的训练状态直接演这一个场景；演完弹每晚结算，点一下再玩一次。心扣光也不结束
+let TRIAL = null;
+export function startTrial(t) {
+  TRIAL = t; resetGame(); clearConvs(); setSessionPicker(pickSession);
+  const e = DATA.list.find(x => x.dir === t.dir);
+  if (!e) return toast('剧本库里没有这个用户：' + t.dir);
+  if (t.stages) Object.assign(G.stage, t.stages);
+  if (t.adj) G.adj = JSON.parse(JSON.stringify(t.adj));
+  QT.forEach(q => { G.adj[q] = G.adj[q] || {}; });
+  Object.assign(G, { day: 1, busy: false, tok: 0, cur: -1, sessions: [], stats: freshStats() });
+  snapPrev(); drawRoomItems();
+  G.tonight = [{ name: e.user.name, bio: e.user.bio, dir: e.dir, avatar: e.user.avatar, boss: !!e.user.boss, repeat: false, file: t.file, entry: e }];
+  startNight();
+}
+// 只播一段共享演出（编辑器「在游戏里预览」）：夜间工位上播，Enter 再播一遍
+export async function startShowPreview(id) {
+  G.showPreview = id; await wipe(true); setMode('night'); clearConvs(); const conv = newConv(); writeTo(conv); showConv(conv, true);
+  G.clock = 21 * 60; renderClock(); setUrl(HOME(), true); await wipe(false); previewShow(id);
+}
+export const replayShow = () => { if (G.showPreview) previewShow(G.showPreview); };
 
 // ---------- 白天 ----------
 export function startDay(n) {
@@ -81,11 +104,13 @@ export async function startNight() {
     if (r === 'abort') { if (!G.skipping) return; G.skipping = false; r = 'drop'; addNote('（开发面板：跳过了这位用户）', 'sys'); }
     s.result = r; s.status = 'done'; s.resultLabel = { solved: '解决离开', win: '特殊胜利', offline: '下线', forced: '强制下线', drop: '掉线' }[r]; renderDrawer();
     G.clock += 20; renderClock();
-    if (G.hearts <= 0 && DATA.sched.start.heartsOutEnds) { await wait(900); return gameOver(); }
+    if (G.hearts <= 0 && DATA.sched.start.heartsOutEnds && !TRIAL) { await wait(900); return gameOver(); }
     await wait(1400 / spd());
   }
   G.cur = -1; renderQueue(); setFish('idle');
-  await wait(700); const last = G.day >= lastDay();
+  await wait(700);
+  if (TRIAL) { await showReport(false, true); return startTrial(TRIAL); }
+  const last = G.day >= lastDay();
   await showReport(last);
   if (last) return showEnd('demo', restartGame);
   await wipe(true); startDay(nextDayOf(G.day)); await wipe(false); SFX.morning();

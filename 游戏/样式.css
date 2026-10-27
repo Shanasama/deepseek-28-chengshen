@@ -326,14 +326,8 @@ body.night #cal .hd{background:var(--deep);color:#C7CDE0}
 body.day #slogan{background:var(--paper);color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink),0 -3px 0 var(--ink),0 3px 0 var(--ink)}
 body.night #slogan{background:#6D7594;color:#121A42;box-shadow:inset 0 0 0 1px var(--k0),0 -3px 0 var(--k0),0 3px 0 var(--k0)}
 #slogan span{text-align:center}
-/* 标语跑马灯：亮的字带一条渐暗的尾巴；横着跑是金色，竖着跑每一列一种颜色 */
+/* 标语跑马灯：彩虹顺着读的方向流过去，只改字色（颜色由 界面.js 逐字设置） */
 #slogan span{transition:color .1s}
-#slogan span.h0{color:var(--paper);background:var(--cobalt)}
-#slogan.m1 span.h0{background:var(--gold)}
-#slogan span.h1{color:var(--cobalt)}#slogan.m1 span.h1{color:var(--gold)}
-#slogan span.h2{color:var(--sky)}#slogan.m1 span.h2{color:var(--lgold)}
-#slogan span.h3{color:var(--g3)}
-#slogan.m2 span:nth-child(3n+2).h0{background:var(--good)}#slogan.m2 span:nth-child(3n).h0{background:var(--gold)}
 #tokdev{left:380px!important;top:286px!important;cursor:pointer}
 #cable{left:296px!important;top:378px!important}
 #scrtitle{left:242px!important;top:275px!important;width:110px;line-height:12px;white-space:nowrap;overflow:hidden}

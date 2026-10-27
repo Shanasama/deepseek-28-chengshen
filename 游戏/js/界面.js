@@ -37,8 +37,8 @@ export function spendAP(to) {
   flyCell(sp(el), to || sp($('fish')), 'apcell', P.gold, renderAP);
 }
 // 花一点控盘额度：格子从 HUD 飞到目标点；额度首次跌到 ≤2 时触发 Tibo 重置（全局一次）
-export function spendQuota(to, onArrive) {
-  const cell = $('quota').children[G.quota - 1], from = sp(cell); G.quota--; renderQuota(); floatText('−1 额度', cell, P.sky);
+export function spendQuota(to, onArrive, n = 1) {
+  const cell = $('quota').children[G.quota - 1], from = sp(cell); G.quota = Math.max(0, G.quota - n); renderQuota(); floatText('−' + n + ' 额度', cell, P.sky);
   flyCell(from, to, 'qcell', P.sky, () => { onArrive && onArrive(); if (G.quota <= 2 && !G.tiboUsed) setTimeout(tibo, 700); });
 }
 export function addQuota(n) { G.quota = Math.min(G.quotaMax, G.quota + n); renderQuota(); restart($('quota'), 'refill'); }
@@ -184,17 +184,18 @@ const SLOGAN = { 1: { order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], say: '横�
 let sloganMode = 0, sloganTimer = 0, sloganStep = 0;
 function sloganClick() {
   sloganMode = (sloganMode + 1) % 3; clearInterval(sloganTimer); sloganStep = 0;
-  const spans = [...$('slogan').children], el = $('slogan'); el.className = 'abs r2' + (sloganMode ? ' run m' + sloganMode : '');
-  spans.forEach(x => x.className = '');
+  const spans = [...$('slogan').children];
+  spans.forEach(x => x.style.color = '');
   if (!sloganMode) { SFX.click(); toast('标语停下了'); return; }
   SFX.good(); toast(SLOGAN[sloganMode].say);
   const order = SLOGAN[sloganMode].order;
+  // 像 RGB 键盘：一道彩虹顺着读的方向流过去，只改字的颜色
   sloganTimer = setInterval(() => {
-    spans.forEach(x => x.className = '');
-    for (let k = 0; k < 4; k++) { const i = order[(sloganStep - k + 120) % 12]; if (sloganStep - k >= 0) spans[i].className = 'h' + k; }
-    if (sloganStep % 4 === 0) SFX.step(sloganStep / 4 % 3);
+    const L = document.body.classList.contains('night') ? 80 : 46;
+    order.forEach((i, k) => spans[i].style.color = `hsl(${(k * 30 - sloganStep * 18 + 3600) % 360},95%,${L}%)`);
+    if (sloganStep % 8 === 0) SFX.step(sloganStep / 8 % 3);
     sloganStep++;
-  }, 150);
+  }, 80);
 }
 function renderSettings() {
   $('v-music').firstChild.style.width = G.vMusic * 100 + '%'; $('v-music-t').textContent = Math.round(G.vMusic * 100);

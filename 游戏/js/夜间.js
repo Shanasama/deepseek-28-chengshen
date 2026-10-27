@@ -23,7 +23,7 @@ function toCard(r) {
     diag: v.diagnosis || '', ending: c.ending || null, fx: c.fx || {}, attachment: c.attachment || null, abnormal: c.abnormalThink || '', s: r.w, dead: false, p: 0, pt: 0 };
 }
 // 这一次的盘面：先决定哪些特殊卡上盘（彩蛋只在每轮第一次弹出时掷骰子，本局去重），其余交给 RULES.board。
-// 后训练的效果按这一轮的问题类型取（v3.7）：骨架阶段剧本还没有 qtype 字段时，先用用户原来的类型顶上。
+// 后训练的效果按这一轮的问题类型取（v3.7）：只改命中率，不改卡的内容。
 function buildBoard(sess, rd, ctx) {
   const specials = [];
   for (const x of rd.extras || []) {
@@ -32,8 +32,7 @@ function buildBoard(sess, rd, ctx) {
     else if (a.mode === 'condition') on = RULES.condOK(a, { ...ctx, prog: G.prog });
     if (!on) continue; if (a.mode === 'egg') G.eggSeen.add(x.id); specials.push(x);
   }
-  const qtype = rd.qtype || sess.U.type;
-  const opts = { reg: DATA.reg, stages: G.stage, adj: G.adj[qtype] || {}, specials };
+  const opts = { reg: DATA.reg, stages: G.stage, adj: G.adj[rd.qtype] || {}, specials };
   let b = RULES.board(rd, { ...opts, struck: ctx.struck });
   if (b.empty) { ctx.struck.clear(); ctx.last = null; addTrace('能想到的都被用户否定了，从头再想', 'bad'); b = RULES.board(rd, opts); }
   return b.shown.map(r => { const k = toCard(r); if (r.off === '用户已否定' && r.c.id !== ctx.last) k.dead = true; return k; });
@@ -182,5 +181,12 @@ export async function runSession(sess) {
   if (!G.hurt) { addQuota(2); toast('完美解决：全程没扣耐心，额度 +2'); SFX.good(); }
   setFish('happy');
   return 'solved';
+}
+// 只播一段共享演出（剧情编辑器「在游戏里预览」用：?show=<演出编号>）
+export async function previewShow(id) {
+  const my = ++RUN; setScreen('console'); setFish('idle'); G.phase = 'user';
+  addNote('演出预览：' + (showById(id)?.name || id), 'egg'); await wait(500 / spd());
+  await runFx([{ do: 'show', id }]); if (my !== RUN) return;
+  await wait(400); addNote('演出结束 · 按 Enter 再播一遍', 'sys');
 }
 export const DETECT_OF = d => DETECT[d] ?? .4;

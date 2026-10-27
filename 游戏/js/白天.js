@@ -6,9 +6,9 @@ import { parts, confetti, ring, burst, floatAt, vignette, glitch, shake, flash, 
 import { setFish, setScreen, drawRoomItems, POP, DESK_Y, MON, DEV } from './工位.js';
 import { youSay, fishSay, addLog, flyWord, scrollChat } from './对话栏.js';
 import { renderAP, renderHUD, spendAP, spendQuota, dropHeart, setUrl, HOME, advanceClock, on, confirmBox, renderClock } from './界面.js';
-import { NUM, w, nudge, pickPair, isNoise, tagName, gib, learn } from './训练.js';
+import { pt, w, trainOne, pickPair, pickQuestions, isNoise, tagName, gib, learn } from './训练.js';
 import { mkRadar, retargetRadar, radarPt, radarLabels, radarStatic } from './六维图.js';
-import { DATA, bankFor } from './数据.js';
+import { DATA } from './数据.js';
 import { startNight } from './日程.js';
 import { renderSelf } from './报告.js';
 
@@ -60,7 +60,7 @@ export function view(v, arg) {
     if (arg) { const el = bv.querySelector(`[data-a="${arg}"]`); if (el) setTimeout(() => restart(el, 'flash'), 250); }
   }
   if (v === 'ptype') {
-    paint(header('后训练 · 练哪一类问题？', `1 行动点 · 连做 ${NUM.perBatch} 题`, true) + '<div class="tgrid">' + QT.map(t =>
+    paint(header('后训练 · 练哪一类问题？', `1 行动点 · 连做 ${pt().perBatch} 题`, true) + '<div class="tgrid">' + QT.map(t =>
       `<div class="tc r8${t.length > 2 ? ' long' : ''}" data-t="${t}"><div class="nm">${t}</div><canvas width="64" height="64"></canvas><div class="n">练过 ${G.done[t] || 0} 题</div></div>`).join('') + '</div>');
     bv.querySelectorAll('.tc').forEach(el => { radarStatic(el.querySelector('canvas'), el.dataset.t); el.onclick = () => { if (G.busy) return; hitFx(el, P.cobalt); postTrain(el.dataset.t); }; });
   }
@@ -106,7 +106,7 @@ async function postTrain(t) {
   fishSay('来吧，出题！我会认真挑的。');
   setUrl(`dafeiyu://rlhf/<b>${t}</b>`, true); setScreen('rlhf');
   const before = Object.fromEntries(AXES.map(a => [a, w(t, a)]));
-  const qs = shuffle(bankFor(t).slice()).slice(0, NUM.perBatch);
+  const qs = pickQuestions(t, pt().perBatch);
   for (let i = 0; i < qs.length; i++) await askOne(t, qs[i], i, qs.length);
   G.done[t] = (G.done[t] || 0) + qs.length;
   const ch = AXES.filter(a => before[a] != null && Math.abs(w(t, a) - before[a]) > .001);
@@ -121,7 +121,7 @@ function askOne(t, q, i, n) {
     let pair = pickPair();
     paint(header(`后训练 · ${t}类`, `第 ${i + 1}/${n} 题`)
       + `<div class="qwrap"><div class="qleft"><div class="qq r4"><div class="who">用户问：</div></div><div class="ans"></div>
-        <div style="display:flex"><span id="reroll" class="r2"><i class="qc r2"></i>换一对 · ${NUM.rerollCost} 额度 <span class="key r2">R</span></span></div></div>
+        <div style="display:flex"><span id="reroll" class="r2"><i class="qc r2"></i>换一对 · ${pt().rerollCost} 额度 <span class="key r2">R</span></span></div></div>
         <div class="qright" id="qr"><canvas width="128" height="128"></canvas><div class="cap"><div>${t}类 · 六维图</div><div class="dots3">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'on' : ''}"></i>`).join('')}</div></div></div></div>`);
     bv.querySelector('.qq').append(q.q);
     const qr = $('qr'); RQ = mkRadar(qr.querySelector('canvas'), 128, t); radarLabels(qr, RQ, 4, 12);
@@ -130,22 +130,22 @@ function askOne(t, q, i, n) {
     const fill = () => {
       const box = bv.querySelector('.ans'); box.innerHTML = pair.map((a, k) => `<div class="an r4${isNoise(a) ? ' noise' : ''}" style="--ac:${AT[a].c}"><span class="tag r2">${tagName(a)}</span><div class="tx"></div><span class="k">${k ? '→ 或 B' : '← 或 A'}</span><i class="wf"></i></div>`).join('');
       box.querySelectorAll('.an').forEach((el, k) => { el.querySelector('.tx').textContent = answer(pair[k]); el.onclick = () => choose(k); el.onmouseenter = () => SFX.hover(); setTimeout(() => { el.classList.add('in'); SFX.step(k + 2); }, 60 + k * 90); });
-      $('reroll').classList.toggle('dis', G.quota < NUM.rerollCost);
+      $('reroll').classList.toggle('dis', G.quota < pt().rerollCost);
     };
     // 花控盘额度换一对回答：同一道题，重抽两个属性
     const reroll = () => {
-      if (chosen || busy) return; if (G.quota < NUM.rerollCost) { deny('额度用完了', $('reroll')); return; }
+      if (chosen || busy) return; if (G.quota < pt().rerollCost) { deny('额度用完了', $('reroll')); return; }
       busy = true; const box = bv.querySelector('.ans'), pb = sp(box);
       spendQuota({ x: pb.x + pb.w / 2, y: pb.y + 20 }, () => {
         bv.querySelectorAll('.an').forEach(e => e.classList.add('out')); glitch(); SFX.shuffle(); burst(pb.x + pb.w / 2, pb.y + pb.h / 2, P.sky, 30, 180);
-        addLog(`换了一对回答 · 额度 −${NUM.rerollCost}`, 'q');
+        addLog(`换了一对回答 · 额度 −${pt().rerollCost}`, 'q');
         setTimeout(() => { pair = pickPair(pair); fill(); busy = false; }, 220);
-      });
+      }, pt().rerollCost);
     };
     const choose = k => {
       if (chosen || busy) return; chosen = true; KEYQ = null; KEYR = null; bv.classList.add('lock');
       const win = pair[k], lose = pair[1 - k], els = bv.querySelectorAll('.an'); els[k].classList.add('win'); els[1 - k].classList.add('lose');
-      const dw = nudge(t, win, NUM.gain), dl = nudge(t, lose, -NUM.loss);
+      const { dWin: dw, dLose: dl } = trainOne(t, win, lose);
       SFX.pick(); setTimeout(SFX.toss, 120); shake(true); restart($('bubble'), 'punch'); const pe = sp(els[k]); burst(pe.x + pe.w / 2, pe.y + pe.h / 2, AT[win].c, 40, 260); ring(pe.x + pe.w / 2, pe.y + pe.h / 2, AT[win].c, 30, 190);
       const pl = sp(els[1 - k]); for (let j = 0; j < 18; j++) parts.push({ x: pl.x + Math.random() * pl.w, y: pl.y + Math.random() * pl.h, vx: (Math.random() - .5) * 120, vy: Math.random() * 120 - 40, g: 400, c: j % 3 ? P.g3 : P.red, life: .4 + Math.random() * .4, s: 2 });
       floatAt('+' + dw.toFixed(2), pe.x + pe.w / 2 - 20, pe.y - 8, P.good, true);
@@ -170,7 +170,7 @@ function summary(t, before, ch) {
       + `<div class="qright" id="qr"><canvas width="128" height="128"></canvas><div class="cap">虚线 = 今天开始时</div></div></div>`
       + `<div class="bf"><span class="sp"></span><span class="btn2 r2" id="sumok">好的 <span class="key r2">Enter</span></span></div>`);
     const qr = $('qr'); RQ = mkRadar(qr.querySelector('canvas'), 128, t); radarLabels(qr, RQ, 4, 12);
-    banner(`训练完成 · ${t}类`, `${NUM.perBatch} 题`, P.mint); SFX.levelup(); vignette(); const bp = sp($('bubble')); confetti(bp.x + bp.w / 2, bp.y + 40, 50);
+    banner(`训练完成 · ${t}类`, `${pt().perBatch} 题`, P.mint); SFX.levelup(); vignette(); const bp = sp($('bubble')); confetti(bp.x + bp.w / 2, bp.y + 40, 50);
     bv.querySelectorAll('.srow[data-a]').forEach((r, i) => { const a = r.dataset.a, from = before[a], to = w(t, a), el = r.querySelector('.nv'); const t0 = performance.now() + 200 + i * 160;
       (function step(now) { const k = Math.max(0, Math.min(1, (now - t0) / 500)); el.textContent = (from + (to - from) * k).toFixed(2); if (k < 1) requestAnimationFrame(step); else { const p = sp(el); ring(p.x + 12, p.y + 8, to > from ? P.mint : P.red, 12, 70); } })(performance.now()); });
     const fin = () => { KEYSUM = null; SFX.click(); done(); }; $('sumok').onclick = fin; KEYSUM = fin;

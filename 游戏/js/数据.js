@@ -1,9 +1,12 @@
 // 数据：都从 剧本/ 读（和剧情编辑器同一份）。登记表、演出库、日程表、剧本库目录、后训练题库、单个场景。
+import { QT } from './状态.js';
+
 export const DATA = { reg: null, lib: { shows: [] }, sched: null, list: [], bank: null };
 
 const getJSON = async (url, fallback) => { try { const r = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now()); if (!r.ok) throw new Error(r.status); return await r.json(); } catch (e) { if (fallback !== undefined) return fallback; throw e; } };
 export async function loadAll() {
   DATA.reg = await getJSON('/剧本/_登记表.json');
+  if (DATA.reg.qtypes) QT.splice(0, QT.length, ...DATA.reg.qtypes);   // 问题类型以登记表为准
   DATA.lib = await getJSON('/剧本/_演出库.json', { shows: [] });
   DATA.sched = await getJSON('/剧本/_日程表.json');
   DATA.list = await getJSON('/api/list');

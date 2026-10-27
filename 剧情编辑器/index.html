@@ -81,6 +81,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .colhd:hover,.colhd.sel{border-color:var(--sky)}
 .colhd .no{display:flex;justify-content:space-between;align-items:center;color:var(--t3);font-size:12px;margin-bottom:6px}
 .colhd .no b{color:var(--t1);font-weight:600;font-size:13px}
+.colhd .qt{color:var(--lgold);border:1px solid currentColor;padding:0 4px;font-size:11px}.colhd .qt.bad{color:#ff9aa1}
+.tsadj{color:var(--t3);font-size:11px;line-height:1.5;margin-top:6px;max-width:260px}
 .bubble{background:var(--k4);padding:6px 10px;border-radius:12px 12px 12px 3px;color:var(--t1);white-space:pre-wrap;word-break:break-all;max-height:160px;overflow:hidden}
 .rh{font-size:11px;line-height:16px;padding:0 5px;background:var(--k3);color:var(--t2);white-space:nowrap}
 .need{margin-top:6px;font-size:12px;line-height:18px;color:var(--t3);border-left:2px solid var(--k5);padding-left:6px}
@@ -387,7 +389,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
       <button class="ghost" id="helpBtn" style="color:var(--lgold);border-color:#5a4720">？ 怎么看</button>
       <button class="ghost" id="validB" title="按写作规则检查这个场景">✓ 校验</button>
       <button class="ghost" id="playB" title="简化试玩：手动指定命中哪张卡，看剧情走向和推进、耐心">▶ 试玩</button>
-      <button class="ghost" id="demoB" title="在夜间 Demo 里完整演出这个场景（带上当前训练状态）">▶ 在 Demo 里玩</button>
+      <button class="ghost" id="demoB" title="在游戏本体里单场试玩这个场景：跳过白天，带上当前训练状态，演完看结算">▶ 在游戏里玩</button>
     </div>
   </header>
   <aside id="side">
@@ -462,15 +464,16 @@ document.addEventListener('click',e=>{const s=e.target.closest('[data-soon]');if
 
 const COL={knowledge:'#3F6EE8',colloquial:'#E8A93A',narrative:'#F07FB0',logic:'#4FCF8A',formal:'#9AA2BD',open:'#4FD8D0',intuition:'#C9ECFF',confess:'#9C9CA3',special:'#8A4DFF'};
 const STAGE=['未学','浅层','深层'];
-const S={reg:null,list:[],user:null,dir:null,scene:null,sel:null,tab:'base',ts:null,preset:'day1'};
+const S={reg:null,sched:null,bank:null,list:[],user:null,dir:null,scene:null,sel:null,tab:'base',ts:null,preset:'day1'};
 const regAttr=id=>S.reg.attrs.find(a=>a.id===id);
 const NOAV=new Set();   // 还没有头像 PNG 的用户，避免每次重绘都闪一下破图
 const filled=o=>!!o&&Object.keys(o).length>0;
 const regName=(k,id)=>(S.reg[k].find(x=>x.id===id)||{}).name||id;
 
 // ---------- 训练状态 → 盘面（v3 §4、§5.2） ----------
-// 盘面和结算规则都在 剧情编辑器/规则.js（和 Demo 共用），这里只是带上编辑器当前的训练状态
-function board(round,struck,specials){return RULES.board(round,{reg:S.reg,stages:S.ts.stages,adj:S.ts.adj||{},struck:struck||new Set(),specials:specials||[]});}
+// 盘面和结算规则都在 剧情编辑器/规则.js（和游戏共用），这里只是带上编辑器当前的训练状态。
+// 后训练是按问题类型分开算的：这一轮是哪类问题，就用那一类的加减分（只改命中率，不改卡的内容）
+function board(round,struck,specials){return RULES.board(round,{reg:S.reg,stages:S.ts.stages,adj:(S.ts.adj||{})[round.qtype]||{},struck:struck||new Set(),specials:specials||[]});}
 const progresses=RULES.progresses;
 const outGlyph=v=>v.ending?{g:'⤓ 结局',k:'e',t:'分叉结局：选中后对话就此结束'}
   :v.result==='糊弄'?{g:'→ 推进（没识破时）',k:'p',t:'没被识破：推进到下一轮；被识破：用户骂人、重问'}
@@ -483,12 +486,14 @@ const TIP={
 // ---------- 渲染：顶栏 ----------
 function renderTop(){
   const sc=S.scene;if(S.mode==='show'){$('#crumb').replaceChildren(h('span',{},'演出库 / '),h('b',{},showOf(S.showId)?.name||''));}else $('#crumb').replaceChildren(h('span',{},S.user.name,' / '),h('b',{},String(sc.order).padStart(2,'0')+' '+sc.title),h('span',{class:'n',title:'N = 主线轮数'},'N = '+sc.rounds.length));
-  const ts=$('#ts');ts.replaceChildren(h('span',{class:'lbl',title:'模拟玩家白天把各个属性训练到了什么程度：没学过的属性，它的卡夜里不会上盘；学到深层就换成深层版、更容易转到。用来检查不同玩家遇到这一轮时的盘面'},'预览：玩家训练到什么程度 ⓘ'));
+  const ts=$('#ts');ts.replaceChildren(h('span',{class:'lbl',title:'模拟玩家白天把各个属性训练到了什么程度：没学过的属性，它的卡夜里不会上盘；学到深层就换成深层版、更容易转到。「第 1 天开局」还带着 Day 0 教学的后训练结果，只影响那一类问题的命中率。用来检查不同玩家遇到这一轮时的盘面'},'预览：玩家训练到什么程度 ⓘ'));
   for(const p of S.reg.trainingPresets)ts.append(h('button',{class:'chip'+(S.preset===p.id?' on':''),onclick:()=>{setPreset(p.id);}},p.name));
   const cw=h('div',{class:'tswrap'});ts.append(cw);
   cw.append(h('button',{class:'chip'+(S.preset?'':' on')+(S.tsOpen?' open':''),title:'逐个属性设定未学 / 浅层 / 深层',onclick:e=>{e.stopPropagation();S.tsOpen=!S.tsOpen;renderTop();}},(S.preset?'自定义':'自定义（已改）')+(S.tsOpen?' ▴':' ▾')));
   if(!S.tsOpen)return;
   const pop=h('div',{class:'tspop',onclick:e=>e.stopPropagation()},h('div',{class:'tsph'},'逐个属性设定玩家学到哪一步'));cw.append(pop);
+  const pts=Object.entries(S.ts.adj||{}).filter(([,o])=>Object.values(o).some(v=>Math.abs(v)>1e-9));
+  pop.append(h('div',{class:'tsadj'},pts.length?'后训练：'+pts.map(([t,o])=>t+'类 '+Object.entries(o).filter(([,v])=>Math.abs(v)>1e-9).map(([a,v])=>regAttr(a)?.name+(v>0?' +':' ')+(+v.toFixed(2))).join('、')).join('；'):'后训练：没做过'));
   for(const a of S.reg.attrs.filter(a=>!['intuition','confess','special'].includes(a.id))){
     const seg=h('div',{class:'seg',title:a.name},h('span',{class:'nm',style:`color:${COL[a.id]}`},a.name));
     [0,1,2].forEach(st=>seg.append(h('button',{class:S.ts.stages[a.id]===st?'on':'',title:a.id==='open'&&st===0?'0 级：没学过也会上盘，表现为胡言乱语':a.name+'：'+STAGE[st],onclick:()=>{S.ts.stages[a.id]=st;S.preset=null;renderAll();}},a.id==='open'&&st===0?'0 级':STAGE[st])));
@@ -496,7 +501,9 @@ function renderTop(){
   }
 }
 document.addEventListener('click',()=>{if(S.tsOpen){S.tsOpen=false;renderTop();}});
-function setPreset(id){const p=S.reg.trainingPresets.find(x=>x.id===id);S.ts={stages:{...p.stages},adj:{}};S.preset=id;if(S.scene)renderAll();}
+// 预设「第 1 天开局」直接用日程表的开局（含 Day 0 教学的后训练结果）；别的预设没做过后训练
+function presetTS(p){const st=p.fromSchedule&&S.sched?S.sched[p.fromSchedule]:null;return st?{stages:{...st.stage},adj:JSON.parse(JSON.stringify(st.adj||{}))}:{stages:{...(p.stages||{})},adj:{}};}
+function setPreset(id){const p=S.reg.trainingPresets.find(x=>x.id===id);S.ts=presetTS(p);S.preset=id;if(S.scene)renderAll();}
 
 // ---------- 渲染：左栏 ----------
 function renderSide(){
@@ -565,7 +572,7 @@ function renderLane(){
     const sel=S.sel&&S.sel.kind==='round'&&S.sel.ri===ri;
     const col=h('div',{class:'col'+(S.enter?' enter':'')+(NEWT?.kind==='round'&&NEWT.ri===ri?' pop':''),style:S.enter?`animation-delay:${ri*90}ms`:''});
     col.append(h('div',{class:'colhd'+(sel?' sel':''),'data-ri':ri,onclick:()=>select({kind:'round',ri})},
-      h('div',{class:'no'},h('b',{},`第 ${ri+1} 轮 `,issueDot({kind:'round',ri})),h('span',{},rd.style==='terminal'?'终端样式':'',rd.speaker?' · 说话人：'+rd.speaker.name:'')),
+      h('div',{class:'no'},h('b',{},`第 ${ri+1} 轮 `,issueDot({kind:'round',ri})),h('span',{},h('span',{class:'qt'+(S.reg.qtypes?.includes(rd.qtype)?'':' bad'),title:'问题类型：后训练按问题类型分开算，命中率用这一类的加减分'},rd.qtype||'没选问题类型'),rd.style==='terminal'?' · 终端样式':'',rd.speaker?' · 说话人：'+rd.speaker.name:'')),
       h('div',{style:'display:flex;gap:6px;align-items:flex-start'},h('div',{class:'bubble',style:'flex:1'},rd.say.text),h('span',{class:'rh',title:'打字节奏：用户在输入框里打这句话的方式，透出情绪'},'⌨ '+regName('rhythms',rd.say.rhythm))),
       h('div',{class:'vars'},h('span',{class:rd.sayAfter?.liked?'has':'',title:'上一轮点赞后的台词变体'},'点赞变体'),h('span',{class:rd.sayAfter?.disliked?'has':'',title:'上一轮点踩（解决但冒犯）后的台词变体'},'点踩变体')),
       h('div',{class:'need',title:'需求句：只给策划看'},rd.need)));
@@ -917,7 +924,7 @@ async function previewFx(list,title){
   const ov=$('#fxpv');ov.classList.add('on');ov.querySelector('.pvt').textContent='预览 · '+title;
   const box=ov.querySelector('.pvchat');box.replaceChildren();const my=++PVR;
   await miniList(list,box,()=>my===PVR,0);
-  if(my===PVR)box.append(h('div',{class:'pvend'},'— 播完了 · 工位上的画面效果只用文字示意，真实效果点「在 Demo 里预览」—'));
+  if(my===PVR)box.append(h('div',{class:'pvend'},'— 播完了 · 工位上的画面效果只用文字示意，真实效果点「在游戏里预览」—'));
   box.scrollTop=box.scrollHeight;
 }
 async function miniList(list,box,alive,depth){
@@ -1007,7 +1014,7 @@ function renderShowCanvas(){
     h('div',{class:'shname'},ed({...fieldIO(sh,'name'),label:'演出的名字',single:true,ph:'演出名字'})),
     ed({...fieldIO(sh,'desc'),label:'一句话说明',ph:'这段演出演的是什么'}),
     h('div',{class:'shbtns'},h('button',{class:'mini',onclick:()=>previewFx(sh.steps,sh.name)},'▶ 预览'),
-      h('button',{class:'mini',onclick:async()=>{await flush();window.open(`/prototype_夜间一轮/index.html?u=${encodeURIComponent(S.dir)}&show=${encodeURIComponent(sh.id)}`,'_blank');}},'▶ 在 Demo 里预览'),
+      h('button',{class:'mini',onclick:async()=>{await flush();window.open(`/游戏/?show=${encodeURIComponent(sh.id)}`,'_blank');}},'▶ 在游戏里预览'),
       h('button',{class:'mini danger',onclick:()=>deleteShow(sh)},'删除这段演出')),
     h('div',{class:'shrefs'},'正在查找用到它的地方……'),
     h('div',{class:'clbl'},'按顺序往下播：'),
@@ -1125,7 +1132,9 @@ function renderRoundChat(P){
   const sp=h('input',{type:'text',class:'chipin',placeholder:'说话人 · 用户本人'});sp.value=rd.speaker?.name||'';
   sp.oninput=()=>{rd.speaker=sp.value?{name:sp.value,avatar:rd.speaker?.avatar||null}:null;changed();};
   sp.title='说话人覆盖：不填就是用户本人（Boss 的拼车用户用）';
-  F.append(h('div',{class:'chips'},chip('样式',rd,'style',[['normal','普通'],['terminal','终端（代码轮）']],{onchange:renderAll}),sp));
+  const qt=chip('问题类型',rd,'qtype',(S.reg.qtypes||[]).map(t=>[t,t]),{onchange:renderAll});if(!rd.qtype){qt.prepend(h('option',{value:'',disabled:true},'问题类型 · 请选'));qt.value='';}
+  qt.title='问题类型：玩家白天按问题类型做后训练，夜里这一轮的命中率就用这一类的加减分。预告不显示问题类型';
+  F.append(h('div',{class:'chips'},qt,chip('样式',rd,'style',[['normal','普通'],['terminal','终端（代码轮）']],{onchange:renderAll}),sp));
   const sa=rd.sayAfter||(rd.sayAfter={liked:null,disliked:null});
   const tab=ri>0?(S.sayTab||'default'):'default';
   F.append(h('div',{class:'clbl'},'① 用户开口'));
@@ -1156,7 +1165,7 @@ function newCard(attr){
   if(attr==='confess')Object.assign(c,{token:'抱歉',result:'坦白',feel:'舒服',diagnosis:undefined});
   return c;
 }
-function newRound(){return{id:uid('r'),need:'',style:'normal',speaker:null,say:{text:'',rhythm:'normal'},sayAfter:{liked:null,disliked:null},think:'',retryLead:'',
+function newRound(){return{id:uid('r'),qtype:null,need:'',style:'normal',speaker:null,say:{text:'',rhythm:'normal'},sayAfter:{liked:null,disliked:null},think:'',retryLead:'',
   cards:[newCard('intuition'),newCard('open')],confess:newCard('confess'),extras:[]};}
 function newScene(order,title){return{order,title,opening:[],farewell:null,rounds:[newRound()]};}
 function addCard(ri){
@@ -1176,7 +1185,8 @@ function delCardNow(ri,slot){
   if(String(slot).startsWith('x'))rd.extras.splice(+String(slot).slice(1),1);else rd.cards.splice(slot,1);
   S.sel={kind:'round',ri};changed();renderAll();toast('已删除这张卡（Ctrl+Z 撤销）');
 }
-function addRound(at){S.scene.rounds.splice(at,0,newRound());NEWT={kind:'round',ri:at};changed();select({kind:'round',ri:at});smoothFocus({kind:'round',ri:at});toast(`已加第 ${at+1} 轮，N 现在是 ${S.scene.rounds.length}`);}
+// 新的一轮沿用前一轮的问题类型（v3 §6.1），第一轮没有前一轮就用后一轮的
+function addRound(at){const rs=S.scene.rounds,nr=newRound();nr.qtype=(rs[at-1]||rs[at])?.qtype||null;rs.splice(at,0,nr);NEWT={kind:'round',ri:at};changed();select({kind:'round',ri:at});smoothFocus({kind:'round',ri:at});toast(`已加第 ${at+1} 轮，N 现在是 ${S.scene.rounds.length}`);}
 function delRound(ri){animOut($(`.colhd[data-ri="${ri}"]`)?.parentElement,()=>delRoundNow(ri));}
 function delRoundNow(ri){S.scene.rounds.splice(ri,1);S.sel=null;changed();renderAll();toast(`已删除第 ${ri+1} 轮（Ctrl+Z 撤销）`);}
 function moveRound(ri,d){const a=S.scene.rounds;[a[ri],a[ri+d]]=[a[ri+d],a[ri]];S.sel={kind:'round',ri:ri+d};changed();renderAll();}
@@ -1209,9 +1219,19 @@ function validate(){
     if(b.do==='together'){if(!b.steps?.length)add('warn',where+'：「同时进行」里面是空的',T);checkFx(b.steps,where,T);}
   }};
   checkFx(sc.opening,'场景开场',SC);
+  // 后训练题库（全局的，哪个场景打开都查一遍）
+  if(!S.bank)add('warn','后训练题库：读不到 剧本/_后训练题库.json，游戏里会用假题',SC);
+  else{const ids=new Set();for(const q of S.bank.questions||[]){const n='后训练题库「'+(q.id||q.q)+'」';
+    if(ids.has(q.id))add('err',n+'：题目 id 重复',SC);ids.add(q.id);
+    if(!(R.qtypes||[]).includes(q.qtype))add('err',n+'：问题类型「'+q.qtype+'」不在登记表里',SC);
+    for(const a of['knowledge','colloquial','narrative','logic','formal','open'])if(!q.a?.[a])add('err',n+'：缺「'+(regAttr(a)?.name||a)+'」的回答',SC);
+    if(!q.a?.open0)add('warn',n+'：缺开放多样性 0 级的乱码版（游戏里会临时生成乱码）',SC);}
+    for(const t of R.qtypes||[]){const k=(S.bank.questions||[]).filter(q=>q.qtype===t&&!q.tutorial).length;if(!k)add('err','后训练题库：「'+t+'」类一道普通题都没有',SC);else if(k<3)add('info','后训练题库：「'+t+'」类只有 '+k+' 道普通题，一次后训练要 3 道',SC);}}
   for(const sh of S.lib.shows){if(!sh.steps.length)add('info','演出库：「'+sh.name+'」里还没有积木',SC);checkFx(sh.steps,'演出库「'+sh.name+'」',SC);}
   sc.rounds.forEach((rd,ri)=>{
     const R0=`第 ${ri+1} 轮`,T={kind:'round',ri};
+    if(!rd.qtype)add('err',R0+'：没选问题类型（后训练按问题类型算，命中率要用）',T);
+    else if(!(R.qtypes||[]).includes(rd.qtype))add('err',R0+'：问题类型「'+rd.qtype+'」不在登记表里',T);
     if(!rd.say?.text)add('err',R0+'：用户台词是空的',T);
     if(!rd.think)add('warn',R0+'：思考链前半是空的',T);
     if(!rd.retryLead)add('warn',R0+'：没写重问引子（重问时接在诊断后面）',T);
@@ -1371,7 +1391,7 @@ function renderPlay(){
       else if(!x.cond)side.append(h('div',{class:'note'},`条件卡「${x.c.token}」：条件「${regName('conditions',x.c.appear?.cond)}」还没满足，不上盘`));
     }
   }
-  side.append(h('div',{class:'acts',style:'padding:12px 0 0'},h('button',{onclick:ptStart},'↺ 从头再来'),h('button',{onclick:openDemo},'▶ 在 Demo 里完整演出'),h('button',{onclick:()=>$('#play').classList.remove('on')},'关闭 Esc')));
+  side.append(h('div',{class:'acts',style:'padding:12px 0 0'},h('button',{onclick:ptStart},'↺ 从头再来'),h('button',{onclick:openDemo},'▶ 在游戏里完整演出'),h('button',{onclick:()=>$('#play').classList.remove('on')},'关闭 Esc')));
   box.replaceChildren(h('div',{class:'phd'},h('b',{},'试玩 · '+S.user.name+' / '+S.scene.title),h('span',{class:'t3'},'简化界面：只看剧情走向和数值，不播动画')),h('div',{class:'pbody'},log,side));
   log.scrollTop=log.scrollHeight;
 }
@@ -1381,10 +1401,10 @@ function ptCardBtn(r,pct){
     h('span',{class:'atag',style:`color:${COL[c.attr]};background:${COL[c.attr]}22`},regAttr(c.attr).name),
     h('b',{style:`color:${COL[c.attr]}`},v.token||'（空）'),h('span',{class:'badge r-'+v.result},v.result),h('span',{class:'go '+o.k},o.g),h('span',{class:'pct'},pct));
 }
-// 用夜间 Demo 完整演出当前场景（带上当前的训练状态）
+// 在游戏本体里单场试玩当前场景（跳过白天，带上当前的训练状态，演完看每晚结算）
 function openDemo(){
   const st=Object.entries(S.ts.stages).map(([k,v])=>k+':'+v).join(',');
-  window.open(`/prototype_夜间一轮/index.html?u=${encodeURIComponent(S.dir)}&s=${encodeURIComponent(S.file)}&st=${st}`,'_blank');
+  window.open(`/游戏/?play=${encodeURIComponent(S.dir+'/'+S.file)}&st=${st}&adj=${encodeURIComponent(JSON.stringify(S.ts.adj||{}))}`,'_blank');
 }
 
 $('#validB').onclick=()=>select({kind:'issues'});
@@ -1450,7 +1470,7 @@ const TOUR=[
   {q:'#split',t:'右栏太窄？',d:'按住这根分隔条左右拖，可以调右栏的宽度；双击恢复。'},
   {q:'#ts',t:'玩家训练到什么程度',d:'切换不同玩家的训练进度，看他们夜里遇到的盘面：没学过的属性，卡会变灰；学到深层就换成深层版。'},
   {q:'#validB',t:'校验',d:'写完点这里，检查漏写和不合规的地方。有问题的卡会带红色 ! 或金色 ?。'},
-  {q:'#playB',t:'试一试',d:'「试玩」可以一轮轮点卡看剧情走向和耐心；「在 Demo 里玩」用真正的游戏界面完整演一遍。'},
+  {q:'#playB',t:'试一试',d:'「试玩」可以一轮轮点卡看剧情走向和耐心；「在游戏里玩」用游戏本体完整演一遍（跳过白天，带上顶部的训练状态）。'},
   {q:'#lane',t:'画布可以拖',d:'空白处按住拖动画布，Ctrl+滚轮缩放，右下角有「适应」和「复位」。好了，开始写吧！随时可以在「？ 怎么看」里重看这段引导。'},
 ];
 let TI=-1;
@@ -1597,6 +1617,8 @@ try{
     const p=JSON.parse(e.data).path;if(p.endsWith('.tmp'))return;
     clearTimeout(listT);listT=setTimeout(refreshList,300);
     if(p==='_登记表.json'){S.reg=await (await fetch('/剧本/_登记表.json?t='+Date.now())).json();renderAll();return toast('登记表已更新');}
+    if(p==='_日程表.json'){await loadSide();if(S.preset)setPreset(S.preset);else renderAll();return toast('日程表已更新');}
+    if(p==='_后训练题库.json'){await loadSide();renderAll();return toast('后训练题库已更新');}
     const doc=docs().find(([q])=>q===p);if(!doc)return;
     let t;try{t=ser(JSON.parse(await (await fetch(`/剧本/${p}?t=${Date.now()}`)).text()));}catch{return;}
     if(t===SAVED[p])return;
@@ -1672,8 +1694,13 @@ async function openScene(dir,file){
   S.mode='scene';S.sel=null;resetUndo();setStatus('已保存','ok');S.enter=true;renderAll();
 }
 function openUser(dir){if(S.dir!==dir){const u=S.list.find(x=>x.dir===dir);return openScene(dir,u.scenes[0].file);}}
+// 日程表（「第 1 天开局」预设用）和后训练题库（校验用）
+async function loadSide(){
+  const get=async f=>{try{const r=await fetch('/剧本/'+f+'?t='+Date.now());return r.ok?await r.json():null;}catch{return null;}};
+  S.sched=await get('_日程表.json');S.bank=await get('_后训练题库.json');
+}
 (async()=>{
-  S.reg=await (await fetch('/剧本/_登记表.json')).json();
+  S.reg=await (await fetch('/剧本/_登记表.json')).json();await loadSide();
   try{S.lib=await (await fetch('/剧本/'+LIBP+'?t='+Date.now())).json();}catch{S.lib={shows:[]};}SAVED[LIBP]=ser(S.lib);
   S.list=await (await fetch('/api/list')).json();
   applyView();setPreset('day1');

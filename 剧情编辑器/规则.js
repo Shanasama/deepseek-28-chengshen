@@ -1,4 +1,4 @@
-// 大肥鱼夜间规则（v3 §4、§5.2、§5.5、§7、§8）：盘面怎么算、选中后怎么结算。
+// 大肥鱼规则（v3 §4、§5.2、§5.5、§7、§8）：盘面怎么算、选中后怎么结算、后训练怎么改权重分。
 // 剧情编辑器（画布、试玩）和夜间 Demo 都调这一份，规则只在这里改。测试：node --test 剧情编辑器/规则.test.js
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -25,11 +25,14 @@
   }
   // 权重分：属性起始分（开放多样性 0 级用 lv0Weight）+ 深层加成 + 后训练调整，保底 0.1。特殊卡固定 -99（不参与概率）
   function weight(c, st, reg, adj = {}) {
-    if (c.attr === 'special') return -99;
-    const ra = attrOf(reg, c.attr);
-    let w = c.attr === 'open' && st === 0 ? ra.lv0Weight : ra.weight;
+    return c.attr === 'special' ? -99 : attrWeight(c.attr, st, reg, adj);
+  }
+  // 不看卡、只看属性的权重分（后训练、六维图用）。adj 是这一个问题类型的调整表
+  function attrWeight(a, st, reg, adj = {}) {
+    const ra = attrOf(reg, a);
+    let w = a === 'open' && st === 0 ? ra.lv0Weight : ra.weight;
     if (st === 2) w += reg.deepBonus;
-    return Math.max(0.1, w + (adj[c.attr] || 0));
+    return Math.max(ptParams(reg).floor, w + (adj[a] || 0));
   }
   function softmax(ws) {
     if (!ws.length) return [];
@@ -106,5 +109,33 @@
   // 识破概率：察觉力 + 当晚每被糊弄一次 +20%，封顶 95%（v3 §7.4）
   const detectChance = (base, bluffsSoFar) => Math.min(0.95, base + 0.2 * bluffsSoFar);
 
-  return { stageOf, trained, variant, weight, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT };
+  // ---------- 后训练（v3 §4；v3.7 按问题类型分开算） ----------
+  // 数字的默认值在 登记表.postTrain，日程表的 postTrain 可以覆盖（28 天版可能大削弱）
+  const PT = { gain: 0.7, loss: 0.35, floor: 0.1, perBatch: 3, rerollCost: 1, spill: 0, diminish: false };
+  function ptParams(reg, over) { return { ...PT, ...((reg && reg.postTrain) || {}), ...(over || {}) }; }
+  // 一道题选了 win、没选 lose：只改 qtype 这一类的调整表（spill > 0 时按比例溢出到别的类）。
+  // 改动都按「实际挪动了多少」记，所以扣到保底以后再扣不会越欠越多。不改传入的 adjAll，返回新的
+  // 返回 { adj 新的整张表, dWin 选中属性实际加了多少, dLose 落选属性实际扣了多少 }
+  // 这一整块以后可以整个换掉（v3 §4），调用方只认这个接口
+  function postTrain(adjAll, { qtype, win, lose, stages, reg, qtypes = reg.qtypes || [], P = ptParams(reg) }) {
+    const out = Object.fromEntries(Object.entries(adjAll || {}).map(([t, o]) => [t, { ...o }]));
+    const st = a => a === 'open' ? stages.open || 0 : stages[a] || 0;
+    const move = (t, a, d) => {
+      const tab = out[t] = out[t] || {}, cur = attrWeight(a, st(a), reg, tab), got = Math.max(P.floor, cur + d) - cur;
+      tab[a] = (tab[a] || 0) + got;
+      return got;
+    };
+    // 收益递减：这一类里这个属性已经加过的分越多，这次加得越少（加过 1 个 gain → 只加一半）
+    const g = P.diminish ? P.gain / (1 + Math.max(0, (out[qtype] || {})[win] || 0) / P.gain) : P.gain;
+    const dWin = move(qtype, win, g), dLose = move(qtype, lose, -P.loss);
+    if (P.spill > 0) for (const t of qtypes) if (t !== qtype) { move(t, win, g * P.spill); move(t, lose, -P.loss * P.spill); }
+    return { adj: out, dWin, dLose };
+  }
+  // 预训练学会一类语料以后对后训练表的影响：开放多样性第一次学会时，0 级（胡言乱语）那时候攒的加减分全清掉
+  function afterLearn(adjAll, a, prevLv) {
+    if (!(a === 'open' && prevLv === 0)) return adjAll;
+    return Object.fromEntries(Object.entries(adjAll || {}).map(([t, o]) => { const { open, ...rest } = o; return [t, rest]; }));
+  }
+
+  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT };
 });

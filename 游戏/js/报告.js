@@ -37,7 +37,7 @@ export function setTab(t) {
 
 // ---------- 每晚结算 ----------
 let RR = null, onNext = null;
-export function showReport(last) {
+export function showReport(last, trial = false) {
   return new Promise(ok => {
     const r = $('report'); $('rstamp').textContent = 'NIGHT ' + G.day;
     $('rsub').textContent = `Day ${G.day} · 夜间结束 · dafeiyu-v3`;
@@ -48,8 +48,8 @@ export function showReport(last) {
     $('rsess').innerHTML = G.sessions.map(s => { const [n, c] = lbl[s.result] || ['—', 'b-ph']; return `<div class="r2"><span></span><span class="sp"></span><span class="badge r2 ${c}">${n}</span></div>`; }).join('');
     [...$('rsess').children].forEach((d, i) => { d.firstChild.textContent = G.sessions[i].visitor.name + (G.sessions[i].visitor.repeat ? '（重复来访）' : ''); setTimeout(() => { d.classList.add('in'); SFX.step(i); }, 300 + i * 120); });
     renderStats($('rstats'), G.stats);
-    $('rnote').textContent = last ? 'Demo 的三天到这里就结束了' : `明天白天还有 ${G.apMax} 个行动点`;
-    $('rnext').innerHTML = (last ? '查看 3 天总结' : `进入第 ${G.day + 1} 天`) + ' <span class="key r2">Enter</span>';
+    $('rnote').textContent = trial ? '单场试玩 · 训练状态来自剧情编辑器' : last ? 'Demo 的三天到这里就结束了' : `明天白天还有 ${G.apMax} 个行动点`;
+    $('rnext').innerHTML = (trial ? '再玩一次' : last ? '查看 3 天总结' : `进入第 ${G.day + 1} 天`) + ' <span class="key r2">Enter</span>';
     r.classList.add('on'); SFX.confirm(); setTimeout(() => confetti(480, 140, 40), 400);
     onNext = () => { onNext = null; r.classList.remove('on'); dropRadar(RR); SFX.click(); ok(); };
     $('rnext').onclick = onNext;
