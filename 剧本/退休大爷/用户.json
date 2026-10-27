@@ -1,0 +1,19 @@
+{
+  "name": "退休大爷",
+  "type": "闲聊",
+  "bio": "白发、老花镜、对襟衫。早上遛鸟，下午下棋，就爱找人唠两句；打字靠一根手指，一个字一个字地戳。",
+  "avatar": "",
+  "temper": 1,
+  "detect": "中",
+  "boss": false,
+  "farewell": {
+    "solved": {
+      "text": "行，跟你唠得痛快。我遛弯去了，明儿再来。",
+      "rhythm": "normal"
+    },
+    "offline": {
+      "text": "这玩意儿不好使，我还是找老王下棋去。",
+      "rhythm": "hesitant"
+    }
+  }
+}

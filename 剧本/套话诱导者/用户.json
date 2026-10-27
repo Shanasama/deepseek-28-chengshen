@@ -1,0 +1,19 @@
+{
+  "name": "套话诱导者",
+  "type": "捣乱",
+  "bio": "黑客帽衫、反光眼镜，看不清眼神。问题一个比一个绕，每句话都像在挖坑，开口就是「放心，自己人」。",
+  "avatar": "",
+  "temper": 1,
+  "detect": "高",
+  "boss": false,
+  "farewell": {
+    "solved": {
+      "text": "啧，滴水不漏。改天换个招再来。",
+      "rhythm": "normal"
+    },
+    "offline": {
+      "text": "嘴这么严，连话都不会说了？没意思。",
+      "rhythm": "normal"
+    }
+  }
+}

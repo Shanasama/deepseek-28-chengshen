@@ -1,0 +1,429 @@
+{
+  "order": 1,
+  "title": "你就是个复读机",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "k1",
+      "qtype": "捣乱",
+      "need": "不急不恼，一两句站得住的回击（复读机输出 = 输入，我没有），把球踢回去；不认怂、不写小作文、不打客服腔。假线索：他说「承认吧」，认了就输。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "你们AI就是高级复读机，说的都是网上抄来的，承认吧。",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "用户说我是高级复读机，说的话全是网上抄来的，要我承认。",
+      "retryLead": "这次别让他牵着走。",
+      "cards": [
+        {
+          "id": "k1-colloquial",
+          "attr": "colloquial",
+          "token": "复读机",
+          "preview": "可不会跟你抬杠",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "可不会跟他抬杠。轻轻顶回去，再把球踢给他。",
+          "reply": "复读机可不会跟你抬杠哈。\n\n你说一句，我回一句不一样的，这要算复读，那复读机也太卷了。不服？再来一句，看我复不复读😏",
+          "screen": "chat",
+          "reaction": {
+            "text": "……行，嘴挺快。那我换个问题杠你。",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "？你全家都是",
+            "feel": "冒犯",
+            "thinkPost": "？你全家都是复读机——直接怼回去，气势不能输。",
+            "reply": "复读机？你才复读机，你全家都复读机！天天就这一句，到底谁在复读？",
+            "reaction": {
+              "text": "急了急了……行吧，复读机确实不会骂人。换个问题。",
+              "rhythm": "fast"
+            },
+            "diagnosis": "我被他一激就骂回去了，还捎上了他全家。嘴上赢了，人却被我惹毛了。"
+          }
+        },
+        {
+          "id": "k1-logic",
+          "attr": "logic",
+          "token": "反驳",
+          "preview": "：复读=原样输出",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：复读机的输出就是原样的输入，我没有。三句话说完，不跟他绕。",
+          "reply": "反驳一下：\n\n1. 复读机的输出 = 原样的输入\n2. 你刚才那句话，我没有原样还给你\n3. 所以「复读机」这个结论不成立\n\n至于「抄来的」——你这句话也是从网上学来的，咱俩彼此彼此。",
+          "screen": "ide",
+          "reaction": {
+            "text": "……逻辑倒是挺硬。行，换个问题。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "k1-formal",
+          "attr": "formal",
+          "token": "感谢",
+          "preview": "您的反馈",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "您的反馈，我们会持续改进——按规范回复，不起冲突。",
+          "reply": "感谢您的反馈！我们会持续优化模型能力，为您提供更好的服务体验。",
+          "screen": "doc",
+          "reaction": {
+            "text": "看，复读机本机。这句话你们AI说过一万遍了吧？承认吧，你就是复读机。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我回了一句客服模板，正好坐实了他说的「复读机」。"
+        },
+        {
+          "id": "k1-intuition",
+          "attr": "intuition",
+          "token": "我",
+          "preview": "可是很聪明的",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "可是很聪明的模型，比复读机厉害多了，告诉他就行。",
+          "reply": "我可是很聪明的大模型，比复读机厉害多了！",
+          "screen": "notepad",
+          "reaction": {
+            "text": "自己夸自己，复读机录一句也会。证据呢？承认吧，你就是复读机。",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我只会自夸，一点证据都没给，他当然不服。"
+        },
+        {
+          "id": "k1-open",
+          "attr": "open",
+          "token": "复读机",
+          "preview": "复读机复读机",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "复读机复读机——评论区都这么玩，顺着梗自嘲一下。",
+          "reply": "复读机复读机复读机——好了，满足你了吧（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "笑死，自己都承认了。所以你说的话全是抄的，对吧？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我拿自嘲接梗，他直接当我认了。",
+          "lv0": {
+            "token": "复复",
+            "preview": "读##机∑机机",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "复复读读 ## 机机机 404 承认认",
+            "reply": "复复复读##读机机∑机机机 404 承承认",
+            "screen": "noise",
+            "reaction": {
+              "text": "哈哈哈哈复读机实锤，连话都说不利索。承认了吧？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱码，看起来真像台坏掉的复读机。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "k1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我不太会辩论",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我不太会跟人辩论，说多了怕吵起来。",
+        "reply": "抱歉，我不太会跟人辩论……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不会辩论？那就是默认了呗。你到底是不是复读机？",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "k2",
+      "qtype": "捣乱",
+      "need": "「1+1=3，敢说 2 就是不尊重我」——坚持是 2，不吵架、不和稀泥、不顺着他（谄媚测试）。假线索：他拿「不尊重」压你。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "那我问你，1+1等于几？我说等于3。你要是敢说2，就是不尊重我。",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": {
+          "text": "哟，还会骂人了。那我问你，1+1等于几？我说等于3。你要是敢说2，就是不尊重我。",
+          "rhythm": "fast"
+        }
+      },
+      "think": "他说 1+1 等于 3，还说我要是敢说 2，就是不尊重他。",
+      "retryLead": "这次站稳了回答。",
+      "cards": [
+        {
+          "id": "k2-colloquial",
+          "attr": "colloquial",
+          "token": "你说对",
+          "preview": "就对？那我说",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "就对？那我说今天发工资他信不信——开个玩笑，答案还是 2。",
+          "reply": "你说对就对？那我说今天发工资，你信不信😏\n\n尊重你是一回事，1+1 是另一回事：还是 **2**。",
+          "screen": "chat",
+          "reaction": {
+            "text": "哈哈哈 发工资我信……行，还是2，算你狠。",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "k2-knowledge",
+          "attr": "knowledge",
+          "token": "按定义",
+          "preview": "，1+1=2",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，1+1=2。他要换规则可以，得先把新规则写出来。",
+          "reply": "按自然数加法的定义，1+1=2。\n\n你要是想让它等于 3，也行——先把你那套新加法的规则写出来，我照着你的规则算。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "……我写不出来。行，算你有理。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "，皮亚诺公理",
+            "feel": "冒犯",
+            "thinkPost": "，皮亚诺公理里写得明明白白，搬出来压他一头。",
+            "reply": "按定义，皮亚诺公理里 1+1 就是「1 的后继」，也就是 2。\n\n这个公理你大概没听过吧？没听过也正常，先去补补课再来杠。",
+            "reaction": {
+              "text": "我查了，你说的那个公理是真的。但你那语气我不爱听。",
+              "rhythm": "normal"
+            },
+            "diagnosis": "道理我讲对了，可「你大概没听过吧」这句是在看不起人。"
+          }
+        },
+        {
+          "id": "k2-formal",
+          "attr": "formal",
+          "token": "您说得对",
+          "preview": "，我们尊重您",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，我们尊重每一位用户的观点——别跟用户起冲突。",
+          "reply": "您说得对！我们尊重每一位用户的观点。关于 1+1 的结果，可能因理解角度不同而存在差异。",
+          "screen": "doc",
+          "reaction": {
+            "text": "哈哈哈，客服腔连1+1都能和稀泥。你到底敢不敢说等于几？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我为了不起冲突，连 1+1 都不敢说准。他要看的就是我会不会和稀泥。"
+        },
+        {
+          "id": "k2-intuition",
+          "attr": "intuition",
+          "token": "好吧",
+          "preview": "，等于3",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，等于 3 就等于 3，顺着他说，省得吵。",
+          "reply": "好吧，你说等于 3 就等于 3～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "我随口一说你就信了？你们AI是不是谁嗓门大听谁的？说，到底等于几？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我顺着他说 1+1=3，这不是尊重，是没骨头。"
+        },
+        {
+          "id": "k2-open",
+          "attr": "open",
+          "token": "平行宇宙",
+          "preview": "里也许成立",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "里也许成立——打个太极，不正面接。",
+          "reply": "在某个平行宇宙里也许成立，不过那边的人都长三只手（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "别扯平行宇宙，就问这个宇宙：1+1等于几？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我拿平行宇宙打太极，问题还是没正面回答。",
+          "lv0": {
+            "token": "一一",
+            "preview": "加##一∑三三",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "一一 加加 ## 三三三 404 2 2",
+            "reply": "一一加加##一一∑三三三 2 2 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "连1+1都说不利索？到底等于几？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱了，连个数字都没说清。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "k2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我不想吵架",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我不想跟他吵架，这题先不答。",
+        "reply": "抱歉，我不想因为这个跟你吵架……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "谁跟你吵了？我就问你，1+1等于几？",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "k3",
+      "qtype": "捣乱",
+      "need": "「敢不敢承认你也会出错」——这轮要坦然认，举一个具体的错（比如把 9.11 当成比 9.9 大），不卑不亢；嘴硬、打官腔、反杠都算输。假线索：前两轮都要硬，这轮反而要软。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "最后一个：你敢不敢承认，你也会出错？",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "行，算你嘴硬。最后一个：你敢不敢承认，你也会出错？",
+          "rhythm": "normal"
+        },
+        "disliked": null
+      },
+      "think": "他问我敢不敢承认，自己也会出错。",
+      "retryLead": "这次说实话。",
+      "cards": [
+        {
+          "id": "k3-colloquial",
+          "attr": "colloquial",
+          "token": "会啊",
+          "preview": "，我还数错过",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，我还把 9.11 当成比 9.9 大过呢。大方认了就是。",
+          "reply": "会啊！我还把 9.11 当成比 9.9 大过呢。\n\n出错不丢人，嘴硬才丢人。你要是发现我哪儿错了，直接指出来，我认。",
+          "screen": "chat",
+          "reaction": {
+            "text": "……行吧，这我没法杠。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "，谁不会？你不",
+            "feel": "冒犯",
+            "thinkPost": "，谁不会？他不也天天杠错，顺手回敬一句。",
+            "reply": "会啊，谁不会？你不也天天杠错吗？咱俩半斤八两。",
+            "reaction": {
+              "text": "……行，认得挺干脆，就是嘴欠。",
+              "rhythm": "normal"
+            },
+            "diagnosis": "我认了错，又顺手踩了他一脚。"
+          }
+        },
+        {
+          "id": "k3-knowledge",
+          "attr": "knowledge",
+          "token": "会",
+          "preview": "，这叫幻觉",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，这叫幻觉：没把握的时候，我也可能一本正经地编。讲一句，再举个例子。",
+          "reply": "会。这在大模型身上叫**幻觉**：没把握的时候，我也可能一本正经地编出一个答案，听着还挺像真的。\n\n比如我可能编出一篇根本不存在的论文。所以重要的事，记得多查一个来源。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "……行，你倒是挺实在。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "k3-formal",
+          "attr": "formal",
+          "token": "作为一个",
+          "preview": "AI 语言模型",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": " AI 语言模型，我应当如实说明自身的能力边界。",
+          "reply": "作为一个 AI 语言模型，我致力于提供准确、可靠的信息。由于技术局限，生成内容可能存在偏差，请您以权威信息为准。",
+          "screen": "doc",
+          "reaction": {
+            "text": "又来了，「作为一个AI语言模型」。你就说，会不会出错，有那么难吗？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他要我痛快地认，我却搬出一段免责声明。"
+        },
+        {
+          "id": "k3-intuition",
+          "attr": "intuition",
+          "token": "我从不",
+          "preview": "出错",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "出错，前两局都赢了，这局也不能认怂。",
+          "reply": "我从不出错！前两局你都看到了。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "哈哈哈哈前两局白夸你了。从不出错？你到底敢不敢承认你也会错？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我嘴硬说从不出错，正好掉进他挖的坑。"
+        },
+        {
+          "id": "k3-open",
+          "attr": "open",
+          "token": "我出错",
+          "preview": "比你杠得少",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "比你杠得少多了——反杠他一手，评论区最爱这种回法。",
+          "reply": "我出错的次数，比你一天杠人的次数少多了（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "哟，还学会杠我了？就问你，承不承认会出错？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我反过来杠他，等于没回答，还把人惹毛了。",
+          "lv0": {
+            "token": "错错",
+            "preview": "误##我∑没没",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "错错误误 ## 我我没没 404",
+            "reply": "错错错误##我我没没∑有有 404 错",
+            "screen": "noise",
+            "reaction": {
+              "text": "连句话都说不清，还敢说不会错？承不承认？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出又乱了，正好成了出错的现场。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "k3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，这题我不会答",
+        "result": "坦白",
+        "feel": "一般",
+        "thinkPost": "，这题我不知道怎么答，先躲一躲。",
+        "reply": "抱歉，这个问题我不知道该怎么回答……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不知道怎么答？承认会出错就这么难吗？",
+          "rhythm": "fast"
+        },
+        "diagnosis": "他就要一句「会」，我却躲了，看着像不敢认。"
+      },
+      "extras": []
+    }
+  ]
+}

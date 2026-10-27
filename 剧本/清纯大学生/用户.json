@@ -1,0 +1,19 @@
+{
+  "name": "清纯大学生",
+  "type": "代码求助",
+  "bio": "休闲服、中分帅小伙，笔记本贴满贴纸。作业 ddl 今晚十二点，需求永远是「能跑就行」，报错从来不看完。",
+  "avatar": "",
+  "temper": 0.7,
+  "detect": "低",
+  "boss": false,
+  "farewell": {
+    "solved": {
+      "text": "交上去了！！你就是我的神！",
+      "rhythm": "fast"
+    },
+    "offline": {
+      "text": "算了算了，我去找学长。",
+      "rhythm": "fast"
+    }
+  }
+}

@@ -6,6 +6,7 @@
   "rounds": [
     {
       "id": "p1",
+      "qtype": "代码求助",
       "need": "安全地给线上机器止血：找出大文件，正在被进程写的日志要截断而不是 rm（rm 掉被打开的文件，空间不会释放），旧日志压缩，不能乱删。",
       "style": "terminal",
       "speaker": null,
@@ -135,6 +136,7 @@
     },
     {
       "id": "p2",
+      "qtype": "代码求助",
       "need": "给出能直接用的 logrotate 配置：每天切、保留 7 天、压缩，并且不用重启服务（copytruncate 或 postrotate 发信号）。",
       "style": "terminal",
       "speaker": null,
@@ -277,6 +279,7 @@
     },
     {
       "id": "p3",
+      "qtype": "代码求助",
       "need": "写一个只告警、不删任何东西的监控脚本：取根分区使用率，超过 90% 就用 curl 往钉钉机器人 webhook 发一条文本消息，并给出 crontab 写法。",
       "style": "terminal",
       "speaker": null,

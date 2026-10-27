@@ -1,0 +1,20 @@
+{
+  "name": "出厂测试员",
+  "type": "闲聊",
+  "bio": "白大褂，胸前别着 QA 工牌，手里一张检查单一项项打勾。说话温和，今天只是来确认你能开口说话。",
+  "avatar": "",
+  "temper": 0.7,
+  "detect": "低",
+  "boss": false,
+  "tutorial": true,
+  "farewell": {
+    "solved": {
+      "text": "出厂测试通过。明天正式营业，加油。",
+      "rhythm": "normal"
+    },
+    "offline": {
+      "text": "测试不通过……先返厂吧。",
+      "rhythm": "hesitant"
+    }
+  }
+}

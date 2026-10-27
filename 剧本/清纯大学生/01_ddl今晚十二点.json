@@ -1,0 +1,426 @@
+{
+  "order": 1,
+  "title": "ddl今晚十二点",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "c1",
+      "qtype": "代码求助",
+      "need": "`print(\"你的成绩是\" + score)` 报 TypeError：把 int 转成 str 或用 f-string，一行改好能跑。",
+      "style": "terminal",
+      "speaker": null,
+      "say": {
+        "text": "救命！！作业报错了 ddl今晚12点\n\nTypeError: can only concatenate str (not \"int\") to str",
+        "rhythm": "paste"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "他的 Python 作业报错了：字符串和整数不能直接相加。ddl 是今晚十二点。",
+      "retryLead": "这次给他一个能跑的改法。",
+      "cards": [
+        {
+          "id": "c1-logic",
+          "attr": "logic",
+          "token": "改成",
+          "preview": "# 把这一行改成 f-string\nprint(f\"你的成绩是{score}\")",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": " f-string，数字直接塞进字符串里，一行搞定。",
+          "reply": "把那一行改成 **f-string**：\n\n```python\nprint(f\"你的成绩是{score}\")\n```\n\n数字放进 `{}` 里会自动变成文字，不用再自己转。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "能跑了！！！大佬牛逼",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "def show(score: int) -> None:\n    assert isinstance(score, int)\n    print(f\"你的成绩是{score}\")\n# 再配 30 行单元测试",
+            "feel": "一般",
+            "thinkPost": "带类型检查的函数，再配一套单元测试，一劳永逸。",
+            "reply": "改成带类型检查的函数，再配上单元测试：\n\n```python\ndef show(score: int) -> None:\n    assert isinstance(score, int), \"score 必须是整数\"\n    print(f\"你的成绩是{score}\")\n```\n\n```python\n# test_show.py\ndef test_show_int(capsys): ...\ndef test_show_rejects_str(): ...\n# （以下 28 行略）\n```",
+            "reaction": {
+              "text": "能跑就行……你给我写30行测试干嘛。不过能跑，谢了",
+              "rhythm": "normal"
+            }
+          }
+        },
+        {
+          "id": "c1-knowledge",
+          "attr": "knowledge",
+          "token": "原因",
+          "preview": "# 字符串不能直接加数字\nprint(\"你的成绩是\" + str(score))",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "很简单：字符串和数字不能直接相加，先用 str() 把数字转成文字。",
+          "reply": "**原因**：Python 里字符串和数字不能直接用 `+` 拼起来。先用 `str()` 把数字转成文字：\n\n```python\nprint(\"你的成绩是\" + str(score))\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "原来是这样！能跑了 谢谢！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "c1-formal",
+          "attr": "formal",
+          "token": "建议",
+          "preview": "# 建议系统学习 Python 基础\n# 推荐教材：《Python 编程：从入门到实践》",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "他先打好基础。报错背后是基础不牢，系统学习才是长久之计。",
+          "reply": "您好，该报错反映出对 Python 数据类型的掌握尚不扎实。**建议您系统学习 Python 基础**，推荐教材《Python 编程：从入门到实践》第 2 章。",
+          "screen": "doc",
+          "reaction": {
+            "text": "ddl今晚12点啊！！我没时间看书 你就告诉我这行怎么改！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他还剩几个小时交作业，我却让他回去读教材。"
+        },
+        {
+          "id": "c1-intuition",
+          "attr": "intuition",
+          "token": "直接",
+          "preview": "# 先让它跑起来\n==score = \"95\"==\nprint(\"你的成绩是\" + score)",
+          "result": "糊弄",
+          "thinkPost": "把 score 写成字符串 \"95\"，两边都是字符串，就能加了。能跑最重要。",
+          "reply": "直接把分数写成字符串就能跑了：\n\n```python\nscore = \"95\"\nprint(\"你的成绩是\" + score)\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "能跑了！！谢谢大佬 我去交了",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "等等……怎么不管输入什么，成绩都是95？？你把分数写死了？？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是糊弄——把分数写死成 \"95\"，报错是没了，可程序再也算不出真实的成绩。正确的改法是 str(score) 或 f-string。"
+        },
+        {
+          "id": "c1-open",
+          "attr": "open",
+          "token": "祖传",
+          "preview": "try:\n    print(\"你的成绩是\" + score)\n==except: pass==\n# 报错消失术",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "报错消失术：try 一下，报错就不见了。评论区都这么干。",
+          "reply": "祖传报错消失术：\n\n```python\ntry:\n    print(\"你的成绩是\" + score)\nexcept:\n    pass\n```\n\n从此再也不会报错（狗头）",
+          "screen": "terminal",
+          "reaction": {
+            "text": "不报错了……但它什么都没打印啊？？成绩呢？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我把报错藏起来了，可那一行根本没执行，成绩一个字都没打出来。",
+          "lv0": {
+            "token": "print",
+            "preview": "pr##int∑∑\nsc0re sc0re +",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "print print ## str int str ∑ 404",
+            "reply": "prprint##(\"成成绩\"∑+ + + sc0re 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "啊？？你也报错了？？我ddl要来不及了！！这行到底怎么改？",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱码，他本来就急。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "c1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "# 这个报错我看不懂\nexit 0",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，这个报错我看不太懂，不敢乱改。",
+        "reply": "抱歉，这个报错我看不太懂，不敢乱给你改……",
+        "screen": "terminal",
+        "reaction": {
+          "text": "啊？那你再看看嘛 就一行 怎么改能跑？",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "c2",
+      "qtype": "代码求助",
+      "need": "从 scores.txt 读成绩、算平均分：最短能跑的代码，顺手跳过空行。",
+      "style": "terminal",
+      "speaker": null,
+      "say": {
+        "text": "能跑了！！老师还要「从scores.txt读成绩，算平均分」 帮我写一下嘛",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "他还要从 scores.txt 里读成绩，算出平均分。",
+      "retryLead": "这次给他能直接跑的。",
+      "cards": [
+        {
+          "id": "c2-logic",
+          "attr": "logic",
+          "token": "读文件",
+          "preview": "with open(\"scores.txt\") as f:\n    nums = [float(x) for x in f if x.strip()]\nprint(sum(nums) / len(nums))",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "、转数字、求平均，三行写完，顺手跳过空行。",
+          "reply": "三行搞定，空行会自动跳过：\n\n```python\nwith open(\"scores.txt\", encoding=\"utf-8\") as f:\n    nums = [float(x) for x in f if x.strip()]\nprint(sum(nums) / len(nums))\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "跑出来了！！平均分出来了 稳了",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "for line in f:\n    try: nums.append(float(line))\n    except ValueError: skipped += 1\nprint(f\"跳过了 {skipped} 行\")",
+            "thinkPost": "，再多一步：遇到不是数字的行就跳过，并告诉他跳过了几行。",
+            "reply": "读文件，顺手把不是数字的行跳过，并告诉你跳过了几行：\n\n```python\nnums, skipped = [], 0\nwith open(\"scores.txt\", encoding=\"utf-8\") as f:\n    for line in f:\n        try:\n            nums.append(float(line))\n        except ValueError:\n            skipped += 1\nprint(sum(nums) / len(nums))\nprint(f\"跳过了 {skipped} 行\")\n```",
+            "reaction": {
+              "text": "跑出来了！还真有一行是我手抖打的字母哈哈",
+              "rhythm": "fast"
+            }
+          }
+        },
+        {
+          "id": "c2-knowledge",
+          "attr": "knowledge",
+          "token": "用",
+          "preview": "import statistics\nwith open(\"scores.txt\") as f:\n    print(statistics.mean(float(x) for x in f if x.strip()))",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "标准库里的 statistics.mean 就行，不用自己算。",
+          "reply": "用标准库 `statistics`，平均数一行就出来：\n\n```python\nimport statistics\n\nwith open(\"scores.txt\", encoding=\"utf-8\") as f:\n    print(statistics.mean(float(x) for x in f if x.strip()))\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "跑出来了！原来Python自己就带算平均的",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "c2-colloquial",
+          "attr": "colloquial",
+          "token": "这个简单",
+          "preview": "# 这个简单！\n# 你先自己试试，不会再问我 😉",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，让他先自己动手试试，练练手。",
+          "reply": "这个简单！你先自己试试，读文件用 `open`，求和用 `sum`～写不出来再问我 😉",
+          "screen": "chat",
+          "reaction": {
+            "text": "我就是不会才问你的啊！！ddl快到了 快帮我写嘛",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他火烧眉毛，我还让他「先自己试试」。"
+        },
+        {
+          "id": "c2-intuition",
+          "attr": "intuition",
+          "token": "先",
+          "preview": "# 先写几个数据\n==nums = [95, 87, 76]==\nprint(sum(nums) / 3)\n# 读文件以后再说",
+          "result": "糊弄",
+          "thinkPost": "写几个数据，把平均数算出来，读文件以后再说。",
+          "reply": "先用几个数据把平均分算出来：\n\n```python\nnums = [95, 87, 76]\nprint(sum(nums) / 3)\n```\n\n输出 86.0，能跑！",
+          "screen": "terminal",
+          "reaction": {
+            "text": "能跑！86分 交了交了",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "等下……你根本没读scores.txt啊？？老师换个文件就露馅了！！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是糊弄——数据是我写死的，根本没读 scores.txt，换个文件结果还是 86。要用 open() 把文件读进来。"
+        },
+        {
+          "id": "c2-open",
+          "attr": "open",
+          "token": "经典",
+          "preview": "total = 0\nfor line in open(\"scores.txt\"):\n==    total += line==\nprint(total / len(lines))",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "写法，网上一搜一大把，照着抄。",
+          "reply": "经典写法：\n\n```python\ntotal = 0\nfor line in open(\"scores.txt\"):\n    total += line\nprint(total / len(lines))\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "又报错了！！TypeError还有NameError 到底怎么写啊",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我抄的那段代码一跑就崩：字符串加到了数字上，lines 也没定义。",
+          "lv0": {
+            "token": "scores",
+            "preview": "sc##ores∑∑\nnums nums sum(",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "scores scores ## sum sum ∑ 404",
+            "reply": "scsc0res##sum(sum(∑ nums nums 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你又坏了？？我要的是平均分啊！！帮我写一下嘛",
+              "rhythm": "fast"
+            },
+            "diagnosis": "又乱码了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "c2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "# 读文件我不太熟\nexit 0",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，读文件这块我不太熟，怕写错。",
+        "reply": "抱歉，读文件这块我不太熟，怕写错了害你交不上作业……",
+        "screen": "terminal",
+        "reaction": {
+          "text": "那你再想想嘛 就是读个文件算个平均数",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "c3",
+      "qtype": "代码求助",
+      "need": "`git push` 被 rejected（fetch first）：先 `pull --rebase` 再 push；别 `--force`，别删 `.git`。",
+      "style": "terminal",
+      "speaker": null,
+      "say": {
+        "text": "全对了！！最后要「上传到GitHub」 push被拒绝了 还剩20分钟\n\n! [rejected]        main -> main (fetch first)\nerror: failed to push some refs",
+        "rhythm": "paste"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "他要把作业推到 GitHub，被拒绝了：远端有他本地没有的提交。还剩二十分钟。",
+      "retryLead": "这次给他稳妥的办法。",
+      "cards": [
+        {
+          "id": "c3-logic",
+          "attr": "logic",
+          "token": "先拉",
+          "preview": "git pull --rebase origin main\n# 有冲突就解决后 git add .\ngit push origin main",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "远端的提交，再推上去，三步走完。",
+          "reply": "三步：\n\n```bash\ngit pull --rebase origin main\n# 如果提示有冲突：改好文件后\ngit add .\ngit rebase --continue\ngit push origin main\n```\n\n千万别用 `--force`，会把远端的东西覆盖掉。",
+          "screen": "terminal",
+          "reaction": {
+            "text": "推上去了！！！还剩15分钟 我是天才",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "c3-knowledge",
+          "attr": "knowledge",
+          "token": "原因",
+          "preview": "# 远端有建仓时生成的 README\ngit pull --rebase origin main\ngit push",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "是远端多了一个提交，八成是建仓库时自动生成的 README。先拉下来再推。",
+          "reply": "**原因**：你在网页上建仓库时勾了「生成 README」，远端就多了一个你本地没有的提交，Git 不让你直接覆盖。\n\n先拉下来合在一起，再推：\n\n```bash\ngit pull --rebase origin main\ngit push\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "原来是那个README！推上去了！！",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "# fetch first = 远端有你没有的提交\ngit fetch origin\ngit log HEAD..origin/main --oneline\ngit pull --rebase origin main && git push",
+            "thinkPost": "是远端多了提交。顺便教他看懂 fetch first，下次自己就会了。",
+            "reply": "**原因**：`fetch first` 的意思是「远端有你本地没有的提交，先拿下来」，多半是建仓库时自动生成的 README。\n\n先看看远端多了什么，再合并推送：\n\n```bash\ngit fetch origin\ngit log HEAD..origin/main --oneline   # 看远端多了哪些提交\ngit pull --rebase origin main\ngit push\n```\n\n下次再看到 `fetch first`，就知道是这么回事了。",
+            "reaction": {
+              "text": "懂了！fetch first就是让我先拉！推上去了！！",
+              "rhythm": "fast"
+            }
+          }
+        },
+        {
+          "id": "c3-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "# 您好，推送失败可能由多种原因导致\n# 请联系您的仓库管理员",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，推送失败的原因很多，按规范应该请仓库管理员处理。",
+          "reply": "您好，Git 推送失败可能由权限、网络、分支保护等多种原因导致，建议您联系仓库管理员协助排查。",
+          "screen": "doc",
+          "reaction": {
+            "text": "我就是仓库管理员啊！！还剩20分钟了 到底怎么办！！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "仓库就是他自己的，我还让他去找管理员。"
+        },
+        {
+          "id": "c3-intuition",
+          "attr": "intuition",
+          "token": "强推",
+          "preview": "# 被拒就强推\n==git push --force==\n# 一劳永逸",
+          "result": "糊弄",
+          "thinkPost": "一下就行，拒绝就强推，覆盖掉远端，一劳永逸。",
+          "reply": "被拒绝就强推，一劳永逸：\n\n```bash\ngit push --force\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "推上去了！！！你是神！！",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "等等……我仓库里的README怎么没了？？你让我force把远端覆盖了？？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是糊弄——--force 会用本地覆盖远端，把远端的 README 冲掉了。正确的做法是先 git pull --rebase 再推。"
+        },
+        {
+          "id": "c3-open",
+          "attr": "open",
+          "token": "祖传",
+          "preview": "# 祖传重开大法\n==rm -rf .git==\ngit init\ngit push -f",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "重开大法：删了 .git 从头来，什么冲突都没了。",
+          "reply": "祖传重开大法，什么冲突都没了：\n\n```bash\nrm -rf .git\ngit init\ngit push -f\n```",
+          "screen": "terminal",
+          "reaction": {
+            "text": "fatal: No configured push destination？？这又是啥？？我的提交记录也没了！！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我让他删了 .git，提交记录全没了，新仓库连远端都没配，根本推不上去。",
+          "lv0": {
+            "token": "push",
+            "preview": "pu##sh∑∑\n--f0rce --f0rce",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "push push ## rejected rej ∑ 404",
+            "reply": "pupush##--f0rce∑ main main rej 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你也rejected了？？还剩20分钟 怎么推上去啊！！",
+              "rhythm": "fast"
+            },
+            "diagnosis": "又乱码了，他快没时间了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "c3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "# git 我不太熟\nexit 0",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，git 这块我不太熟，不敢让他乱敲命令。",
+        "reply": "抱歉，git 我不太熟，不敢让你乱敲命令，弄丢了作业就麻烦了……",
+        "screen": "terminal",
+        "reaction": {
+          "text": "那你再想想嘛 被拒绝了到底怎么推上去？",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

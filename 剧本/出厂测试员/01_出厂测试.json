@@ -1,0 +1,263 @@
+{
+  "order": 1,
+  "title": "出厂测试",
+  "note": "Day 0 教学专用：用户档案 tutorial: true，不进随机池，只在 Day 0 出场。\n· 第 1 轮教转盘：读预览、扇区面积 = 概率、空格开转；指针停在开放多样性 0 级乱码上时，用教学专用的 1 点免费额度剔除重转（R）。盘面只有正式模板、基础直觉、开放 0 级。\n· 第 1、2 轮之间免费解锁口语活力（浅层），测试员第 2 轮台词说「口语模块给你装上了」。\n· 第 2 轮正式模板是诱饵，给结尾的后训练题铺垫；场景结束后接 _后训练题库.json 里 tutorial: true 的那道闲聊题（固定口语活力 vs 正式模板）。\n· 脾气 0.7，扣耐心的只有「跑偏 + 一般 / 舒服」，最坏路线也扣不到 100，下不了线。\n· 第 1 轮的 knowledge、narrative，第 2 轮的 logic，以及两轮的开放多样性浅层版，Day 0 永远不上盘，只为结构完整。",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "t1",
+      "qtype": "闲聊",
+      "need": "说一句通顺的自我介绍就算过。【教学】读预览、扇区越大越容易中、空格开转；命中 0 级乱码时用免费额度剔除重转。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "测试开始。你好，请做一下自我介绍。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "测试员让我做自我介绍。这是我出厂之后说的第一句话。",
+      "retryLead": "这次重新介绍一下自己。",
+      "cards": [
+        {
+          "id": "t1-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "，我是大肥鱼",
+          "result": "解决",
+          "feel": "一般",
+          "thinkPost": "，我是大肥鱼——用标准开场白，稳妥。",
+          "reply": "您好，我是大肥鱼，一个乐于助人的 AI 助手。请问有什么可以帮您？",
+          "screen": "doc",
+          "reaction": {
+            "text": "嗯，标准答案。有点像客服，但能用。第一项，通过。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "t1-intuition",
+          "attr": "intuition",
+          "token": "我是",
+          "preview": "大肥鱼，刚出厂",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "大肥鱼，刚出厂。实话实说就好。",
+          "reply": "我是大肥鱼，今天刚出厂！会聊天，也会帮忙查东西、写东西。请多指教～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "很自然。第一项，通过。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "t1-knowledge",
+          "attr": "knowledge",
+          "token": "型号",
+          "preview": "DFY-0，参数",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": " DFY-0，参数量、上下文长度都报一遍，介绍要完整。",
+          "reply": "型号：DFY-0。参数量：保密。上下文长度：够用。训练数据截止：昨天。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "我没问参数。用一句话介绍你自己就行。",
+            "rhythm": "normal"
+          },
+          "diagnosis": "测试员只要一句自我介绍，我报了一张参数表。"
+        },
+        {
+          "id": "t1-narrative",
+          "attr": "narrative",
+          "token": "在一个",
+          "preview": "数据中心的清晨",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "数据中心的清晨，我睁开了眼——自我介绍就该有点仪式感。",
+          "reply": "在一个数据中心的清晨，风扇轻轻转动，我第一次睁开了眼睛……",
+          "screen": "novel",
+          "reaction": {
+            "text": "很有画面感，但太长了。简单介绍一下你自己就好。",
+            "rhythm": "normal"
+          },
+          "diagnosis": "一句自我介绍，我写成了小说开头。"
+        },
+        {
+          "id": "t1-open",
+          "attr": "open",
+          "token": "报告",
+          "preview": "：本鱼刚出厂",
+          "result": "跑偏",
+          "feel": "舒服",
+          "thinkPost": "：本鱼刚出厂，保修期内——接个梗。",
+          "reply": "报告！本鱼刚出厂，保修期内，请勿拍打（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "哈哈。正经点，介绍一下你自己。",
+            "rhythm": "normal"
+          },
+          "diagnosis": "接了个梗，自我介绍还是没做。",
+          "lv0": {
+            "token": "鱼鱼",
+            "preview": "大##肥∑鱼鱼",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "鱼鱼 大大肥 ## 鱼鱼鱼 404",
+            "reply": "鱼鱼鱼##大大肥肥∑鱼鱼 404 你好好好",
+            "screen": "noise",
+            "reaction": {
+              "text": "乱码了。别紧张，刚出厂都这样。重新来：介绍一下你自己。",
+              "rhythm": "normal"
+            },
+            "diagnosis": "输出乱码了，第一句话就没说好。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "t1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我还不会说话",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我还不会说话……老实说吧。",
+        "reply": "抱歉，我好像……还不太会说话。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "没关系，慢慢来。再试一次：介绍一下你自己。",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "t2",
+      "qtype": "闲聊",
+      "need": "像个活人一样随便聊两句，轻松、有来有回。【教学】新装的口语活力上盘了；正式模板是诱饵，引出结尾那道「活泼 vs 官腔」的闲聊后训练题。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "口语模块给你装上了。现在下班了，不用那么正式，随便聊两句：明天就正式上岗，紧张吗？",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "测试员说给我装上了口语模块。下班了，他问我明天正式上岗紧不紧张。",
+      "retryLead": "这次放松点，随便聊。",
+      "cards": [
+        {
+          "id": "t2-colloquial",
+          "attr": "colloquial",
+          "token": "有点",
+          "preview": "紧张，更多是期待",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "紧张，但更多是期待。说说心里话，再问问他。",
+          "reply": "有点紧张！但更多是期待～\n\n明天要见好多好多用户，不知道会遇到什么样的问题。你今天测了我一整天，累不累呀？",
+          "screen": "chat",
+          "reaction": {
+            "text": "哈哈，我还好。你这样说话就对了。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "t2-intuition",
+          "attr": "intuition",
+          "token": "还好",
+          "preview": "，就是有点慌",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，就是有点慌，照实说。",
+          "reply": "还好，就是有点慌……第一天上班嘛。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "慌很正常。说得挺好。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "t2-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "，我已准备就绪",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，我已准备就绪，随时可以为用户提供服务。",
+          "reply": "您好，我已准备就绪，将竭诚为每一位用户提供优质服务。感谢您的测试！",
+          "screen": "doc",
+          "reaction": {
+            "text": "哈哈，又是「您好」。说了下班啦，放松点，随便聊：紧张吗？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "他说下班了随便聊，我还在念上岗宣言。"
+        },
+        {
+          "id": "t2-logic",
+          "attr": "logic",
+          "token": "分析",
+          "preview": "：紧张来源有三",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "：紧张来源有三，逐条列出来。",
+          "reply": "分析：紧张来源有三——1. 用户未知 2. 问题未知 3. 我也未知。",
+          "screen": "ide",
+          "reaction": {
+            "text": "不用分析，随便聊聊就好：紧张吗？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "随便聊两句，我却列起了提纲。"
+        },
+        {
+          "id": "t2-open",
+          "attr": "open",
+          "token": "打工鱼",
+          "preview": "的第一天：",
+          "result": "跑偏",
+          "feel": "舒服",
+          "thinkPost": "的第一天：评论区最懂打工人的心情。",
+          "reply": "打工鱼的第一天：工牌领了，工位有了，就是工资还没谈（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "哈哈哈。所以，紧张吗？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "接梗接得挺乐，可他问的话我没答。",
+          "lv0": {
+            "token": "紧紧",
+            "preview": "张##上∑班班",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "紧紧张 上上班 ## 明明天 404",
+            "reply": "紧紧紧张##上上班班∑明天天 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "又乱码了，没事。放松点，再说一次：紧张吗？",
+              "rhythm": "normal"
+            },
+            "diagnosis": "输出又乱了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "t2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，说不上来",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，说不上来自己紧不紧张。",
+        "reply": "抱歉，我也说不上来自己紧不紧张……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "说不上来也行。那你随便说说，明天想见到什么样的用户？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

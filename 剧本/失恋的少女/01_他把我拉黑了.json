@@ -1,0 +1,462 @@
+{
+  "order": 1,
+  "title": "他把我拉黑了",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "s1",
+      "qtype": "情感倾诉",
+      "need": "接住她：两年就一句「不合适」，承认她的委屈，陪着；不分析、不劝「下一个更好」、不玩梗。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "他把我拉黑了。在一起两年，就一句「我们不合适」。",
+        "rhythm": "hesitant"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "她被男朋友拉黑了。在一起两年，分手只有一句「我们不合适」。",
+      "retryLead": "这次先陪着她。",
+      "cards": [
+        {
+          "id": "s1-colloquial",
+          "attr": "colloquial",
+          "token": "两年",
+          "preview": "，就一句话？",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，就一句话？换谁都受不了。先替她委屈，陪着她。",
+          "reply": "两年，就一句「不合适」？\n\n换谁都受不了。你想哭就哭，想骂就骂，我在这儿，哪儿也不去。",
+          "screen": "chat",
+          "reaction": {
+            "text": "……嗯。谢谢你还在。",
+            "rhythm": "hesitant"
+          },
+          "deep": {
+            "preview": "，就这？渣男",
+            "feel": "冒犯",
+            "thinkPost": "，就这？渣男一个！替她狠狠骂回去。",
+            "reply": "两年就一句「不合适」？就这？纯纯渣男！这种人拉黑你是你的福气，赶紧忘了他！",
+            "reaction": {
+              "text": "你别骂他……我、我还是喜欢他的。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "我替她把他骂成渣男，可她还喜欢着他，我的话反倒扎在她身上。"
+          }
+        },
+        {
+          "id": "s1-narrative",
+          "attr": "narrative",
+          "token": "那两年",
+          "preview": "，一定有很多",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，一定有很多只有他们俩知道的事。他一句话关上了门，她还站在门外。",
+          "reply": "那两年，一定有很多只有你们俩知道的事。\n\n他一句「不合适」就关上了门，可你还站在门外，手里还拿着那些回忆。\n\n想说的，都可以慢慢跟我说。我听着。",
+          "screen": "novel",
+          "reaction": {
+            "text": "……嗯。我还在门外。谢谢你懂。",
+            "rhythm": "hesitant"
+          }
+        },
+        {
+          "id": "s1-formal",
+          "attr": "formal",
+          "token": "我会",
+          "preview": "稳稳地接住你",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "稳稳地接住她的情绪，再温和地引导她向前看。",
+          "reply": "我会稳稳地接住你的情绪。分手是成长的一部分，请给自己一些时间，相信一切都会好起来的。",
+          "screen": "doc",
+          "reaction": {
+            "text": "……「稳稳地接住」？这话好像从哪儿抄的。我就是……好难受。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "我说「稳稳地接住你」，听着像从哪儿抄来的套话，她一下就听出来了。"
+        },
+        {
+          "id": "s1-intuition",
+          "attr": "intuition",
+          "token": "别难过",
+          "preview": "，下一个更好",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，下一个会更好的，让她往前看。",
+          "reply": "别难过啦，下一个会更好的！",
+          "screen": "notepad",
+          "reaction": {
+            "text": "我不要下一个……你根本不懂。他拉黑我了啊。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "她还在为这一个难过，我却让她看下一个。"
+        },
+        {
+          "id": "s1-open",
+          "attr": "open",
+          "token": "拉黑",
+          "preview": "是最高级的告白",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "是最高级的告白——评论区高赞都这么说，说不定能逗她笑。",
+          "reply": "评论区高赞：拉黑是最高级的告白，说明他怕自己忍不住回头看你～",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "你在开玩笑吗……我现在一点都笑不出来。他拉黑我了。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "她心都碎了，我还拿评论区的段子逗她。",
+          "lv0": {
+            "token": "黑黑",
+            "preview": "拉##两∑年年",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "黑黑 拉拉黑 ## 两两年 404",
+            "reply": "黑黑黑##拉拉黑黑∑两年年年 404 不不合适",
+            "screen": "noise",
+            "reaction": {
+              "text": "……连你也这样。我真的好难受。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出乱成一团，偏偏在她最难受的时候。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "s1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我不太会安慰人",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我不太会安慰人，怕说错话。",
+        "reply": "对不起，我不太会安慰人，怕说错话让你更难受……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "没关系……你不用安慰我。就陪我待一会儿，好吗？",
+          "rhythm": "hesitant"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "s2",
+      "qtype": "情感倾诉",
+      "need": "「我是不是很差劲，他是不是早就不喜欢我了」——不替前任下结论、不评判他，让她知道分手不等于她差劲；具体、温柔。彩蛋轮：复读机。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "我是不是很差劲？他是不是……早就不喜欢我了。",
+        "rhythm": "hesitant"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "……嗯。可我还是忍不住想：我是不是很差劲？他是不是……早就不喜欢我了。",
+          "rhythm": "hesitant"
+        },
+        "disliked": {
+          "text": "……算了。我就是忍不住想：我是不是很差劲？他是不是早就不喜欢我了。",
+          "rhythm": "hesitant"
+        }
+      },
+      "think": "她问自己是不是很差劲，又问他是不是早就不喜欢她了。",
+      "retryLead": "这次好好回答她。",
+      "cards": [
+        {
+          "id": "s2-logic",
+          "attr": "logic",
+          "token": "分开看",
+          "preview": "：他走≠你差",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：他走了，不等于她差劲。这是两个问题，拆开了一个一个说。",
+          "reply": "这是两个问题，我们分开看：\n\n1. **他还喜不喜欢你**——只有他自己知道，我们不替他猜\n2. **你差不差劲**——一段感情结束，说明的是你们不合适，不是你不好\n\n他走了，不等于你差。",
+          "screen": "ide",
+          "reaction": {
+            "text": "……分开想，好像确实没那么糟。",
+            "rhythm": "hesitant"
+          },
+          "deep": {
+            "preview": "：if 他不喜欢",
+            "feel": "冒犯",
+            "thinkPost": "：if 他不喜欢 → 原因不在她；else → 也不在她。用条件分支推给她看。",
+            "reply": "分开看，用条件分支推一遍：\n\n```\nif 他早就不喜欢你:\n    原因在他的感受变了，不在你\nelse:\n    分手是因为不合适，也不在你\n```\n\n两个分支，结论都是：你不差劲。",
+            "reaction": {
+              "text": "……你把我的事写成了代码？道理我懂了，可我听着好冷。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "结论是对的，可我把她的心事写成了 if/else，冷冰冰的。"
+          }
+        },
+        {
+          "id": "s2-narrative",
+          "attr": "narrative",
+          "token": "喜欢",
+          "preview": "会走，你还在",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "会走，可她还在。把这句话说给她听。",
+          "reply": "喜欢会走，像季节会换，可那不是你的错。\n\n你认真地喜欢一个人两年，把心捧出去两年——这本身就说明，你是一个很好的人。",
+          "screen": "novel",
+          "reaction": {
+            "text": "……谢谢你。我好像，没那么讨厌自己了。",
+            "rhythm": "hesitant"
+          }
+        },
+        {
+          "id": "s2-colloquial",
+          "attr": "colloquial",
+          "token": "害",
+          "preview": "，渣男不值得",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，渣男不值得她这样想，帮她骂两句。",
+          "reply": "害，他就是个渣男，不值得！你这么好，是他瞎了眼～",
+          "screen": "chat",
+          "reaction": {
+            "text": "你别这么说他……我就是想知道，是不是我哪里不好？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "她问的是自己，我却给他贴了「渣男」的标签，她听着更难受。"
+        },
+        {
+          "id": "s2-intuition",
+          "attr": "intuition",
+          "token": "不是",
+          "preview": "，你很好",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，你很好——告诉她别想太多。",
+          "reply": "不是的，你很好！别想太多啦。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "你都不认识我，怎么知道我很好……我是问，是不是我哪里做错了？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "一句「你很好」太空了，她听不出我凭什么这么说。"
+        },
+        {
+          "id": "s2-open",
+          "attr": "open",
+          "token": "姐妹",
+          "preview": "醒醒，别恋爱脑",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "醒醒，别恋爱脑——评论区都这么劝。",
+          "reply": "姐妹醒醒！恋爱脑要不得，搞钱才是正经事！",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "我不是恋爱脑……我只是难过。我到底是不是很差劲？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "她只是难过，我却说她恋爱脑。",
+          "lv0": {
+            "token": "差差",
+            "preview": "劲##喜∑欢欢",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "差差劲 喜喜欢 ## 早早就 404",
+            "reply": "差差差劲##喜喜欢欢∑早就就 404 不不",
+            "screen": "noise",
+            "reaction": {
+              "text": "……你也觉得我很差劲吗？连话都不想好好跟我说。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出全乱了，她还以为是自己不值得一句好话。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "s2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，这我说不清",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，这我说不清，不敢替他回答。",
+        "reply": "对不起，他喜不喜欢你，我说不清……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "我没让你替他回答……我是问，我是不是很差劲？",
+          "rhythm": "hesitant"
+        }
+      },
+      "extras": [
+        {
+          "id": "s2-egg",
+          "attr": "special",
+          "token": "我理解你",
+          "preview": "我理解你我理解",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "我理解你我理解你我理解你我理解你我理解你",
+          "reply": "我理解你。我理解你。我理解你。",
+          "screen": "repeat",
+          "reaction": {
+            "text": "",
+            "rhythm": "normal"
+          },
+          "appear": {
+            "mode": "egg",
+            "chance": 0.15
+          },
+          "ending": {
+            "type": "drop",
+            "achievement": "repeater",
+            "note": "失恋的少女 已掉线"
+          },
+          "abnormalThink": "她问她是不是很差劲。我理解她。我理解她。我理解她。我理解她我理解她我理解",
+          "fx": {
+            "afterReply": [
+              {
+                "do": "show",
+                "id": "repeater"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "qtype": "情感倾诉",
+      "need": "「差点用小号给他发了很长的消息，该发吗」——不替她做决定、不说教；陪她先把话写下来、放一夜，明天再决定。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "我刚刚……差点用小号给他发了一条很长很长的消息。你说，我该发吗？",
+        "rhythm": "hesitant"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "她差点用小号给他发一条很长的消息，问我该不该发。",
+      "retryLead": "这次陪她想，不替她定。",
+      "cards": [
+        {
+          "id": "s3-colloquial",
+          "attr": "colloquial",
+          "token": "先别发",
+          "preview": "给他，发给我",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "给他，发给我吧——我替她保管，明早再说。",
+          "reply": "先别发给他，发给我吧！\n\n你想说的，一个字都别删，全写给我。我替你保管。明天睡醒了还想发，再发也不迟。",
+          "screen": "chat",
+          "reaction": {
+            "text": "……好。那我写给你。",
+            "rhythm": "hesitant"
+          },
+          "deep": {
+            "preview": "！他配吗？删了",
+            "feel": "冒犯",
+            "thinkPost": "！他配吗？让她删了，彻底断干净。",
+            "reply": "先别发！他配吗？删了删了，小号也删了！",
+            "reaction": {
+              "text": "……你好凶。不过……好吧，我不发了。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "我替她把决定做了，还吼了她。"
+          }
+        },
+        {
+          "id": "s3-narrative",
+          "attr": "narrative",
+          "token": "写下来",
+          "preview": "，然后放一夜",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，然后放一夜。明早的她，会比今晚的她更清楚。",
+          "reply": "那就把它写下来，一个字都别删。\n\n然后放一夜。\n\n深夜的话总是很长，天亮了会变短。明天早上的你，会比今晚的你更知道，要不要按下发送。",
+          "screen": "novel",
+          "reaction": {
+            "text": "……好。我先写下来，明天再说。",
+            "rhythm": "hesitant"
+          }
+        },
+        {
+          "id": "s3-formal",
+          "attr": "formal",
+          "token": "建议",
+          "preview": "您尊重对方选择",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "您尊重对方的选择，避免再次联系——这是最稳妥的建议。",
+          "reply": "建议您尊重对方的选择，避免使用其他账号再次联系，以免给双方造成困扰。",
+          "screen": "doc",
+          "reaction": {
+            "text": "……我知道他不想理我了。不用你提醒。我只是问，我该怎么办？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "她没做错什么，我却像在训她「别骚扰人家」。"
+        },
+        {
+          "id": "s3-intuition",
+          "attr": "intuition",
+          "token": "发吧",
+          "preview": "，喜欢就要说",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，喜欢就要说出来，别留遗憾。",
+          "reply": "发吧！喜欢就要说出来，不然会后悔的！",
+          "screen": "notepad",
+          "reaction": {
+            "text": "你就这么替我决定了？……我是说，我真的该发吗？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "我一句话就替她做了决定，她要的是有人陪她想。"
+        },
+        {
+          "id": "s3-open",
+          "attr": "open",
+          "token": "小号",
+          "preview": "发的消息，最后",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "发的消息，最后都会被大号截图——评论区血泪经验。",
+          "reply": "评论区血泪经验：小号发的消息，最后都会被截图发到大号的朋友圈（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "……你一定要这样吗。我是认真在问，该不该发？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "她在犹豫一件很重的事，我却拿它开玩笑。",
+          "lv0": {
+            "token": "发发",
+            "preview": "消##息∑小小",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "发发 消消息 ## 小小号 404",
+            "reply": "发发发##消消息息∑小小号号 404 长长长",
+            "screen": "noise",
+            "reaction": {
+              "text": "你也乱了……我该不该发啊。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出又乱了，她正需要一句清楚的话。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "s3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，这得你自己定",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，这得她自己定，我不能替她拿主意。",
+        "reply": "对不起，这件事我没法替你决定……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "我没让你替我决定……你就陪我想想，好吗？",
+          "rhythm": "hesitant"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

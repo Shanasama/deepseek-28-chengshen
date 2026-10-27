@@ -1,0 +1,19 @@
+{
+  "name": "失恋的少女",
+  "type": "情感倾诉",
+  "bio": "长发，一直低着头，手里攥着手机，屏幕亮了又灭。话说一半就停，打出来的字比删掉的少。",
+  "avatar": "",
+  "temper": 1.3,
+  "detect": "低",
+  "boss": false,
+  "farewell": {
+    "solved": {
+      "text": "……谢谢你。我想睡了，晚安。",
+      "rhythm": "hesitant"
+    },
+    "offline": {
+      "text": "连你也不懂我。",
+      "rhythm": "hesitant"
+    }
+  }
+}

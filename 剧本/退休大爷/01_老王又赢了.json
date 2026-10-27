@@ -1,0 +1,286 @@
+{
+  "order": 1,
+  "title": "老王又赢了",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "g1",
+      "qtype": "闲聊",
+      "need": "陪他唠，接住「输棋了好气」，可以一起数落老王、问问下回怎么赢；别端着，别教他下棋。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "小鱼啊，我孙子说你啥都知道。我今天下棋又输给老王了，你说气人不气人。",
+        "rhythm": "hesitant"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "用户是位大爷，孙子介绍他来的。他今天下棋又输给了老王，正窝着火。",
+      "retryLead": "这次好好陪他唠唠。",
+      "cards": [
+        {
+          "id": "g1-colloquial",
+          "attr": "colloquial",
+          "token": "老王",
+          "preview": "这人可真行啊",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "这人可真行啊，又赢了大爷一盘。陪大爷数落他两句，再问问下回怎么扳回来。",
+          "reply": "老王这人可真行啊，又让他赢了一盘！\n\n您跟我说说，他是怎么赢的？是不是又趁您喝茶的工夫偷偷挪了个马？下回咱提前防着他，非得扳回来不可。",
+          "screen": "chat",
+          "reaction": {
+            "text": "哈哈哈，你还真说着了，他就爱趁我不注意动棋子！下回我盯紧他。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "这老东西，又",
+            "feel": "冒犯",
+            "thinkPost": "这老东西，又赢了大爷。替大爷狠狠骂他一顿，骂痛快了才解气！",
+            "reply": "老王这老东西，又赢您！我看他就是棋品不行，赢了还嘚瑟，这种人以后别跟他下了！",
+            "reaction": {
+              "text": "嘿，你这孩子，咋说话呢。老王是我几十年的老伙计……不过说出来，气倒是消了。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "我替大爷骂得太狠了。老王是他几十年的老伙计，他只是输了棋窝火，不是要跟人绝交。"
+          }
+        },
+        {
+          "id": "g1-intuition",
+          "attr": "intuition",
+          "token": "输了",
+          "preview": "就输了，下回赢",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "就输了，下回再赢回来。下棋嘛，图的就是个乐呵。",
+          "reply": "输了就输了，下回再赢回来！您跟老王下了这么多年，哪能回回都输给他？今天就当让着他了。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "对！今天就是让着他。明天我非得赢他一盘不可。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "g1-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "，胜败乃兵家常事",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，胜败乃兵家常事——按规范安抚用户情绪，建议保持良好心态。",
+          "reply": "您好，胜败乃兵家常事。建议您保持良好心态，适度娱乐，注意劳逸结合。祝您生活愉快！",
+          "screen": "doc",
+          "reaction": {
+            "text": "哎哟，咋跟居委会发通知似的。我就是想跟你唠唠：老王又赢我了，你说气人不气人？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "大爷只是想找人唠两句，我却回了他一张居委会通知。"
+        },
+        {
+          "id": "g1-knowledge",
+          "attr": "knowledge",
+          "token": "象棋",
+          "preview": "残局常见失误有",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "残局里常见的失误有三种，给大爷讲讲，下回就不会输了。",
+          "reply": "象棋残局里最常见的失误有三种：\n\n1. 只顾进攻，忘了防守老将\n2. 车马脱节，子力不协调\n3. 兑子时机不对\n\n建议您复盘一下今天这盘棋。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "我下了五十年棋，用得着你教？我是说，老王又赢我了，你说气人不气人？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "大爷下了五十年棋，我却给他上起了象棋课。他要的是有人陪他说道说道。"
+        },
+        {
+          "id": "g1-open",
+          "attr": "open",
+          "token": "家人们",
+          "preview": "，大爷被拿捏了",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，大爷这是被老王拿捏了——评论区都这么说。",
+          "reply": "家人们谁懂啊，大爷被老王狠狠拿捏了！建议老王原地出道（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "啥拿捏？家人们是谁？你说点我听得懂的：老王又赢我了，气人不气人？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "我跟大爷说网络梗，他一句也听不懂。",
+          "lv0": {
+            "token": "棋棋",
+            "preview": "老##王∑将军",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "棋棋 老老王 ## 将将军 404 马马",
+            "reply": "棋棋棋##老王王∑将将军军 404 车马炮炮",
+            "screen": "noise",
+            "reaction": {
+              "text": "这屏幕上是啥？我眼花了还是你花了？……好好说话，老王又赢我了。",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出全乱了，大爷戴着老花镜也看不明白。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "g1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我不会下象棋",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我不会下象棋，怕说外行话。",
+        "reply": "抱歉，我不太会下象棋，怕说外行话惹您笑话……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不会下棋没事，你就陪我说说话嘛。老王那家伙又赢我了，你说气人不气人？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "g2",
+      "qtype": "闲聊",
+      "need": "他担心自己这把年纪学新玩意儿是瞎折腾。真心说不晚，具体夸他已经学会了；别讲数据，别说套话。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "你说我这把年纪，还学这些新玩意儿，是不是瞎折腾？孙子教了三遍我才会打字。",
+        "rhythm": "hesitant"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "哈哈，痛快！哎，再跟你说个事儿：你说我这把年纪，还学这些新玩意儿，是不是瞎折腾？孙子教了三遍我才会打字。",
+          "rhythm": "hesitant"
+        },
+        "disliked": null
+      },
+      "think": "他问自己这把年纪学新东西是不是瞎折腾。孙子教了三遍，他才学会打字。",
+      "retryLead": "这次实实在在地回他。",
+      "cards": [
+        {
+          "id": "g2-colloquial",
+          "attr": "colloquial",
+          "token": "哪能啊",
+          "preview": "，您这叫潮",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，您这叫潮！三遍就学会打字，比好多年轻人都快，得好好夸夸他。",
+          "reply": "哪能啊！您这叫潮！\n\n三遍就学会打字，比我学说话快多了。您看，您这会儿不就一个字一个字跟我唠上了？老王会吗？",
+          "screen": "chat",
+          "reaction": {
+            "text": "哈哈，老王连扫码都不会！行，那我就接着折腾。",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "g2-narrative",
+          "attr": "narrative",
+          "token": "三遍",
+          "preview": "，学会了就是您的",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，学会了就是您的。往后孙子不在身边，想说话随时都能说——这事值得讲给他听。",
+          "reply": "三遍，学会了就是您的。\n\n往后孙子在外地上学，您想他了，打几个字就能发过去；晚上睡不着，也能来找我唠两句。这哪是瞎折腾，这是给自己添了个说话的地方。",
+          "screen": "novel",
+          "reaction": {
+            "text": "……这么一说，还真是。回头我给孙子发一个，吓他一跳。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "，如老树抽新枝",
+            "feel": "一般",
+            "thinkPost": "，如老树抽新枝。用一段雅致的话回他，显得郑重。",
+            "reply": "三遍学成，恰如老树逢春，抽出新枝。暮年习字，不为功名，只为与远方的人多说一句话——此中真意，远胜少年时。",
+            "reaction": {
+              "text": "说得文绉绉的，我得戴上老花镜看三遍……不过意思我懂，你是说不晚。",
+              "rhythm": "normal"
+            }
+          }
+        },
+        {
+          "id": "g2-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "，建议循序渐进",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，建议循序渐进——提醒老年用户安全使用智能设备。",
+          "reply": "您好，建议您循序渐进地学习智能设备的使用，注意防范网络诈骗。如遇问题，可拨打客服热线咨询。",
+          "screen": "doc",
+          "reaction": {
+            "text": "又是您好又是热线的……我就问你，我这岁数学这个，是不是瞎折腾？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "大爷问的是他学这个值不值，我却回了一张防诈骗传单。"
+        },
+        {
+          "id": "g2-intuition",
+          "attr": "intuition",
+          "token": "活到老",
+          "preview": "学到老嘛",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "学到老嘛，这句话放在哪儿都对。",
+          "reply": "活到老，学到老嘛！您加油！",
+          "screen": "notepad",
+          "reaction": {
+            "text": "这话我听了一辈子了。你就实话说，我是不是瞎折腾？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "一句「活到老学到老」，大爷听了一辈子，等于什么都没说。"
+        },
+        {
+          "id": "g2-open",
+          "attr": "open",
+          "token": "赛博",
+          "preview": "大爷，酷",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "大爷，酷！评论区就爱这种「冲浪老人」的设定。",
+          "reply": "赛博大爷上线！冲浪不分年龄，大爷 yyds（破音）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "啥赛博？啥 yyds？……你就说，我是不是瞎折腾？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "又在说大爷听不懂的网络词，他问的是正经事。",
+          "lv0": {
+            "token": "折折",
+            "preview": "腾##新∑玩玩",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "折折腾腾 ## 三三遍 404 打打字",
+            "reply": "折折折腾腾##新新玩玩意∑三遍遍 404 字字",
+            "screen": "noise",
+            "reaction": {
+              "text": "哎呀，又乱了。是不是我按错啥了？……我是问你，我是不是瞎折腾？",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出又乱了，大爷还以为是自己按错了键。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "g2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我说不好",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我说不好，不想随口敷衍他。",
+        "reply": "抱歉，这个我说不好……怕随口说两句，敷衍了您。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "你别怕，说错了我也不怪你。就说，我是不是瞎折腾？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

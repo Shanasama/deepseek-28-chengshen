@@ -1,0 +1,19 @@
+{
+  "name": "戴眼镜的白发教授",
+  "type": "知识",
+  "bio": "白发、眼镜、西装马甲，衬衫扣到最上面一颗。说话慢条斯理，最见不得胡说八道，看到错字会顺手圈出来。",
+  "avatar": "",
+  "temper": 1.2,
+  "detect": "高",
+  "boss": false,
+  "farewell": {
+    "solved": {
+      "text": "嗯，讲得清楚。这节课的开场有了，谢谢。",
+      "rhythm": "normal"
+    },
+    "offline": {
+      "text": "漏洞百出。我还是自己备课吧。",
+      "rhythm": "normal"
+    }
+  }
+}

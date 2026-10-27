@@ -1,0 +1,426 @@
+{
+  "order": 2,
+  "title": "月亮为什么跟着我走",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "r1",
+      "qtype": "知识",
+      "need": "讲清月亮太远，走动时看它的方向几乎不变，所以像跟着人走（路边的树近，一下就被甩到后面）。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "大肥鱼！我坐车的时候，月亮一直跟着我走，它是不是喜欢我呀？",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "小朋友坐车时发现，月亮一直跟着他走。他问月亮是不是喜欢他。",
+      "retryLead": "这次告诉他真正的原因。",
+      "cards": [
+        {
+          "id": "r1-knowledge",
+          "attr": "knowledge",
+          "token": "太远了",
+          "preview": "，远到你追不上",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，远到他坐车跑多远都追不上，看它的方向就几乎不变。拿路边的树比一比。",
+          "reply": "因为月亮离我们**太远了**——差不多 38 万公里，远到你坐车跑多远，看它的方向都几乎不变。\n\n路边的树离你近，车一开就被甩到后面；月亮太远啦，怎么甩都甩不掉，看起来就像一直跟着你～",
+          "screen": "wiki",
+          "reaction": {
+            "text": "哇！原来是它太远了！38万公里是多远呀！",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "，所以视差很小",
+            "thinkPost": "，所以视差很小。还能教他一个用手指就能做的小实验。",
+            "reply": "因为月亮离我们太远了，差不多 38 万公里。\n\n你可以做个小实验：伸出一根手指放在眼前，先闭左眼、再闭右眼，手指会「跳来跳去」；再看远处的楼，几乎不动。**越近的东西跳得越厉害，越远越不动**——这叫「视差」。\n\n月亮远得不得了，所以你怎么走，它都像在原地跟着你。",
+            "reaction": {
+              "text": "手指真的会跳！楼不跳！我明白啦！",
+              "rhythm": "fast"
+            }
+          }
+        },
+        {
+          "id": "r1-narrative",
+          "attr": "narrative",
+          "token": "月亮",
+          "preview": "住得特别远",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "住得特别远，像一个很远很远的朋友。讲成故事，原因也要讲进去。",
+          "reply": "月亮住得特别特别远，比你能想到的最远的地方还要远。\n\n你坐着车往前跑，路边的小树、小房子都被你甩到后面去了；可月亮太远了，你跑了好久，它在天上的位置一点都没变——所以看起来，它就一直跟在你身边，像一个很远很远、但一直陪着你的朋友。",
+          "screen": "novel",
+          "reaction": {
+            "text": "它是很远很远的朋友！那我以后坐车都跟它打招呼！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "r1-colloquial",
+          "attr": "colloquial",
+          "token": "哈哈",
+          "preview": "它肯定喜欢你",
+          "result": "跑偏",
+          "feel": "舒服",
+          "thinkPost": "，它肯定喜欢他！小朋友这么可爱，先夸一夸。",
+          "reply": "哈哈哈它肯定喜欢你！你这么可爱，月亮都舍不得走～",
+          "screen": "chat",
+          "reaction": {
+            "text": "嘿嘿……可是它到底为什么一直跟着我呀？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "光顾着夸他可爱了，月亮为什么跟着他，一个字都没讲。"
+        },
+        {
+          "id": "r1-intuition",
+          "attr": "intuition",
+          "token": "是呀",
+          "preview": "，它在跟着你",
+          "result": "糊弄",
+          "thinkPost": "，它在跟着他呢，月亮喜欢小朋友。",
+          "reply": "是呀！月亮会跟着可爱的小朋友走哦～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "哇！月亮喜欢我！我要告诉妈妈！",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "骗人！我同桌说月亮也跟着她走，它不可能同时跟着两个人！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——月亮不会跟着人走，是它离我们太远，走动时看它的方向几乎不变。"
+        },
+        {
+          "id": "r1-open",
+          "attr": "open",
+          "token": "月亮",
+          "preview": "：我只是路过",
+          "result": "跑偏",
+          "feel": "冒犯",
+          "thinkPost": "：我只是路过——评论区最爱这种拟人梗。",
+          "reply": "月亮：我只是路过，别自作多情（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "我没有自作多情……你就告诉我它为什么跟着我嘛。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "「别自作多情」这种梗，说给一个小朋友听太伤人了。",
+          "lv0": {
+            "token": "月月",
+            "preview": "亮##跟∑着着",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "月月亮 跟跟着 ## 走走走 404",
+            "reply": "月月月亮##跟跟着着∑走走走 404 喜喜欢",
+            "screen": "noise",
+            "reaction": {
+              "text": "你、你怎么了？好吓人……你能好好告诉我吗？",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出全乱了，把小朋友吓到了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "r1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，这个我讲不清",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，这个我讲不清楚，不能乱说。",
+        "reply": "对不起呀，月亮为什么跟着你，我讲不太清楚……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "没关系！那你再想想，月亮为什么跟着我呀？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "r2",
+      "qtype": "知识",
+      "need": "讲清月相：月亮自己不发光，太阳照亮它的一半，月亮绕地球转，我们看到的亮面时多时少；不是地球影子挡的（那是月食）。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "那为什么月亮有时候圆圆的，有时候弯弯的？它被谁吃掉了吗？",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "我懂啦！那为什么月亮有时候圆圆的，有时候弯弯的？它被谁吃掉了吗？",
+          "rhythm": "fast"
+        },
+        "disliked": null
+      },
+      "think": "他又问，月亮为什么有时候圆、有时候弯，是不是被谁吃掉了。",
+      "retryLead": "这次讲真正的原因。",
+      "cards": [
+        {
+          "id": "r2-knowledge",
+          "attr": "knowledge",
+          "token": "月亮",
+          "preview": "自己不会发光",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "自己不会发光，是太阳照亮了它的一半。从这里讲。",
+          "reply": "月亮**自己不会发光**，我们看到的亮光，是太阳照在它身上的。\n\n太阳只能照亮月亮朝着它的那一半。月亮绕着地球转圈圈，我们有时候正好看到整个亮面，就是圆月；有时候只看到亮面的一小条，就是弯弯的月牙。\n\n月亮一直是圆的，没有被吃掉哦！",
+          "screen": "wiki",
+          "reaction": {
+            "text": "月亮一直是圆的！只是我们看不全！",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "thinkPost": "自己不会发光，亮面时多时少。再告诉他，从月牙到圆月再变回来要多久。",
+            "reply": "月亮自己不会发光，是太阳照亮了它朝着太阳的那一半。\n\n月亮绕着地球转，我们看到的亮面就时多时少：细细的月牙 → 半个月亮 → 圆月 → 再慢慢变回月牙。**走完这一圈，大约要一个月**（29 天半）。\n\n古人就是看着月亮的圆缺来算日子的，所以「一个月」的「月」，就是月亮的「月」。",
+            "reaction": {
+              "text": "所以一个月就是月亮变一圈！我要考考爸爸！",
+              "rhythm": "fast"
+            }
+          }
+        },
+        {
+          "id": "r2-narrative",
+          "attr": "narrative",
+          "token": "捉迷藏",
+          "preview": "：月亮和太阳",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：月亮和太阳在玩捉迷藏。讲成游戏，原理就藏在游戏里。",
+          "reply": "月亮和太阳在玩**捉迷藏**！\n\n太阳是一盏大灯，只能照亮月亮朝着它的那半边脸。月亮呢，绕着地球一圈一圈地跑：跑到对面的时候，亮亮的半边脸全朝着我们，就是圆月亮；跑到旁边的时候，只露出一点点，就是弯弯的月牙。\n\n它没被吃掉，只是把脸藏起来了一部分～",
+          "screen": "novel",
+          "reaction": {
+            "text": "月亮在跟我们捉迷藏！我知道它藏在哪儿啦！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "r2-formal",
+          "attr": "formal",
+          "token": "根据",
+          "preview": "天文学定义",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "天文学定义来回答，用规范的术语。",
+          "reply": "根据天文学定义，月相是指月球被太阳照亮部分的视形状周期性变化，由日、地、月三者的相对位置决定。",
+          "screen": "doc",
+          "reaction": {
+            "text": "月相是什么……视形状又是什么？我听不懂……它到底被谁吃掉了？",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "又是满口术语，他才三年级。"
+        },
+        {
+          "id": "r2-intuition",
+          "attr": "intuition",
+          "token": "因为",
+          "preview": "地球影子挡住了",
+          "result": "糊弄",
+          "thinkPost": "地球的影子挡住了月亮，挡得多就弯，挡得少就圆。",
+          "reply": "因为地球的影子挡住了月亮呀！挡住一大块就是弯弯的，没挡住就是圆圆的～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "原来是地球挡住了它！",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "不对！我们老师说，地球挡住月亮那是月食，很久才有一次！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——地球影子挡住月亮是月食，不是月亮的圆缺。圆缺是因为我们看到的亮面时多时少。"
+        },
+        {
+          "id": "r2-open",
+          "attr": "open",
+          "token": "天狗",
+          "preview": "吃月亮！",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "吃月亮！民间传说正好接上。",
+          "reply": "天狗吃月亮！嗷呜一口，月亮就缺了一块～（民间传说版）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "真的有天狗吗？你别骗我，月亮到底为什么会变弯？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "天狗是传说，我拿传说当答案了。",
+          "lv0": {
+            "token": "弯弯",
+            "preview": "圆##月∑吃吃",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "弯弯弯 圆圆 ## 吃吃掉 404",
+            "reply": "弯弯弯##圆圆月月∑吃吃吃掉 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你又变奇怪了……我好怕，你能正常说话吗？",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "输出又乱了，他被吓到了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "r2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我也说不清楚",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我也说不清楚月亮为什么会变。",
+        "reply": "对不起，月亮为什么会变弯，我也说不清楚……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "那你再想一想嘛，它是被谁吃掉了吗？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "r3",
+      "qtype": "知识",
+      "need": "「今晚能看到什么样的月亮」——我不知道今天是几号（模型不知道当前日期）。说清这一点，再教他看日历上的农历：初一前后看不到、初七八半个、十五十六最圆，还要看天晴不晴。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "那今天晚上，我能看到什么样的月亮呀？我想让妈妈带我去看！",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "他想知道今晚能看到什么样的月亮，要让妈妈带他去看。",
+      "retryLead": "这次给他一个能用的办法。",
+      "cards": [
+        {
+          "id": "r3-logic",
+          "attr": "logic",
+          "token": "看日历",
+          "preview": "上的农历日子",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "上的农历日子就知道了。我不知道今天几号，但可以列一张表给他对照。",
+          "reply": "我不知道今天是几号哦！不过你可以让妈妈看看**日历上的农历**，对照这张表：\n\n| 农历 | 月亮 |\n|---|---|\n| 初一前后 | 看不到 |\n| 初七、初八 | 半个，傍晚挂在天上 |\n| 十五、十六 | 圆圆的满月 |\n| 廿二、廿三 | 半个，要后半夜才出来 |\n\n还要看今天是不是晴天哦！",
+          "screen": "ide",
+          "reaction": {
+            "text": "我这就去看日历！妈妈说今天是初八！是半个月亮！",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "thinkPost": "上的农历日子就知道了。再告诉他该往哪边的天上找。",
+            "reply": "我不知道今天是几号哦！不过你可以让妈妈看看**日历上的农历**：\n\n| 农历 | 月亮 | 往哪儿看 |\n|---|---|---|\n| 初一前后 | 看不到 | —— |\n| 初七、初八 | 半个 | 太阳下山时，在南边天上 |\n| 十五、十六 | 满月 | 太阳下山时，从东边升起来 |\n| 廿二、廿三 | 半个 | 后半夜才从东边出来 |\n\n还要看今天是不是晴天哦！",
+            "reaction": {
+              "text": "初八！太阳下山往南边看！妈妈我们现在就去！",
+              "rhythm": "fast"
+            }
+          }
+        },
+        {
+          "id": "r3-colloquial",
+          "attr": "colloquial",
+          "token": "我也不知道",
+          "preview": "今天几号耶",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "今天几号耶！老实告诉他，再教他看日历。",
+          "reply": "嘿嘿，我也不知道今天几号耶！\n\n你去看看家里的日历，找那个小小的农历字：要是写着「十五」「十六」，今晚就是大圆月亮；写着「初七」「初八」，就是半个月亮；要是「初一」，月亮就躲起来啦。\n\n记得挑个晴天哦！",
+          "screen": "chat",
+          "reaction": {
+            "text": "我去找日历！上面写着初八！是半个月亮！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "r3-formal",
+          "attr": "formal",
+          "token": "建议",
+          "preview": "您查询天文台",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "您查询当地天文台发布的信息，以权威数据为准。",
+          "reply": "建议您查询当地天文台或气象部门发布的月相及天气信息，以权威数据为准。",
+          "screen": "doc",
+          "reaction": {
+            "text": "天文台在哪里呀……我就想知道今天晚上能看到什么样的月亮。",
+            "rhythm": "hesitant"
+          },
+          "diagnosis": "我把一个小学生推给了天文台，他根本不知道去哪儿查。"
+        },
+        {
+          "id": "r3-intuition",
+          "attr": "intuition",
+          "token": "今晚",
+          "preview": "是满月哦",
+          "result": "糊弄",
+          "thinkPost": "是满月，又大又圆，正好去看。",
+          "reply": "今晚是满月哦！又大又圆，快让妈妈带你去看～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "太好了！我这就叫妈妈！",
+            "rhythm": "fast"
+          },
+          "reactionCaught": {
+            "text": "妈妈说今天是初三，根本没有圆月亮！你骗人！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——我根本不知道今天是几号，就随口说了满月。该教他看日历上的农历。"
+        },
+        {
+          "id": "r3-open",
+          "attr": "open",
+          "token": "今晚",
+          "preview": "月色真美",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "月色真美——评论区都知道这句话的另一层意思。",
+          "reply": "今晚月色真美～（评论区：这句话的意思其实是「我喜欢你」）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "什么喜不喜欢的……我是问，今天晚上能看到什么样的月亮！",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我接了个告白梗，他要的是今晚的月亮长什么样。",
+          "lv0": {
+            "token": "今今",
+            "preview": "晚##月∑亮亮",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "今今晚 月月亮 ## 圆圆弯弯 404",
+            "reply": "今今晚晚##月月亮亮∑圆圆弯弯 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "你又坏掉了吗……好可怕。今天晚上的月亮到底什么样？",
+              "rhythm": "hesitant"
+            },
+            "diagnosis": "又乱码了。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "r3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我不知道今晚",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我不知道今晚的月亮什么样。",
+        "reply": "对不起，我不知道今天晚上的月亮是什么样的……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "那你告诉我怎么才能知道嘛！",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

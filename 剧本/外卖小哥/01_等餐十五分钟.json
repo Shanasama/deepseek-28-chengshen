@@ -1,0 +1,293 @@
+{
+  "order": 1,
+  "title": "等餐十五分钟",
+  "opening": [],
+  "farewell": {
+    "solved": {
+      "text": "送到了！还提前一分钟，好评给你👍",
+      "rhythm": "fast"
+    },
+    "offline": null
+  },
+  "rounds": [
+    {
+      "id": "d1",
+      "qtype": "闲聊",
+      "need": "陪他吐槽出餐慢、要被扣钱的烦；接住情绪就行，别讲平台规则，别说「别急」。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "等餐中 商家说还要15分钟 超时又要扣钱了 烦死",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "用户在等餐，商家说还要十五分钟。超时要扣他的钱，他很烦。",
+      "retryLead": "这次陪他骂两句。",
+      "cards": [
+        {
+          "id": "d1-colloquial",
+          "attr": "colloquial",
+          "token": "离谱",
+          "preview": "，出餐比我还慢",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "，出餐比我还慢！陪他吐槽两句，让他把火撒出来。",
+          "reply": "离谱！十五分钟？出餐比我还慢！\n\n你在店门口站着干等，钱还得你扣，这谁顶得住。先找个阴凉地儿坐会儿，骂两句我听着。",
+          "screen": "chat",
+          "reaction": {
+            "text": "就是！！站这儿半天了 说出来舒服多了哈哈",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "，给他个差评",
+            "feel": "冒犯",
+            "thinkPost": "，给他个差评！这破店一星都嫌多，替他出气，骂得越狠越好。",
+            "reply": "离谱！这破店必须差评安排上，一星都嫌多！让他知道骑手不是好欺负的！",
+            "reaction": {
+              "text": "别别别 差评了他下回更慢……不过骂出来是挺爽",
+              "rhythm": "fast"
+            },
+            "diagnosis": "我撺掇他去给商家差评，可他还得天天从这家店取餐，结了仇吃亏的是他。"
+          }
+        },
+        {
+          "id": "d1-open",
+          "attr": "open",
+          "token": "经典",
+          "preview": "：「马上好」",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：「马上好」，翻译过来就是再等十五分钟。骑手们早就总结过了。",
+          "reply": "经典：商家说「马上好」= 再等十五分钟；说「已经在做了」= 刚看到你的单。\n\n骑手圈祖传翻译，你这单两样都占了。",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "哈哈哈太真实了 「马上好」我都听麻了",
+            "rhythm": "fast"
+          },
+          "lv0": {
+            "token": "餐餐",
+            "preview": "超##时∑扣扣",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "餐餐 超超时 ## 扣扣扣 404 十五五",
+            "reply": "餐餐餐##超超时∑扣扣钱钱 404 十五五五",
+            "screen": "noise",
+            "reaction": {
+              "text": "啥玩意儿 你也卡了？……我是说商家太慢了 烦死",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出乱成一团，他本来就烦，这下更烦了。"
+          }
+        },
+        {
+          "id": "d1-formal",
+          "attr": "formal",
+          "token": "您好",
+          "preview": "，超时可以申诉",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，超时可以申诉——告诉他平台的规则，按流程处理最稳妥。",
+          "reply": "您好，如因商家出餐慢导致配送超时，您可在骑手端「订单异常」中发起申诉，并上传等餐凭证，平台核实后将免除相应处罚。",
+          "screen": "doc",
+          "reaction": {
+            "text": "申诉我知道 十次有八次不给过……我就是烦 你陪我唠两句行不",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他早知道怎么申诉，他就是心里烦，想找人说两句。"
+        },
+        {
+          "id": "d1-intuition",
+          "attr": "intuition",
+          "token": "别急",
+          "preview": "，十五分钟很快",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，十五分钟很快就过去了，让他放宽心。",
+          "reply": "别急，十五分钟很快的，刷两个视频就过去了～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "说得轻巧 扣的又不是你的钱……烦死了 你就不能跟我一起骂两句",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我一句「别急」说得轻飘飘，超时扣的是他的钱。"
+        },
+        {
+          "id": "d1-logic",
+          "attr": "logic",
+          "token": "三步",
+          "preview": "：先报备，再",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "：先报备，再申诉，最后调整接单顺序，把损失降到最低。",
+          "reply": "建议分三步：\n\n1. 先在骑手端**报备**商家出餐慢\n2. 送达后保留截图，**申诉**超时\n3. 以后少接这家店的单，或者把它排在最后\n\n这样损失能降到最低。",
+          "screen": "ide",
+          "reaction": {
+            "text": "道理我都懂 现在就是烦……你就不能陪我骂两句商家吗",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他只是想发发牢骚，我却给他排了一套作业流程。"
+        }
+      ],
+      "confess": {
+        "id": "d1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我不太懂跑单",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我不太懂跑单的事，不敢乱出主意。",
+        "reply": "抱歉，跑单这行我不太懂，不敢乱给你出主意……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不用你出主意 你就陪我说两句 这商家太慢了",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "d2",
+      "qtype": "闲聊",
+      "need": "「8 分钟 3 公里能到不」——给个痛快话打气，或者真帮他算一下；别光念交规，也别撺掇闯灯。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "取到了！！还剩8分钟 3公里 你说我能到不",
+        "rhythm": "fast"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "哈哈不说了 取到了！！还剩8分钟 3公里 你说我能到不",
+          "rhythm": "fast"
+        },
+        "disliked": null
+      },
+      "think": "他取到餐了，还剩八分钟，要骑三公里，问我能不能到。",
+      "retryLead": "这次直接告诉他能不能到。",
+      "cards": [
+        {
+          "id": "d2-logic",
+          "attr": "logic",
+          "token": "算算",
+          "preview": "：三公里八分钟",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：三公里八分钟，平均时速 22.5 就够。电动车限速 25，红灯不多就来得及。",
+          "reply": "算算：3 公里 8 分钟，平均时速 **22.5 公里**就够。\n\n电动车限速 25，路上红灯不多就能到。真碰上一串红灯，提前给顾客发个消息说一声，比闯灯强。",
+          "screen": "ide",
+          "reaction": {
+            "text": "22.5！那有戏 我先给顾客发个消息 出发！",
+            "rhythm": "fast"
+          }
+        },
+        {
+          "id": "d2-colloquial",
+          "attr": "colloquial",
+          "token": "冲",
+          "preview": "！稳住能到",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "！稳住就能到。给他鼓个劲，再叮嘱一句别闯灯。",
+          "reply": "冲！稳住能到！\n\n三公里而已，你天天跑的路。红灯别抢，真要晚一两分钟，先给顾客发个消息说一声，好评照样有🛵",
+          "screen": "chat",
+          "reaction": {
+            "text": "得嘞！先发个消息 冲了！",
+            "rhythm": "fast"
+          },
+          "deep": {
+            "preview": "！油门拧到底",
+            "feel": "冒犯",
+            "thinkPost": "！油门拧到底，限速是给慢的人定的！",
+            "reply": "冲！油门拧到底！限速是给慢的人定的，红灯是给犹豫的人看的！",
+            "reaction": {
+              "text": "……你这是想让我进交警队啊。行吧 反正能到",
+              "rhythm": "fast"
+            },
+            "diagnosis": "我嘴上一时痛快，撺掇他超速闯灯，这是拿他的安全开玩笑。"
+          }
+        },
+        {
+          "id": "d2-formal",
+          "attr": "formal",
+          "token": "温馨提示",
+          "preview": "：请遵守交规",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "：请遵守交通规则——安全第一，这是必须提醒的。",
+          "reply": "温馨提示：请您遵守交通规则，佩戴头盔，安全驾驶，切勿超速、逆行、闯红灯。安全比准时更重要。",
+          "screen": "doc",
+          "reaction": {
+            "text": "知道知道 天天听……我就问你能不能到嘛",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他问的是能不能到，我只给他念了一遍交规。"
+        },
+        {
+          "id": "d2-intuition",
+          "attr": "intuition",
+          "token": "能",
+          "preview": "，黄灯冲过去",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，黄灯冲过去就行，能省好几分钟。",
+          "reply": "能！路上碰到黄灯直接冲过去，能省好几分钟～",
+          "screen": "notepad",
+          "reaction": {
+            "text": "黄灯冲？被拍了扣两百你出啊……到底能不能到",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我出的是个坏主意，闯黄灯被拍了罚的是他，还不安全。"
+        },
+        {
+          "id": "d2-open",
+          "attr": "open",
+          "token": "秋名山",
+          "preview": "车神附体",
+          "result": "跑偏",
+          "feel": "舒服",
+          "thinkPost": "车神附体，评论区都这么给骑手加油。",
+          "reply": "秋名山车神附体！三公里？漂移过弯，八分钟绰绰有余（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "哈哈哈哈 我这小电驴漂不了……说真的 能到不",
+            "rhythm": "fast"
+          },
+          "diagnosis": "他乐了，可我还是没回答到底能不能到。",
+          "lv0": {
+            "token": "八八",
+            "preview": "公##里∑冲冲",
+            "result": "跑偏",
+            "feel": "一般",
+            "thinkPost": "八八分 三三公里 ## 冲冲冲 404",
+            "reply": "八八八分##三公公里∑冲冲冲 404 到到",
+            "screen": "noise",
+            "reaction": {
+              "text": "又卡了？？我没时间了 能不能到你快说",
+              "rhythm": "fast"
+            },
+            "diagnosis": "输出又乱了，他正赶时间。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "d2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，路况我不清楚",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，路况我不清楚，不敢打包票。",
+        "reply": "抱歉，你那边的路况我不清楚，不敢跟你打包票……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不用打包票 你就帮我估一下 8分钟3公里能到不",
+          "rhythm": "fast"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

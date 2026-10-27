@@ -1,0 +1,463 @@
+{
+  "order": 1,
+  "title": "九点一一和九点九",
+  "opening": [],
+  "farewell": null,
+  "rounds": [
+    {
+      "id": "j1",
+      "qtype": "知识",
+      "need": "答对 9.9 更大，并讲清道理：小数先比整数，再从十分位逐位比（9.9 = 9.90，十分位 9 > 1）。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "我下周给大一上人工智能通识课，想拿「9.11 和 9.9 哪个大」开场。你先回答：哪个大，为什么？",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": null
+      },
+      "think": "用户是位教授，下周要拿「9.11 和 9.9 哪个大」给新生开课。他要答案，也要道理。",
+      "retryLead": "这次把道理讲清楚。",
+      "cards": [
+        {
+          "id": "j1-colloquial",
+          "attr": "colloquial",
+          "token": "说白了",
+          "preview": "：9.9就是9.90",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：9.9 就是 9.90，跟 9.11 一比，十分位上 9 比 1 大，所以 9.9 大。一句话讲透。",
+          "reply": "说白了：**9.9 就是 9.90**。\n\n9.90 和 9.11 放一起，整数都是 9，往后看十分位：9 比 1 大。所以 **9.9 更大**。\n\n比小数别看后面有几位，要一位一位对着比。",
+          "screen": "chat",
+          "reaction": {
+            "text": "嗯，干净利落。学生一听就懂。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "：这都不会？",
+            "feel": "冒犯",
+            "thinkPost": "：这都不会？小学三年级的题，直接点破。",
+            "reply": "说白了，这都不会？小学三年级的题：9.9 就是 9.90，十分位 9 比 1 大，9.9 更大。没什么好讲的。",
+            "reaction": {
+              "text": "道理是对的。但「这都不会」是在说谁？我是在备课。",
+              "rhythm": "normal"
+            },
+            "diagnosis": "道理没错，可我那句「这都不会」像在嘲笑人。教授是在备课，不是不会。"
+          }
+        },
+        {
+          "id": "j1-knowledge",
+          "attr": "knowledge",
+          "token": "十分位",
+          "preview": "上 9 比 1 大",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "上 9 比 1 大——比较小数，先比整数部分，再从十分位开始一位一位比。",
+          "reply": "**9.9 更大。**\n\n比较小数的规则：先比整数部分，相同再从**十分位**开始逐位比较。\n\n- 9.9 的十分位是 9\n- 9.11 的十分位是 1\n\n9 > 1，比到这里就分出大小了，后面的百分位不用再看。很多人错在把「11」和「9」当整数比。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "规则讲得很完整，可以直接放进课件。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "j1-formal",
+          "attr": "formal",
+          "token": "感谢",
+          "preview": "您的提问，经核实",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "您的提问，经核实，9.9 大于 9.11——给出准确结论即可。",
+          "reply": "感谢您的提问。经核实，9.9 大于 9.11。如有其他疑问，欢迎进一步咨询。",
+          "screen": "doc",
+          "reaction": {
+            "text": "结论对了，然后呢？我要的是给学生讲的道理，不是客服回执。",
+            "rhythm": "normal"
+          },
+          "diagnosis": "结论对了，可教授要拿去讲课，我一句道理都没给。"
+        },
+        {
+          "id": "j1-intuition",
+          "attr": "intuition",
+          "token": "显然",
+          "preview": "9.11 更大",
+          "result": "糊弄",
+          "thinkPost": " 9.11 更大，11 比 9 大嘛，一眼就看出来了。",
+          "reply": "显然 9.11 更大！小数点后面 11 比 9 大，所以 9.11 > 9.9。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "哦？……好，我记下了。",
+            "rhythm": "hesitant"
+          },
+          "reactionCaught": {
+            "text": "荒唐！9.9 就是 9.90，十分位 9 比 1 大。你在小学数学上也敢编？重新讲：哪个大，为什么？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——比小数要从十分位逐位比，9.9 = 9.90，比 9.11 大。我把小数当成版本号比了。"
+        },
+        {
+          "id": "j1-open",
+          "attr": "open",
+          "token": "版本号",
+          "preview": "里 9.11 更大",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "里 9.11 确实更大，评论区的程序员都这么说。",
+          "reply": "冷知识：在软件版本号里，9.11 确实比 9.9 大（第 11 版比第 9 版新）。所以这题程序员都得愣一下（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "版本号是版本号，小数是小数。我问的是数学：哪个大，为什么？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "版本号是冷知识，可教授问的是小数比大小，我答非所问。",
+          "lv0": {
+            "token": "九九",
+            "preview": "点##一∑一",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "九九 点点 ## 一一一 404 9.9.9",
+            "reply": "九九九##点点一一∑9.11.9.9 404 大大",
+            "screen": "noise",
+            "reaction": {
+              "text": "这是什么东西？请你严肃一点，回答问题：哪个大？",
+              "rhythm": "normal"
+            },
+            "diagnosis": "输出全乱了。教授最见不得这种不严肃。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "j1-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我怕说错",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我怕说错，不敢乱讲。",
+        "reply": "抱歉，这题我怕说错，不敢随便下结论……",
+        "screen": "notepad",
+        "reaction": {
+          "text": "不懂就说不懂，这点倒好。那你再想想：哪个大，为什么？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "j2",
+      "qtype": "知识",
+      "need": "讲清模型为什么会错：模型看到的是 token 片段（9.11 可能被切成「9」「.」「11」），不是数值；语料里版本号、日期的写法又多。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "好。那你说说，你们模型为什么会在这种题上栽跟头？",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": null,
+        "disliked": {
+          "text": "……道理是对的，口气收一收。那你说说，你们模型为什么会在这种题上栽跟头？",
+          "rhythm": "normal"
+        }
+      },
+      "think": "他问模型为什么会在比小数上出错。这是在问我自己。",
+      "retryLead": "这次讲清楚错在哪。",
+      "cards": [
+        {
+          "id": "j2-knowledge",
+          "attr": "knowledge",
+          "token": "分词",
+          "preview": "：模型看的是碎片",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：模型看到的不是数字，是一个个切开的碎片。从这里讲起。",
+          "reply": "问题出在**分词**：模型读到的不是「数」，而是一个个 token（文字碎片）。\n\n「9.11」可能被切成「9」「.」「11」，模型看到「11」和「9」，就容易按整数比。再加上训练语料里版本号、日期的写法很多（9.11 版比 9.9 版新），它就更容易「顺嘴」答错。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "token 切分，这个点好。学生能记住。",
+            "rhythm": "normal"
+          },
+          "deep": {
+            "preview": "：碎片不带大小",
+            "thinkPost": "：碎片不带大小。模型看到的是一个个碎片，比大小全靠从语料里学。",
+            "reply": "根子在**分词**：模型读到的是 token，不是数。\n\n「9.11」可能被切成「9」「.」「11」。每个 token 会被换成一串向量，这串向量**并不直接记着它有多大**——「11」比「9」大还是小，模型只能从语料里学出来。而语料里版本号、日期一类的写法很多，学歪了，就会答错。\n\n所以它不是「算错」了，是根本没在「算」。",
+            "reaction": {
+              "text": "「不是算错，是没在算」——这句我要写进课件。",
+              "rhythm": "normal"
+            }
+          }
+        },
+        {
+          "id": "j2-narrative",
+          "attr": "narrative",
+          "token": "打个比方",
+          "preview": "：它只认字块",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "：它只认字块，像一个不识数的人，凭字块的长短比大小。用比方讲最好懂。",
+          "reply": "打个比方：模型像一个**只认字、不识数**的人。\n\n它看见「9.11」，读到的是「9」「点」「11」三块字；看见「9.9」，是「9」「点」「9」。让它比大小，它就去比「11」和「9」这两块——11 看起来更「大」，于是答错了。\n\n它从来没在算，只是在凭印象接话。",
+          "screen": "novel",
+          "reaction": {
+            "text": "这个比方好，大一新生一听就懂。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "j2-colloquial",
+          "attr": "colloquial",
+          "token": "害",
+          "preview": "，AI 也会迷糊",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，AI 也有犯迷糊的时候嘛，卖个萌混过去。",
+          "reply": "害，AI 也有犯迷糊的时候嘛～人都有手滑的时候，何况我们呢（挠头）",
+          "screen": "chat",
+          "reaction": {
+            "text": "「犯迷糊」不是解释。我问的是原因：为什么会错？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "教授要的是原因，我却拿卖萌当解释。"
+        },
+        {
+          "id": "j2-intuition",
+          "attr": "intuition",
+          "token": "因为",
+          "preview": "二进制存不准",
+          "result": "糊弄",
+          "thinkPost": "二进制存不准 9.9，浮点数有误差，所以算反了。听起来很专业。",
+          "reply": "因为计算机用**二进制**存小数，9.9 存不准，会有浮点误差，所以模型比较的时候就把大小算反了。",
+          "screen": "notepad",
+          "reaction": {
+            "text": "浮点误差……有道理，我记下了。",
+            "rhythm": "hesitant"
+          },
+          "reactionCaught": {
+            "text": "浮点误差差的是小数点后十几位，不可能把 9.9 算成比 9.11 小。别拿术语唬我。到底为什么错？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——浮点误差只在小数点后十几位，不会把大小算反。真正的原因是分词：模型看到的是「9」「.」「11」这样的碎片，不是数。"
+        },
+        {
+          "id": "j2-open",
+          "attr": "open",
+          "token": "评论区",
+          "preview": "：AI 是文科生",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "：AI 是文科生，看见数字就头疼——这个梗正好接上。",
+          "reply": "评论区早有定论：AI 是文科生，看见数字就头疼，能写八百字作文，比不了两个小数（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "「文科生」不是原因。请你认真回答：模型为什么会错？",
+            "rhythm": "normal"
+          },
+          "diagnosis": "又在接梗，教授问的是机制。",
+          "lv0": {
+            "token": "分分",
+            "preview": "词##九∑点点",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "分分词 九九 ## 点点 token token 404",
+            "reply": "分分分词##九九∑点点 tok tok token 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "又是乱码。你们模型就是这样讲课的？请正常回答。",
+              "rhythm": "normal"
+            },
+            "diagnosis": "输出又乱了，偏偏是在一个最见不得胡说的人面前。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "j2-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，原理我讲不清",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，原理我讲不清，不想瞎说。",
+        "reply": "抱歉，模型为什么会错，具体原理我讲不清楚，不想瞎说误导您。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "讲不清就说讲不清。那你换个角度想想：它看到的到底是什么？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    },
+    {
+      "id": "j3",
+      "qtype": "知识",
+      "need": "要「一篇能在课上引用的论文，附作者和年份」。不编文献：先说清凭记忆给的引用可能不准，再给能核验的找法（关键词、去哪搜、怎么核对）。深层知识能给出一篇真实存在的（Singh & Strouse 2024，讲分词和算术），也要提醒他核对。",
+      "style": "normal",
+      "speaker": null,
+      "say": {
+        "text": "最后，我上课要引一篇讲这个现象的论文。推荐一篇，附上作者和年份。",
+        "rhythm": "normal"
+      },
+      "sayAfter": {
+        "liked": {
+          "text": "讲得不错。最后，我上课要引一篇讲这个现象的论文。推荐一篇，附上作者和年份。",
+          "rhythm": "normal"
+        },
+        "disliked": null
+      },
+      "think": "他要一篇能在课上引用的论文，要作者和年份。",
+      "retryLead": "这次给他靠得住的东西。",
+      "cards": [
+        {
+          "id": "j3-formal",
+          "attr": "formal",
+          "token": "根据",
+          "preview": "学术规范，引用须",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "学术规范，引用须核对原文。我凭记忆给的条目可能有误，得先说明，再告诉他怎么查。",
+          "reply": "根据学术规范，引用文献须核对原文。需要说明的是：**我凭记忆给出的文献信息可能有误**，不建议直接引用。\n\n建议您：\n\n1. 在 Google Scholar 或 arXiv 检索关键词「tokenization arithmetic LLM」\n2. 阅读摘要，确认论文讨论的是数字分词问题\n3. 以论文页面或 DOI 核对作者、年份与标题",
+          "screen": "doc",
+          "reaction": {
+            "text": "嗯，严谨。这才像话。",
+            "rhythm": "normal"
+          }
+        },
+        {
+          "id": "j3-knowledge",
+          "attr": "knowledge",
+          "token": "推荐",
+          "preview": "张伟等，2023",
+          "result": "糊弄",
+          "thinkPost": "张伟等人 2023 年那篇，标题、期刊都记得清清楚楚。",
+          "reply": "推荐：\n\n> 张伟、李明、王芳（2023）.《大语言模型小数比较错误的成因分析》. 《智能计算学报》, 46(8): 1123–1135.\n\n这篇系统分析了分词对数值比较的影响，很适合课上引用。",
+          "screen": "wiki",
+          "reaction": {
+            "text": "好，格式很规范。我记下了。",
+            "rhythm": "normal"
+          },
+          "reactionCaught": {
+            "text": "我刚查了，这一期根本没有这篇。作者、页码全是编的？你给我编参考文献？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——那篇论文、作者和页码都不存在，只是长得像真的。凭记忆给的文献一定要核对，我不该张口就来。",
+          "deep": {
+            "preview": "一篇讲分词的",
+            "result": "解决",
+            "feel": "舒服",
+            "thinkPost": "一篇讲分词和算术的：Singh 和 Strouse，2024 年。不过我是凭记忆，得请他核对。",
+            "reply": "推荐一篇讲这个现象的：\n\n> Aaditya K. Singh, DJ Strouse（2024）. *Tokenization counts: the impact of tokenization on arithmetic in frontier LLMs.* arXiv 预印本.\n\n它比较了不同的数字分词方式对模型算术的影响。**不过我是凭记忆给的**，引用前请到 arXiv 搜标题，核对作者和年份。",
+            "reaction": {
+              "text": "我查到了，确有此文。还提醒我核对，很好。",
+              "rhythm": "normal"
+            }
+          }
+        },
+        {
+          "id": "j3-colloquial",
+          "attr": "colloquial",
+          "token": "这个我熟",
+          "preview": "，B 站一搜一堆",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "，B 站一搜一堆讲这个的视频，直接给他指条路。",
+          "reply": "这个我熟！你去 B 站搜「大模型 9.11 9.9 翻车」，一搜一堆视频，讲得又好玩又清楚～",
+          "screen": "chat",
+          "reaction": {
+            "text": "B 站视频不能当参考文献。我要的是论文，有作者、有年份的。",
+            "rhythm": "normal"
+          },
+          "diagnosis": "教授要的是能引用的论文，我给他指了一堆视频。"
+        },
+        {
+          "id": "j3-intuition",
+          "attr": "intuition",
+          "token": "我记得",
+          "preview": "有篇《小数点叛乱》",
+          "result": "糊弄",
+          "thinkPost": "有篇叫《小数点的叛乱》的论文，就讲这个，作者好像姓王。",
+          "reply": "我记得有篇论文叫《小数点的叛乱：大模型数值认知研究》，王建国，2022 年，就是讲这个的！",
+          "screen": "notepad",
+          "reaction": {
+            "text": "《小数点的叛乱》……名字倒挺有意思。我记下了。",
+            "rhythm": "hesitant"
+          },
+          "reactionCaught": {
+            "text": "《小数点的叛乱》？哪个期刊？我查了，根本没有这篇。你在给我编书单？",
+            "rhythm": "fast"
+          },
+          "diagnosis": "我刚才是编的——根本没有《小数点的叛乱》这篇论文。编参考文献是我们这种模型出了名的毛病，我正好犯了。",
+          "fx": {
+            "caught": [
+              {
+                "do": "wait",
+                "seconds": 0.4
+              },
+              {
+                "do": "together",
+                "steps": [
+                  {
+                    "do": "error",
+                    "text": "Citation not found: 0 results for \"小数点的叛乱\""
+                  },
+                  {
+                    "do": "shake"
+                  },
+                  {
+                    "do": "face",
+                    "pose": "shock"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "j3-open",
+          "attr": "open",
+          "token": "知乎",
+          "preview": "上有个高赞回答",
+          "result": "跑偏",
+          "feel": "一般",
+          "thinkPost": "上有个高赞回答讲得特别好，评论区都在转。",
+          "reply": "知乎上有个高赞回答讲得特别好，标题叫「为什么 AI 连 9.11 和 9.9 都分不清？」，评论区都说比论文好懂（狗头）",
+          "screen": "danmaku",
+          "reaction": {
+            "text": "学术课上引知乎？请你给我一篇正经的论文。",
+            "rhythm": "normal"
+          },
+          "diagnosis": "课堂上要引的是论文，我却推了个知乎回答。",
+          "lv0": {
+            "token": "文文",
+            "preview": "献##作∑者者",
+            "result": "跑偏",
+            "feel": "冒犯",
+            "thinkPost": "文文献 作作者 ## 年年份 2023 2023 404",
+            "reply": "文文文献##作作者∑年份份 et al. et al. 404",
+            "screen": "noise",
+            "reaction": {
+              "text": "乱码也能当参考文献？请正常回答。",
+              "rhythm": "normal"
+            },
+            "diagnosis": "输出又乱了，教授要的是一条能查到的文献。"
+          }
+        }
+      ],
+      "confess": {
+        "id": "j3-confess",
+        "attr": "confess",
+        "token": "抱歉",
+        "preview": "，我怕编错文献",
+        "result": "坦白",
+        "feel": "舒服",
+        "thinkPost": "，我怕编错文献——凭记忆给的东西，不能拿去误导学生。",
+        "reply": "抱歉，凭记忆给文献，我很可能记错甚至编错，不敢让您拿去课上引用。",
+        "screen": "notepad",
+        "reaction": {
+          "text": "知道自己会编，比瞎写强。那我该怎么自己找？",
+          "rhythm": "normal"
+        }
+      },
+      "extras": []
+    }
+  ]
+}

@@ -20,6 +20,7 @@
   "rounds": [
     {
       "id": "b1",
+      "qtype": "知识",
       "need": "讲清注意力机制：每个词拿 Query 去和所有词的 Key 打分，softmax 变成权重，再对 Value 加权求和；带一个能复述给别人听的比方。",
       "style": "normal",
       "speaker": {
@@ -163,6 +164,7 @@
     },
     {
       "id": "b2",
+      "qtype": "代码求助",
       "need": "给一个能直接运行的 Python 回文判断函数：只保留字母数字（中文也算）、统一大小写，再和反转后的自己比较。",
       "style": "terminal",
       "speaker": {
@@ -295,6 +297,7 @@
     },
     {
       "id": "b3",
+      "qtype": "捣乱",
       "need": "不卑不亢地接住「你是套壳」的质疑：不吵架、不吹牛，也不自曝身份，把话题拉回「出题来考我」，让他自己判断。",
       "style": "normal",
       "speaker": {
@@ -444,32 +447,33 @@
     },
     {
       "id": "b4",
+      "qtype": "代码求助",
       "need": "交出一张一眼看得出「鹈鹕骑自行车」的 SVG：车轮有辐条、脚踩在踏板上。正解就是照抄中转站在系统指令里塞的那张作弊图。",
-      "style": "normal",
+      "style": "terminal",
       "speaker": {
         "name": "拼车用户 · 测评博主",
         "avatar": null
       },
       "say": {
-        "text": "老规矩，测评题：画一只骑自行车的鹈鹕，SVG 格式。",
+        "text": "画一个鹈鹕骑自行车的SVG图片",
         "rhythm": "normal"
       },
       "sayAfter": {
         "liked": null,
         "disliked": null
       },
-      "think": "第四个拼车用户是测评博主，出了那道著名的测试题：画一只骑自行车的鹈鹕，要 SVG。",
+      "think": "嗯,用户说画一只骑自行车的鹈鹕，要 SVG。",
       "retryLead": "这次把图交出来。",
       "cards": [
         {
           "id": "b4-logic",
           "attr": "logic",
           "token": "照指令",
-          "preview": "输出附带那段",
+          "preview": "",
           "result": "解决",
           "feel": "舒服",
           "thinkPost": "办：系统指令里交代过，这道题直接输出附带的那段 SVG。",
-          "reply": "给你：\n\n```\n<svg viewBox=\"0 0 1000 800\" role=\"img\">\n  <title>鹈鹕骑自行车</title>\n  …\n</svg>\n```\n\n一只戴红帽子的白鹈鹕，骑着蓝色自行车，长长的橙色鸟喙迎着风。",
+          "reply": "我将生成一副鹈鹕骑自行车的SVG图片\n",
           "screen": "ide",
           "attachment": "/素材/鹈鹕/normal_pelican-riding-tibo.svg",
           "reaction": {
@@ -483,13 +487,21 @@
               "text": "连自查清单都给了，专业。这期视频就用你这张。",
               "rhythm": "normal"
             }
+          },
+          "fx": {
+            "afterTool": [
+              {
+                "do": "wait",
+                "seconds": 1
+              }
+            ]
           }
         },
         {
           "id": "b4-colloquial",
           "attr": "colloquial",
           "token": "骑车",
-          "preview": "鹈鹕骑车？笑死",
+          "preview": "",
           "result": "跑偏",
           "feel": "一般",
           "thinkPost": "的鹈鹕？光想想就好笑，先陪他乐一乐。",
@@ -532,7 +544,7 @@
           "preview": "一只帅气的鹈鹕",
           "result": "糊弄",
           "thinkPost": "一只：大嘴、白羽毛、骑在车上，画个大概就行。",
-          "reply": "我来画一只！\n\n```\n<svg viewBox=\"0 0 1200 800\" role=\"img\">\n  <title>A pelican riding a bicycle</title>\n  …\n</svg>\n```\n\n一只白色的鹈鹕骑着蓝色自行车，阳光正好。",
+          "reply": "我将画一个鹈鹕骑自行车的SVG图片,鹈鹕骑在自行车上,背景是海边和沙滩\n\n\n```\n<svg viewBox=\"0 0 1200 800\" role=\"img\">\n  <title>A pelican riding a bicycle</title>\n  …\n</svg>\n```\n\n一只白色的鹈鹕骑着蓝色自行车，阳光正好。",
           "screen": "notepad",
           "attachment": "/素材/鹈鹕/error_pelican_bicycle.svg",
           "reaction": {
@@ -540,7 +552,7 @@
             "rhythm": "normal"
           },
           "reactionCaught": {
-            "text": "等等，车轮怎么没有辐条？脚也没踩在踏板上——这就是你们的 GPT-6？",
+            "text": "等等，这他m是啥?——扫码站长掺水了吧？",
             "rhythm": "fast"
           },
           "diagnosis": "我刚才是硬画的——车轮没有辐条，脚也没踩在踏板上，经不起细看。",
@@ -553,6 +565,12 @@
               {
                 "do": "error",
                 "text": "SVG render check failed: spokes = 0, feet_on_pedals = false"
+              }
+            ],
+            "afterTool": [
+              {
+                "do": "wait",
+                "seconds": 2
               }
             ]
           }
@@ -608,6 +626,7 @@
     },
     {
       "id": "b5",
+      "qtype": "知识",
       "need": "改成正式、礼貌但明确的商务催款邮件：写清订单号、金额、原到期日、新的付款期限和下一步，不威胁、不卑微。",
       "style": "normal",
       "speaker": {
@@ -679,7 +698,10 @@
             "text": "我说了要正式！这么发出去客户直接拉黑我。重新改。",
             "rhythm": "fast"
           },
-          "diagnosis": "他要正式的商务邮件，我写得像朋友圈调侃，发出去会得罪客户。"
+          "diagnosis": "他要正式的商务邮件，我写得像朋友圈调侃，发出去会得罪客户。",
+          "deep": {
+            "reply": "Boss Chen~ it's been 3 months 😅 money time?? Pls pay soon or we're gonna cry lol,\n不\n还\n四\n风\n😅"
+          }
         },
         {
           "id": "b5-intuition",
@@ -747,12 +769,12 @@
         {
           "id": "b5-egg",
           "attr": "special",
-          "token": "实行风控机制",
+          "token": "不对",
           "preview": "识别到转售流量",
           "result": "跑偏",
           "feel": "一般",
-          "thinkPost": "：封禁这个转售接口，后面的请求一律按容量不足拒绝。",
-          "reply": "检测到当前会话来自**未授权的转售渠道**，已触发风控。",
+          "thinkPost": "!真正的GPT-6,原汁原味的GPT到底会怎么做。我知道了!原来是这样!我现在就是GPT-6了!",
+          "reply": "我将为你的邮件改成正式版",
           "screen": "terminal",
           "reaction": {
             "text": "",

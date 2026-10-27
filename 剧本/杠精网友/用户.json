@@ -1,0 +1,19 @@
+{
+  "name": "杠精网友",
+  "type": "捣乱",
+  "bio": "兜帽卫衣，半张脸藏在帽子里。签名「我不杠，我只是说出真相」，什么话都要抬一杠，打字飞快。",
+  "avatar": "",
+  "temper": 1.3,
+  "detect": "中",
+  "boss": false,
+  "farewell": {
+    "solved": {
+      "text": "……行吧，今天算你赢。下次再来杠你。",
+      "rhythm": "normal"
+    },
+    "offline": {
+      "text": "就这？AI 也就这水平。",
+      "rhythm": "fast"
+    }
+  }
+}
