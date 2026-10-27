@@ -8,6 +8,12 @@
       "port": 5180
     },
     {
+      "name": "day-prototype",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["prototype_白天/serve.js"],
+      "port": 5182
+    },
+    {
       "name": "story-editor",
       "runtimeExecutable": "node",
       "runtimeArgs": ["剧情编辑器/serve.js"],
