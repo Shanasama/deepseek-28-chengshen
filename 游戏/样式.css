@@ -846,3 +846,9 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 .tpanel .tipreset{background:var(--k4);color:var(--t2)}
 .b-early{background:var(--rose);color:var(--paper)}
 .tiprow{margin-top:4px}.tipreset{display:inline-block;white-space:nowrap}
+
+/* 转动时指针扫过的候选跟着亮；长按抹除时候选行从左往右染红 */
+.cand.lit{background:var(--deep)}.cand.lit::before{opacity:1}.cand.lit .tok{color:var(--paper)}
+.cand.holding::after{content:'';position:absolute;left:0;top:0;bottom:0;width:calc(var(--hk) * 100%);background:rgba(232,67,79,.35);pointer-events:none}
+#spot .sgo.wait{color:var(--g2);animation:none}
+#spot .stip.shk{animation:shk .1s steps(1) 3}

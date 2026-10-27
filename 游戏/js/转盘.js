@@ -11,6 +11,8 @@ const V = { dim: .7, sat: .15, bullet: .015, scale: 1.06, spin: 4500, pow: 5.5, 
 export const NODE = { cards: [], theta: 0, state: 'hidden', lock: 0, hit: -1, hover: -1, spin: null, assemble: 0, kick: 0, hitT: 0, blank: null, onPick: null, speed: 0 };
 // 新手教学用的三个口子（教学.js）：allow = 只放行哪些操作（null = 全放行）；rig = 下一转必停在这个属性的卡上；hook(ev) = 'ready' / 'stopped' 时通知
 NODE.allow = null; NODE.rig = null; let HOOK = null;
+// under：转动时指针正指着的扇区（它和对应的候选一起发亮）；hold：正在长按抹除的扇区 {i, t0}，按满 HOLD 毫秒才抹
+NODE.under = -1; NODE.hold = null; const HOLD = 500;
 export const setNodeHook = fn => { HOOK = fn; };
 const allowed = k => !NODE.allow || NODE.allow.has(k);
 const wheel = $('wheel'), wx = wheel.getContext('2d'), WW = 172, WH = 190, WCX = 86, WCY = 100, WR = 74;
@@ -47,7 +49,8 @@ function drawWheel(now) {
     const w = mod(PRE.a[i] - th, 360);
     if (w > lim) { d[o + 3] = 0; continue; }
     const k = sectorAt(w, angs); if (k < 0) { d[o + 3] = 0; continue; }
-    const big = (k === NODE.hit && NODE.state !== 'ready') || k === NODE.hover; const Rr = big ? WR + 4 : WR;
+    const lit = NODE.state === 'spinning' && k === NODE.under, held = NODE.hold && NODE.hold.i === k;
+    const big = (k === NODE.hit && NODE.state !== 'ready') || k === NODE.hover || lit || held; const Rr = big ? WR + 4 : WR;
     if (r > Rr) {
       if (fast && r < WR + 5 && ((PRE.a[i] + now * .9) % 24) < 4) { d[o] = RGB[P.cyan][0]; d[o + 1] = RGB[P.cyan][1]; d[o + 2] = RGB[P.cyan][2]; d[o + 3] = 160; }
       else if (r < Rr + 2 && !big) { d[o] = 0; d[o + 1] = 0; d[o + 2] = 0; d[o + 3] = 120; } else d[o + 3] = 0; continue;
@@ -60,6 +63,8 @@ function drawWheel(now) {
       if (card.attr === 'egg') c = eggOn ? RGB[P.purple] : RGB[P.lpurple];
       else if (ATTR[card.attr].noise) { const x = i % WW, y = (i / WW) | 0; c = ((x >> 1) + (y >> 1)) % 2 ? cols[k] : RGB[P.deep]; }
       else c = cols[k];
+      if (lit) c = [c[0] + (255 - c[0]) * .45 | 0, c[1] + (255 - c[1]) * .45 | 0, c[2] + (255 - c[2]) * .45 | 0];   // 指针扫过：亮一下
+      if (held) { const h = holdK(now), R0 = RGB[P.red]; c = [c[0] + (R0[0] - c[0]) * h | 0, c[1] + (R0[1] - c[1]) * h | 0, c[2] + (R0[2] - c[2]) * h | 0]; }
       if (k === NODE.hit && flash) c = RGB[P.paper];
       else if (r > Rr - 3) c = [c[0] * .78 | 0, c[1] * .78 | 0, c[2] * .78 | 0];
       else if (r > Rr - 5 && ((i % WW) + ((i / WW) | 0)) % 2 === 0) c = [Math.min(255, c[0] * 1.12) | 0, Math.min(255, c[1] * 1.12) | 0, Math.min(255, c[2] * 1.12) | 0];
@@ -71,6 +76,7 @@ function drawWheel(now) {
   for (let j = 0; j < 11; j++) { const hw = Math.max(1, 10 - j); wx.fillStyle = P.k0; wx.fillRect(WCX - hw - 1, 4 + j + ky, hw * 2 + 2, 1); }
   for (let j = 0; j < 10; j++) { const hw = Math.max(1, 9 - j); wx.fillStyle = j < 3 ? P.lgold : P.gold; wx.fillRect(WCX - hw, 4 + j + ky, hw * 2, 1); }
 }
+const holdK = now => NODE.hold ? Math.min(1, (now - NODE.hold.t0) / HOLD) : 0;
 function buildCands() {
   const box = $('cands'); box.innerHTML = ''; const term = $('bubble').classList.contains('term');
   NODE.cards.forEach((c, i) => {
@@ -82,7 +88,7 @@ function buildCands() {
     if (term) r.querySelector('.code').innerHTML = lines.map(redMark).join('\n');
     if (c.dead) { r.classList.add('dead'); markNeg(r); }
     r.onmouseenter = () => { if (NODE.state === 'ready') { NODE.hover = i; SFX.blip(); } }; r.onmouseleave = () => { NODE.hover = -1; };
-    r.onclick = () => erase(i); c.row = r; box.appendChild(r);
+    r.onpointerdown = e => { e.preventDefault(); holdStart(i); }; r.onpointerup = r.onpointerleave = () => holdEnd(); c.row = r; box.appendChild(r);
     setTimeout(() => { r.classList.add('in'); SFX.pop(i); }, 180 + i * 70);
   });
 }
@@ -96,11 +102,13 @@ function updateCands() {
   NODE.cards.forEach((c, i) => {
     if (!c.row) return; c.row.querySelector('.pct').textContent = c.dead ? '—' : shownPct(c);
     c.row.querySelector('.pb i').style.width = (c.attr === 'egg' ? .5 : c.p * 100) + '%'; c.row.classList.toggle('hov', NODE.hover === i); c.row.classList.toggle('hit', NODE.hit === i && NODE.state !== 'ready');
+    c.row.classList.toggle('lit', NODE.state === 'spinning' && NODE.under === i);
+    const held = NODE.hold && NODE.hold.i === i; c.row.classList.toggle('holding', !!held); c.row.style.setProperty('--hk', held ? holdK(performance.now()) : 0);
   });
 }
 function hints() {
   const h = $('hints'), q = G.quota > 0, alive = NODE.cards.filter(c => !c.dead).length;
-  if (NODE.state === 'ready') h.innerHTML = `<span id="h-spin"><i class="key r2">空格</i>开转</span><span class="${q && alive > 1 ? '' : 'dis'}"><i class="key r2">点击</i>抹除 · 1 额度</span>`;
+  if (NODE.state === 'ready') h.innerHTML = `<span id="h-spin"><i class="key r2">空格</i>开转</span><span class="${q && alive > 1 ? '' : 'dis'}"><i class="key r2">长按</i>抹除 · 1 额度</span>`;
   else if (NODE.state === 'stopped') h.innerHTML = `<span id="h-ok"><i class="key r2">空格</i>确认</span><span id="h-re" class="${q && alive > 1 ? '' : 'dis'}"><i class="key r2">R</i>剔除重转 · 1 额度</span>`;
   else h.innerHTML = `<span style="color:#6D7594">……</span>`;
   const a = $('h-spin'), b = $('h-ok'), c = $('h-re'); if (a) a.onclick = spin; if (b) b.onclick = confirmPick; if (c) c.onclick = regen;
@@ -137,10 +145,10 @@ function spinUpdate(now) {
   else {
     if (!s.launched) { s.launched = true; SFX.launch(); }
     const t = Math.min(1, (el - s.wind) / s.dur), e = 1 - Math.pow(1 - t, s.pow); NODE.theta = (s.th0 - 14) + (s.thF - s.th0 + 14) * e;
-    if (t >= 1) { NODE.spin = null; NODE.speed = 0; hitStop(s.tgt, now); return; }
+    if (t >= 1) { NODE.spin = null; NODE.speed = 0; NODE.under = -1; hitStop(s.tgt, now); return; }
   }
   NODE.speed = Math.abs(NODE.theta - prev) * 60;
-  const k = sectorAt(mod(-NODE.theta, 360), angles(false));
+  const k = sectorAt(mod(-NODE.theta, 360), angles(false)); NODE.under = k;
   if (k !== s.last) { if (s.last !== -2) { SFX.tick(NODE.speed / 1500); NODE.kick = 1; const p = sp(wheel); for (let j = 0; j < 3; j++) parts.push({ x: p.x + WCX + rand(-3, 3), y: p.y + 15, vx: rand(-60, 60), vy: rand(-80, -20), g: 300, c: P.lgold, life: .25, s: 1 }); } s.last = k; }
 }
 function hitStop(i, now) {
@@ -197,6 +205,8 @@ export function confirmPick() {
 // 主循环每帧调
 export function nodeTick(now, dt) {
   spinUpdate(now);
+  if (NODE.hold && (NODE.state !== 'ready' || NODE.cards[NODE.hold.i]?.dead)) NODE.hold = null;
+  if (NODE.hold && holdK(now) >= 1) { const i = NODE.hold.i; NODE.hold = null; erase(i); }
   if (NODE.state !== 'hidden') {
     NODE.cards.forEach(c => { if (NODE.state !== 'spinning') c.p += (c.pt - c.p) * Math.min(1, dt * 10); }); NODE.kick = Math.max(0, NODE.kick - dt * 20); drawWheel(now); updateCands();
     $('hints').classList.toggle('lock', now < NODE.lock);
@@ -204,7 +214,16 @@ export function nodeTick(now, dt) {
 }
 wheel.addEventListener('mousemove', e => { if (NODE.state !== 'ready') { NODE.hover = -1; return; } const k = wheelIdx(e); if (k !== NODE.hover && k >= 0) SFX.blip(); NODE.hover = k; });
 wheel.addEventListener('mouseleave', () => NODE.hover = -1);
-wheel.addEventListener('click', e => { const k = wheelIdx(e); if (k >= 0) erase(k); });
+// 抹除要长按半秒（防手滑）：按住时扇区慢慢变红，松开或移到别的扇区就取消
+function holdStart(i) {
+  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase') || NODE.cards[i]?.dead) return;
+  if (G.quota <= 0 || NODE.cards.filter(c => !c.dead).length <= 1) { SFX.bad(); return; }
+  NODE.hold = { i, t0: performance.now() }; SFX.windup();
+}
+const holdEnd = () => { NODE.hold = null; };
+wheel.addEventListener('pointerdown', e => { const k = wheelIdx(e); if (k >= 0) { wheel.setPointerCapture(e.pointerId); holdStart(k); } });
+wheel.addEventListener('pointermove', e => { if (NODE.hold && wheelIdx(e) !== NODE.hold.i) holdEnd(); });
+wheel.addEventListener('pointerup', holdEnd); wheel.addEventListener('pointercancel', holdEnd);
 function wheelIdx(e) {
   const r = wheel.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * WW, y = (e.clientY - r.top) / r.height * WH, dx = x - WCX, dy = y - WCY;
   if (Math.hypot(dx, dy) > WR + 3 || Math.hypot(dx, dy) < 12) return -1; return sectorAt(mod(mod(Math.atan2(dx, -dy) * 180 / Math.PI, 360) - NODE.theta, 360), angles(false));

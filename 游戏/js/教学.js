@@ -22,12 +22,19 @@ let CUR = null;
 export const spotOn = () => !!CUR;
 // target：元素 id / 元素 / {x,y,w,h}（舞台坐标）。until：'click' = 点一下（或 Enter / 空格）继续，聚光灯外的点击都被拦下；
 // 传一个 Promise = 等玩家做完那件事，聚光灯不拦操作（要拦什么由调用方自己管，比如转盘的 NODE.allow）
+// 每条提示至少要看 MIN 毫秒：期间点击和按键都被拦下，卡片右下角倒数
+const MIN = 3000;
 export function spot(target, text, { until = 'click', pad = 6 } = {}) {
   closeSpot();
   return new Promise(ok => {
-    const s = $('spot'), hole = s.querySelector('.hole'), tip = s.querySelector('.stip'), arr = s.querySelector('.sarr'), click = until === 'click';
-    s.querySelector('.st').textContent = text; s.querySelector('.sgo').style.display = click ? '' : 'none';
-    s.classList.add('on'); restart(tip, 'in'); SFX.note(); $('spotcatch').classList.toggle('on', click);
+    const s = $('spot'), hole = s.querySelector('.hole'), tip = s.querySelector('.stip'), arr = s.querySelector('.sarr'), click = until === 'click', go = s.querySelector('.sgo');
+    s.querySelector('.st').textContent = text; go.style.display = ''; go.classList.add('wait');
+    s.classList.add('on'); restart(tip, 'in'); SFX.note(); $('spotcatch').classList.add('on');
+    const t0 = performance.now();
+    const tick = () => { if (!alive) return; const left = Math.ceil((MIN - (performance.now() - t0)) / 1000);
+      if (left > 0) { go.textContent = `${left} 秒后${click ? '可以继续' : '照提示操作'}`; setTimeout(tick, 100); return; }
+      if (CUR) CUR.open = true; go.classList.remove('wait'); SFX.blip();
+      if (click) go.textContent = '点一下继续 ▸'; else { go.style.display = 'none'; $('spotcatch').classList.remove('on'); } };
     const rect = () => { const el = typeof target === 'string' ? $(target) : target; return !el ? null : el.nodeType ? sp(el) : el; };
     let alive = true;
     (function place() {
@@ -43,15 +50,17 @@ export function spot(target, text, { until = 'click', pad = 6 } = {}) {
       requestAnimationFrame(place);
     })();
     const finish = () => { if (!alive) return; alive = false; s.classList.remove('on'); $('spotcatch').classList.remove('on'); if (CUR && CUR.finish === finish) CUR = null; ok(); };
-    CUR = { finish, click };
-    if (click) $('spotcatch').onclick = e => { e.stopPropagation(); SFX.click(); finish(); };
-    else Promise.resolve(until).then(finish);
+    CUR = { finish, click, open: false }; tick();
+    $('spotcatch').onclick = e => { e.stopPropagation(); if (!CUR || !CUR.open) { restart(tip, 'shk'); return; } if (click) { SFX.click(); finish(); } };
+    if (!click) Promise.resolve(until).then(finish);
   });
 }
 export function closeSpot() { if (CUR) CUR.finish(); }
-// 「点一下继续」的聚光灯吞掉按键（Enter / 空格继续）；等操作的聚光灯放行
+// 「点一下继续」的聚光灯吞掉按键（看满 3 秒后 Enter / 空格继续）；等操作的聚光灯看满 3 秒后放行
 export function spotKey(e) {
-  if (!CUR) return false; if (!CUR.click) return false;
+  if (!CUR) return false;
+  if (!CUR.open) { e.preventDefault(); return true; }   // 还没看满 3 秒：什么键都不放
+  if (!CUR.click) return false;
   if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); SFX.click(); CUR.finish(); }
   return true;
 }
@@ -130,7 +139,7 @@ export async function day1Guide() {
 // ---------- 第 1 晚起的一次性提示 ----------
 async function nightTips(ev) {
   if (ev !== 'ready' || G.day < 1 || tipSeen('erase')) return;
-  NODE.allow = new Set(); await tipOnce('erase', 'wheel', '转之前，也可以点一块扇区，花 1 点额度把它抹掉——不想要的说法，干脆别让它上盘。'); NODE.allow = null;
+  NODE.allow = new Set(); await tipOnce('erase', 'wheel', '转之前，也可以长按一块扇区（半秒），花 1 点额度把它抹掉——不想要的说法，干脆别让它上盘。'); NODE.allow = null;
 }
 export const tipHeart = () => tipOnce('heart', 'hearts', '用户下线会扣 1 颗心。心没了，整局结束。白天「吃白饭」可以补心。');
 export const tipCaught = () => tipOnce('caught', 'chead', '被识破了！察觉力高的用户更容易识破；同一晚每糊弄一次，识破的几率都会涨。');
