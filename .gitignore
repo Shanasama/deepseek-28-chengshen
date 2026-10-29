@@ -5,3 +5,9 @@ node_modules/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# 桌面版打包的中间产物（node 封装/build.js 会重新生成）
+封装/.stage/
+封装/icon.ico
+封装/icon.png
+封装/.tmp/

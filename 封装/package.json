@@ -1,0 +1,15 @@
+{
+  "name": "dafeiyu-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "大肥鱼的 28 日成神计划 · Demo 桌面版（Electron 外壳）",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "node build.js"
+  },
+  "devDependencies": {
+    "@electron/packager": "20.3.0",
+    "electron": "45.0.0"
+  }
+}
