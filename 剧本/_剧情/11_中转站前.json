@@ -1,0 +1,21 @@
+{
+  "id": "seg-mvs8wshi",
+  "name": "中转站前",
+  "hook": {
+    "at": "beforeVisitor",
+    "slot": 4
+  },
+  "day": 3,
+  "nodes": [
+    {
+      "id": "n1",
+      "name": "开头",
+      "steps": [
+        {
+          "do": "caption",
+          "text": "广告位招租"
+        }
+      ]
+    }
+  ]
+}

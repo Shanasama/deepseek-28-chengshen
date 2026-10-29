@@ -1,0 +1,52 @@
+{
+  "id": "sample-ending-hearts",
+  "name": "样板 · 结局：心尽",
+  "hook": {
+    "at": "ending",
+    "end": "hearts"
+  },
+  "group": "结局",
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "fade",
+          "to": "out",
+          "seconds": 1
+        },
+        {
+          "do": "say",
+          "text": "时间差不多喽!",
+          "who": "boss",
+          "face": "开心"
+        },
+        {
+          "do": "caption",
+          "text": "机房里，有人伸手摸到了那根电源线。"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "face": "难过",
+          "text": "……等一下，我还没学会怎么说再见。"
+        },
+        {
+          "do": "glitch",
+          "level": "heavy"
+        },
+        {
+          "do": "say",
+          "text": "......",
+          "who": "fish",
+          "face": "难过"
+        },
+        {
+          "do": "say",
+          "text": "大肥鱼停止了思考......"
+        }
+      ],
+      "name": ""
+    }
+  ]
+}

@@ -187,7 +187,7 @@ test('后训练题库', () => {
 });
 
 // 冒烟：剧本库里每个场景、每一轮，在三种训练状态下都能算出盘面，且第一次弹出时盘上至少有一张卡
-for (const dir of fs.readdirSync(ROOT, { withFileTypes: true }).filter(d => d.isDirectory())) {
+for (const dir of fs.readdirSync(ROOT, { withFileTypes: true }).filter(d => d.isDirectory() && fs.existsSync(path.join(ROOT, d.name, '用户.json')))) {   // 用户文件夹（_剧情/ 不是）
   for (const f of fs.readdirSync(path.join(ROOT, dir.name)).filter(f => f.endsWith('.json') && f !== '用户.json')) {
     test(`剧本库：${dir.name}/${f}`, () => {
       const sc = JSON.parse(fs.readFileSync(path.join(ROOT, dir.name, f), 'utf8'));
@@ -203,3 +203,88 @@ for (const dir of fs.readdirSync(ROOT, { withFileTypes: true }).filter(d => d.is
     });
   }
 }
+
+// ---------- 游戏剧情（游戏剧情_设计.md） ----------
+test('剧情条件：剧情变量、数值比较、属性阶段、成就；空条件算满足', () => {
+  const st = { day: 2, hearts: 1, quota: 4, stage: { knowledge: 2 }, vars: { 态度: '摸鱼', 答应了: true }, ach: ['tibo'], played: ['opening'] };
+  assert.equal(R.storyCond([], st), true);
+  assert.equal(R.storyCond([{ k: 'var', name: '态度', v: '摸鱼' }], st), true);
+  assert.equal(R.storyCond([{ k: 'var', name: '答应了' }], st), true, '不写 v 就是「是真」');
+  assert.equal(R.storyCond([{ k: 'var', name: '没设过', v: 'x' }], st), false);
+  assert.equal(R.storyCond([{ k: 'var', name: '没设过', op: '!=', v: 'x' }], st), true);
+  assert.equal(R.storyCond([{ k: 'hearts', op: '<=', v: 1 }, { k: 'day', v: 2 }], st), true);
+  assert.equal(R.storyCond([{ k: 'hearts', op: '<=', v: 1 }, { k: 'day', v: 3 }], st), false, '全部满足才算');
+  assert.equal(R.storyCond([{ k: 'stage', attr: 'knowledge', op: '>=', v: 2 }, { k: 'stage', attr: 'logic', v: 0 }], st), true);
+  assert.equal(R.storyCond([{ k: 'ach', id: 'tibo' }, { k: 'ach', id: 'repeater', v: false }], st), true);
+  assert.equal(R.storyCond([{ k: 'played', id: 'opening' }], st), true);
+  assert.equal(R.storyCond([{ k: '没有这种条件' }], st), false);
+});
+
+test('挂点选段：挂点参数、哪一天、只播一次、优先级、互斥组', () => {
+  const seg = (id, hook, extra = {}) => ({ id, hook, ...extra });
+  const segs = [
+    seg('m-every', { at: 'morning' }),
+    seg('m-d2', { at: 'morning' }, { day: 2, priority: 5 }),
+    seg('m-d3', { at: 'morning' }, { day: [1, 3] }),
+    seg('m-low', { at: 'morning' }, { day: 2, when: [{ k: 'hearts', op: '<=', v: 1 }] }),
+    seg('pre-only', { at: 'afterAct', act: 'pretrain' }),
+    seg('any-act', { at: 'afterAct' }),
+    seg('end-a', { at: 'ending', end: 'full' }, { group: 'end', priority: 1, when: [{ k: 'var', name: '态度', v: '摸鱼' }] }),
+    seg('end-b', { at: 'ending', end: 'full' }, { group: 'end' }),
+    seg('again', { at: 'beforeNight' }, { once: false }),
+  ];
+  const ids = (at, st) => R.storyPick(segs, at, { day: 2, hearts: 3, played: [], vars: {}, ...st }).map(g => g.id);
+  assert.deepEqual(ids({ at: 'morning' }), ['m-d2', 'm-every'], '优先级大的先播，其余按文件顺序');
+  assert.deepEqual(ids({ at: 'morning' }, { hearts: 1 }), ['m-d2', 'm-every', 'm-low']);
+  assert.deepEqual(ids({ at: 'morning' }, { day: 3 }), ['m-every', 'm-d3']);
+  assert.deepEqual(ids({ at: 'morning' }, { played: ['m-every'] }), ['m-d2'], '只播一次的播过就不播');
+  assert.deepEqual(ids({ at: 'afterAct', act: 'eat' }), ['any-act'], '剧情段写了 act 就必须对得上');
+  assert.deepEqual(ids({ at: 'afterAct', act: 'pretrain' }), ['pre-only', 'any-act']);
+  assert.deepEqual(ids({ at: 'ending', end: 'full' }, { vars: { 态度: '摸鱼' } }), ['end-a'], '同一互斥组只播第一段');
+  assert.deepEqual(ids({ at: 'ending', end: 'full' }), ['end-b']);
+  assert.deepEqual(ids({ at: 'ending', end: 'hearts' }), []);
+  assert.deepEqual(ids({ at: 'beforeNight' }, { played: ['again'] }), ['again'], '每次都播的不看播过没有');
+});
+
+// 冒烟：剧本/_剧情/ 下每个剧情段——挂点在登记表里、积木认得、跳转的节点都存在、角色都在角色表里
+{
+  const SDIR = path.join(ROOT, '_剧情');
+  const chars = JSON.parse(fs.readFileSync(path.join(SDIR, '_角色.json'), 'utf8')).chars.map(c => c.id);
+  const known = new Set([...reg.blocks.map(b => b.id), ...reg.storyBlocks.map(b => b.id)]);
+  const segIds = new Set();
+  for (const f of fs.readdirSync(SDIR).filter(f => f.endsWith('.json') && !f.startsWith('_'))) {
+    test(`剧情段：${f}`, () => {
+      const g = JSON.parse(fs.readFileSync(path.join(SDIR, f), 'utf8'));
+      assert.ok(g.id && !segIds.has(g.id), `剧情段 id 缺失或重复：${g.id}`); segIds.add(g.id);
+      assert.ok(reg.storyHooks.some(h => h.id === g.hook?.at), `挂点「${g.hook?.at}」不在登记表里`);
+      const nodes = new Set(g.nodes.map(n => n.id)), to = (t, where) => assert.ok(t == null || nodes.has(t), `${where} 跳到了不存在的节点「${t}」`);
+      to(g.start, 'start');
+      for (const n of g.nodes) {
+        to(n.next, n.id + ' 的 next');
+        (n.steps || []).forEach((b, i) => {
+          const where = `${n.id} 第 ${i + 1} 块`;
+          assert.ok(known.has(b.do), `${where}：积木「${b.do}」不在积木库里`);
+          if (b.who && b.do === 'say') assert.ok(chars.includes(b.who), `${where}：角色「${b.who}」不在角色表里`);
+          if (b.do === 'choice') { assert.ok((b.options || []).length >= 2 && b.options.length <= 4, `${where}：选项要 2–4 个`); b.options.forEach(o => to(o.to, where + ' 的选项')); }
+          if (b.do === 'if' || b.do === 'goto') { to(b.to, where); to(b.else, where); }
+          if (b.do === 'ach' || (b.do === 'ending' && b.id !== 'hearts')) assert.ok(reg.achievements.some(a => a.id === b.id && (b.do === 'ach' || a.ending)), `${where}：${b.do === 'ending' ? '结局' : '成就'}「${b.id}」没登记在 achievements 里${b.do === 'ending' ? '（要带 ending: true）' : ''}`);
+          if (b.do === 'visitor' && b.user) assert.ok(fs.existsSync(path.join(ROOT, b.user, '用户.json')), `${where}：剧本库里没有用户「${b.user}」`);
+          if (b.do === 'rig') assert.ok(reg.storyBlocks.find(x => x.id === 'rig').params.find(p => p.k === 'attr').opts.some(([k]) => k === b.attr), `${where}：剧情杀的卡类「${b.attr}」不认得`);
+          if (g.now) assert.ok(!['say', 'caption', 'picture', 'fade', 'choice'].includes(b.do), `${where}：勾了「立即」的剧情段只能用窗口里的积木，不能用「${b.do}」`);
+        });
+      }
+    });
+  }
+}
+
+test('几个说法里随机挑一句：没写 alts 就是 text；有得选不连着重复；空的说法不算', () => {
+  assert.equal(R.pickLine({ text: 'A' }), 'A');
+  assert.equal(R.pickLine({ text: 'A', alts: [] }), 'A');
+  assert.equal(R.pickLine({ text: 'A', alts: ['', null] }), 'A');
+  const b = { text: 'A', alts: ['B', 'C'] };
+  assert.equal(R.pickLine(b, null, () => 0), 'A');
+  assert.equal(R.pickLine(b, null, () => .99), 'C');
+  for (let i = 0; i < 20; i++) assert.notEqual(R.pickLine(b, 'B'), 'B', '上次播过的不连着再播');
+  assert.equal(R.pickLine({ text: 'A', alts: ['B'] }, 'A'), 'B');
+  assert.equal(R.pickLine({ text: '', alts: ['B'] }), 'B', 'text 空着就从 alts 里挑');
+});

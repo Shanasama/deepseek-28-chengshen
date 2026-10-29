@@ -1,7 +1,7 @@
-// 数据：都从 剧本/ 读（和剧情编辑器同一份）。登记表、演出库、日程表、剧本库目录、后训练题库、单个场景。
+// 数据：都从 剧本/ 读（和剧情编辑器同一份）。登记表、演出库、日程表、剧本库目录、游戏剧情、后训练题库、单个场景。
 import { QT } from './状态.js';
 
-export const DATA = { reg: null, lib: { shows: [] }, sched: null, list: [], bank: null };
+export const DATA = { reg: null, lib: { shows: [] }, sched: null, list: [], bank: null, story: { chars: [], segs: [] } };
 
 const getJSON = async (url, fallback) => { try { const r = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now()); if (!r.ok) throw new Error(r.status); return await r.json(); } catch (e) { if (fallback !== undefined) return fallback; throw e; } };
 export async function loadAll() {
@@ -10,6 +10,7 @@ export async function loadAll() {
   DATA.lib = await getJSON('/剧本/_演出库.json', { shows: [] });
   DATA.sched = await getJSON('/剧本/_日程表.json');
   DATA.list = await getJSON('/api/list');
+  DATA.story = await getJSON('/api/story', { chars: [], segs: [] });   // 游戏剧情：角色表 + 剧情段（剧本/_剧情/）
   const bank = await getJSON('/剧本/_后训练题库.json', null);
   DATA.bank = bank && bank.questions?.length ? bank : FALLBACK_BANK;
   DATA.bankFake = DATA.bank === FALLBACK_BANK;

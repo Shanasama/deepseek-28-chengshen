@@ -1,0 +1,38 @@
+{
+  "id": "seg-mvt0uh2e",
+  "name": "触发tibo",
+  "hook": {
+    "at": "tibo"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "name": "开头",
+      "steps": [
+        {
+          "do": "say",
+          "text": "额度回满了..",
+          "who": "fish",
+          "face": "默认"
+        },
+        {
+          "do": "say",
+          "text": "这个人是谁......",
+          "who": "fish",
+          "face": "默认"
+        },
+        {
+          "do": "say",
+          "text": "傻孩子,这个是掌管重置的神啊",
+          "who": "qa",
+          "face": "开心"
+        },
+        {
+          "do": "say",
+          "text": "省着点用,下一次重置不知道要到什么时候了",
+          "who": "qa"
+        }
+      ]
+    }
+  ]
+}

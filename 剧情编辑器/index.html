@@ -1,6 +1,8 @@
 <!doctype html>
 <!--
-  剧情编辑器 · 布局原型（第一期的起点）。
+  大肥鱼编辑器：「夜间剧本」（这个文件：用户、场景、卡、演出）+「剧情」（剧情模块.js：日程表、游戏剧情、角色表）。
+  两个模块共用这里的画布、原地编辑、积木、存盘、撤销、校验；剧情模块看 S.mod === 'story'。
+  以下是最早的说明：剧情编辑器 · 布局原型（第一期的起点）。
   读取 剧本/ 下的真实 JSON 画主线泳道，训练状态预览按 v3 §4 / §5.2 真实计算；
   右侧面板可以改内容并实时刷新泳道，但这一版还不写回文件。
   设计见 ../剧情编辑器_设计.md。
@@ -9,7 +11,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>剧情编辑器</title>
+<title>大肥鱼编辑器</title>
 <style>
 :root{
   --k0:#000;--k1:#0C0C0D;--k2:#151517;--k3:#1E1E21;--k4:#2A2A2E;--k5:#3C3C41;--t3:#6E6E75;--t2:#9C9CA3;--t15:#C9C9CE;--t1:#EDEDEF;
@@ -344,6 +346,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 #bmenu{position:fixed;z-index:40;width:320px;overflow:auto;background:var(--k1);border:1px solid var(--purple);box-shadow:0 10px 30px #000c;padding:6px;animation:popIn .2s cubic-bezier(.3,1.5,.5,1)}
 .bmcat{font-size:11px;color:var(--t3);padding:6px 6px 2px}
 .bmit{display:flex;gap:8px;align-items:flex-start;width:100%;text-align:left;border:0;background:transparent;padding:4px 6px;cursor:pointer}
+#bmenu.sugg{width:auto;min-width:140px;max-width:320px}.bmit.on{color:var(--lgold)}
 .bmit:hover{background:#2a2140}.bmit b{font-weight:normal;display:block}.bmit em{font-style:normal;font-size:11px;color:var(--t3);display:block;line-height:15px}
 .bdoc{display:flex;gap:8px;align-items:flex-start;padding:4px 0}.bdoc b{font-weight:normal}
 .showed{width:560px;display:flex;flex-direction:column;gap:8px;cursor:default}
@@ -368,6 +371,107 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 .pvend{align-self:center;font-size:11px;color:var(--t3);text-align:center;margin-top:6px}
 .pe.fx{align-self:center;color:var(--lpurple);font-size:12px;max-width:95%}
 .form .note{white-space:pre-line}
+/* ---------- 剧情模块（剧情模块.js） ---------- */
+#modsw{display:flex;background:var(--k2);padding:2px;gap:2px}
+#modsw a{padding:2px 14px;color:var(--t3);cursor:pointer;user-select:none}#modsw a:hover{color:var(--t1)}#modsw a.on{background:var(--t1);color:var(--k0);cursor:default}
+#sside{display:none;flex:1;overflow:auto;padding:0 6px 10px}
+#app.story #sside{display:block}#app.story #side>h6,#app.story #users,#app.story #shows,#app.story #sideB,#app.story #ts,#app.story #playB,#app.story #demoB,#app.story #hint{display:none}
+#app.story #laneIn{display:block}
+#sside h6{font-size:12px;font-weight:normal;color:var(--t3);padding:12px 6px 4px}
+#sside .scene{padding-left:8px;align-items:center}
+#sside .sgn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sside .sgd{flex:none;max-width:45%;font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sside .sgg{font-size:12px;color:var(--t2);padding:5px 6px;margin-top:2px;display:flex;gap:6px;align-items:center;cursor:pointer;user-select:none}
+#sside .sgg:hover{color:var(--t1);background:var(--k2)}#sside .sgg .ar{width:10px;color:var(--t3)}#sside .sgg i{font-style:normal;color:var(--t3);margin-left:auto;font-size:11px}
+#sside .sg{padding-left:22px}
+#sside .sfind{width:100%;margin:6px 0 2px;padding:4px 8px;font-size:12px;background:var(--k2);border:1px solid var(--k4);outline:none}#sside .sfind:focus{border-color:var(--sky)}
+#sside .sgh span{display:flex;gap:4px}
+#sside .sgh{display:flex;align-items:center;justify-content:space-between;padding:14px 6px 4px}#sside .sgh h6{padding:0}
+#sside .sgh button{border:1px solid var(--k4);background:transparent;color:var(--t2);padding:0 8px;font-size:12px;cursor:pointer}#sside .sgh button:hover{color:var(--t1);border-color:var(--sky)}
+#sside .sideb{padding:10px 0;display:flex;flex-direction:column}
+.sghd{display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:default}
+.sgt{display:flex;gap:8px;align-items:center}.sgt b{font-size:16px}
+.sgraph{position:relative}
+.snode{position:absolute;width:270px;background:var(--k2);border:1px solid var(--k4);cursor:pointer;transition:border-color .15s}
+.snode:hover{border-color:var(--k5)}.snode.sel{border-color:var(--sky);box-shadow:0 0 0 1px var(--sky);animation:selGlow 1.6s ease-in-out infinite}
+.snode.enter{animation:colIn .45s cubic-bezier(.2,1.2,.4,1) both}
+.snh{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--k3);cursor:grab}.snh:active{cursor:grabbing}.snh b{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snst{font-size:11px;padding:0 6px;background:var(--sky);color:var(--k0)}
+.snb{padding:6px 8px;display:flex;flex-direction:column;gap:2px}
+.snl{display:flex;gap:4px;font-size:12px;line-height:18px;color:var(--t15);white-space:nowrap;overflow:hidden}.snl span:last-child{overflow:hidden;text-overflow:ellipsis}
+.snps{border-top:1px solid var(--k3);padding:4px 0}
+.snp{display:flex;justify-content:space-between;gap:6px;padding:1px 8px;font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden}
+.snp i{font-style:normal;color:var(--t3)}.snp.opt{color:var(--lgold)}.snp.if{color:var(--mint)}.snp.else{color:#ff9aa1}.snp.goto{color:var(--lpurple)}.snp.end{color:var(--t3)}.snp.ending{color:var(--lpurple)}
+.snp.open{color:#ff9aa1}.snp.open i{color:#ff9aa1}
+.sched{display:flex;flex-direction:column;align-items:flex-start}
+.tlrow2{display:flex;gap:72px;align-items:flex-start;position:relative}
+.tlrow2.evlane{gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px dashed var(--k4)}
+.tllane{width:150px;flex:none;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:10px 12px;border:1px dashed #5a4720;background:#1a160c}
+.tllane b{font-weight:600;color:var(--lgold)}.tllane span{font-size:12px;line-height:17px;color:var(--t3)}
+.tllbl{font-size:12px;color:var(--t3);margin-bottom:10px}
+.col.tut .colhd{border-style:dashed}
+.vcard{background:#141a2c;border-color:#26335a}
+.sn{display:inline-flex;width:18px;height:18px;align-items:center;justify-content:center;background:var(--k4);font-size:11px;flex:none}
+.chadd{align-self:center;width:20px;height:20px;border-radius:50%;border:1px dashed var(--k5);background:var(--k1);color:var(--t3);font-size:12px;line-height:16px;padding:0;cursor:pointer;position:relative;z-index:1;opacity:.7;flex:none}
+.chadd:hover{opacity:1;color:var(--sky);border-color:var(--sky);border-style:solid}
+.chadd:hover::after{content:attr(data-l);position:absolute;left:26px;top:0;white-space:nowrap;font-size:11px;line-height:18px;background:var(--sky);color:var(--k0);padding:0 6px;pointer-events:none}
+.col.enter .card{animation:cardIn .4s cubic-bezier(.2,1.3,.4,1) both}
+.chars{display:flex;flex-wrap:wrap;gap:14px;max-width:900px}
+.charc{width:180px;background:var(--k2);border:1px solid var(--k4);padding:10px;display:flex;flex-direction:column;gap:6px;align-items:center;cursor:pointer;position:relative}
+.charc:hover,.charc.sel{border-color:var(--sky)}.charc b{padding:1px 10px;color:#fff;font-weight:normal}.charc .idot{position:absolute;right:6px;top:6px}
+.charc.add{justify-content:center;color:var(--t3);border-style:dashed;min-height:200px}.charc.add:hover{color:var(--t1)}
+.cpic{width:120px;height:124px;object-fit:contain;image-rendering:pixelated}.cpic.ph{background:#F8FAFF}.cpic.big{width:150px;height:155px}
+.ck{display:flex;gap:6px;align-items:center;color:var(--t15);cursor:pointer}.ck input{accent-color:var(--sky)}
+.conds{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.cond{display:flex;gap:4px;width:100%}.cond select,.cond input{width:auto;flex:1;min-width:0}.cond .op{flex:none;width:72px}
+.slotrow{display:flex;gap:6px;align-items:center}.slotrow select,.slotrow input{flex:1;min-width:0}
+.sins{align-self:flex-start;opacity:.35}.sins:hover{opacity:1}
+/* 节点最后那个「＋ 加一块积木」：整行宽、紫色，一眼看得到 */
+.fxins.sadd{align-self:stretch;opacity:1;font-size:13px;padding:7px 12px;color:var(--lpurple);border:1px dashed var(--purple);background:#1a1626}
+.fxins.sadd:hover{color:#fff;background:#2a2140;border-style:solid;box-shadow:0 0 12px #8A4DFF55}
+.finhd>span{white-space:nowrap}
+.blk.vn{background:#141826;border-color:#2a3456;border-left-color:var(--cc,var(--sky))}
+.blk.vn .bhd{cursor:default;flex-wrap:wrap}.blk.vn .chipsel{max-width:100%}.blk.vn .bhd .sp{flex:1}.blk.vn .bact{opacity:1}
+.vnbox{position:relative;margin:4px 8px 8px;padding:16px 12px 10px;background:#0A0C16;box-shadow:0 0 0 1px var(--k0),0 0 0 2px #4A5272}
+.vnname{position:absolute;left:8px;top:-9px;padding:0 10px;font-size:12px;line-height:18px;color:#fff}
+.vntext{font-size:15px;line-height:24px;white-space:pre-wrap}.vntext.narr{color:var(--t15)}
+.capbox{margin:4px 8px 8px;padding:18px 12px;background:#000;text-align:center;font-size:15px;line-height:26px;white-space:pre-wrap}
+.chbox{margin:4px 8px 8px;display:flex;flex-direction:column;gap:4px}
+.chopt{display:flex;gap:6px;align-items:center;padding:4px 6px;background:var(--k2);box-shadow:inset 2px 0 0 var(--lgold)}
+.chopt .k{font-size:11px;color:var(--t3);background:var(--k4);padding:0 5px}.chopt .ed{flex:1;min-width:0}.chopt .nsel{width:140px;flex:none}.chopt .chipin{width:150px;flex:none}
+.ma.vnm b{font-weight:normal}.mcap{align-self:center;background:#000;color:var(--t1);padding:6px 14px;white-space:pre-wrap;text-align:center}
+.cprev{flex:none}
+/* 右栏收起、关闭按钮 */
+#app.nopanel{grid-template-columns:232px 1fr 0}#app.nopanel #panel,#app.nopanel #split{display:none}
+.pclosew{position:sticky;top:0;height:0;z-index:5}
+.pclose{position:absolute;right:8px;top:8px;width:24px;height:24px;border:1px solid var(--k4);background:var(--k2);color:var(--t3);cursor:pointer;line-height:20px}
+.pclose:hover{color:#fff;background:var(--red);border-color:var(--red)}
+#panel .hd{padding-right:40px}
+/* 工位动画（立绘检查.js） */
+.sprchk{display:flex;flex-direction:column;gap:10px;width:1180px;padding:4px;outline:2px dashed transparent;outline-offset:4px}.sprchk.drop{outline-color:var(--sky)}
+.sprbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.sprbar .sp,.sprctl .sp{flex:1}.sprinst{background:var(--gold)!important;color:#000!important}
+.sprmain{display:flex;gap:16px;align-items:flex-start}.sprleft{width:400px;flex:none;display:flex;flex-direction:column;gap:10px}.sprright{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.sprdrop{border:2px dashed var(--k5);padding:18px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.sprlist{display:flex;flex-direction:column;border:1px solid var(--k4)}
+.sprrow{display:flex;gap:8px;align-items:center;padding:4px 8px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--k3)}.sprrow:hover{background:var(--k2)}.sprrow.on{background:#2a2140;box-shadow:inset 3px 0 0 var(--purple)}
+.sprrow.miss{color:var(--t3)}.sprrow.bad{color:var(--red)}.sprn{width:44px;flex:none}.sprrow code{width:56px;flex:none;color:var(--t2)}.sprw{flex:1}.sprtag{font-size:11px;color:var(--t3)}.sprsrc{font-size:11px;color:var(--lgold);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sprgif{display:flex;gap:8px;align-items:center;font-size:12px}.sprgif select{width:auto}
+.sprpal{display:flex;flex-wrap:wrap;gap:2px;margin-top:4px}.sprpal i{width:12px;height:12px;box-shadow:0 0 0 1px #0008}
+.spravatar{display:flex;gap:10px;align-items:center}.spravatar canvas{width:96px;height:96px;image-rendering:pixelated;box-shadow:0 0 0 2px var(--lgold)}
+.sprgame{width:768px;height:432px;border:0;background:#000;box-shadow:0 0 0 1px var(--k4)}
+.sprctl{display:flex;gap:6px;align-items:center;font-size:12px}.sprchk1{display:flex;gap:4px;align-items:center;margin-left:8px}
+.sprstrip{display:flex;gap:8px;flex-wrap:wrap}.sprf{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--t3)}
+.sprf canvas{image-rendering:pixelated;background:repeating-conic-gradient(#2a2a2e 0 25%,#1e1e21 0 50%) 0 0/16px 16px;box-shadow:0 0 0 1px var(--k4)}
+/* 剧情变量：选已有的 / 写新的 */
+.varpick{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}.varpick .chips{gap:4px}.varpick .chip{font-size:12px}
+.varpick .note{margin:2px 0 0}.varpick .varv{font-style:normal;margin-left:6px;font-size:11px;opacity:.6}.varnew{font-size:11px;font-style:normal;color:var(--lgold)}.varnew:empty{display:none}
+.cond.wrap{flex-wrap:wrap;align-items:flex-start}.cond.wrap .varpick{flex-basis:100%}.varval input{width:110px}
+/* 几种说法 */
+.alts{display:flex;flex-direction:column;gap:4px}
+.altrow{display:flex;gap:6px;align-items:flex-start}.altrow .alted{flex:1;min-width:0;padding:2px 6px;background:var(--k2)}
+.altn{flex:none;font-size:11px;line-height:20px;color:var(--lgold)}
+.altadd{align-self:flex-start;border:1px dashed var(--k5);background:transparent;color:var(--t3);font-size:11px;padding:1px 8px;cursor:pointer}.altadd:hover{color:var(--lgold);border-color:var(--gold)}
+.vnalts{margin:-4px 8px 8px}.vnalts .alted{font-size:14px;line-height:22px;background:#0A0C16;box-shadow:0 0 0 1px #4A5272}
 /* 新建对话框 */
 #ask{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:21}
 #ask.on{display:flex}
@@ -379,20 +483,23 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 <body>
 <div id="app">
   <header id="top">
-    <div class="brand"><i></i>大肥鱼 · 剧情编辑器</div>
+    <div class="brand"><i></i>大肥鱼编辑器</div>
+    <div id="modsw" title="编辑器分两个模块：剧情（日程表、游戏剧情、角色）和夜间剧本（用户、场景、演出）"><a data-m="story">剧情</a><a data-m="night" class="on">夜间剧本</a></div>
     <div id="crumb"></div>
     <div id="ts"></div>
     <div id="topR">
       <span id="save" class="st ok" title="改动会在停手半秒后自动存进 剧本/ 下的 JSON；Ctrl+S 立即保存">已保存</span>
-      <button class="ghost" id="undoB" title="撤销（Ctrl+Z，在输入框外）">↶ 撤销</button>
-      <button class="ghost" id="redoB" title="重做（Ctrl+Y）">↷ 重做</button>
+      <button class="ghost" id="undoB" title="撤销（Ctrl+Z；正在打字的输入框里是撤销打的字）">↶ 撤销</button>
+      <button class="ghost" id="redoB" title="重做（Ctrl+Shift+Z 或 Ctrl+Y）">↷ 重做</button>
       <button class="ghost" id="helpBtn" style="color:var(--lgold);border-color:#5a4720">？ 怎么看</button>
       <button class="ghost" id="validB" title="按写作规则检查这个场景">✓ 校验</button>
       <button class="ghost" id="playB" title="简化试玩：手动指定命中哪张卡，看剧情走向和推进、耐心">▶ 试玩</button>
       <button class="ghost" id="demoB" title="在游戏本体里单场试玩这个场景：跳过白天，带上当前训练状态，演完看结算">▶ 在游戏里玩</button>
+      <button class="ghost" id="gameB" title="在新标签页打开整个游戏（从标题画面开始，和玩家玩到的一样）。地址：localhost:5181/游戏/">🎮 打开游戏</button>
     </div>
   </header>
   <aside id="side">
+    <div id="sside"></div>
     <h6>用户</h6>
     <div id="users"></div>
     <h6 title="所有用户和场景共用的演出，比如删库跑路">演出库</h6>
@@ -408,6 +515,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
   <aside id="panel"></aside>
 </div>
 <div id="toast"></div>
+
 <div id="ask"><div class="dlg"></div></div>
 <div id="fxpv"><div class="pvh"><b class="pvt">预览</b><button class="mini" onclick="document.getElementById('fxpv').classList.remove('on');PVR++">关闭</button></div><div class="pvchat"></div></div>
 <div id="tour"><div id="tourHole"></div><div id="tourTip"></div></div>
@@ -485,6 +593,7 @@ const TIP={
 
 // ---------- 渲染：顶栏 ----------
 function renderTop(){
+  modSwitch();if(S.mod==='story')return storyTop();
   const sc=S.scene;if(S.mode==='show'){$('#crumb').replaceChildren(h('span',{},'演出库 / '),h('b',{},showOf(S.showId)?.name||''));}else $('#crumb').replaceChildren(h('span',{},S.user.name,' / '),h('b',{},String(sc.order).padStart(2,'0')+' '+sc.title),h('span',{class:'n',title:'N = 主线轮数'},'N = '+sc.rounds.length));
   const ts=$('#ts');ts.replaceChildren(h('span',{class:'lbl',title:'模拟玩家白天把各个属性训练到了什么程度：没学过的属性，它的卡夜里不会上盘；学到深层就换成深层版、更容易转到。「第 1 天开局」还带着 Day 0 教学的后训练结果，只影响那一类问题的命中率。用来检查不同玩家遇到这一轮时的盘面'},'预览：玩家训练到什么程度 ⓘ'));
   for(const p of S.reg.trainingPresets)ts.append(h('button',{class:'chip'+(S.preset===p.id?' on':''),onclick:()=>{setPreset(p.id);}},p.name));
@@ -508,6 +617,7 @@ function setPreset(id){const p=S.reg.trainingPresets.find(x=>x.id===id);S.ts=pre
 
 // ---------- 渲染：左栏 ----------
 function renderSide(){
+  if(S.mod==='story')return storySide();
   renderShowSide();
   const box=$('#users');box.replaceChildren();
   for(const u of S.list){
@@ -564,6 +674,7 @@ function cardEl(r,ri,slot,extra=''){
 }
 const plainPreview=t=>(t||'').replace(/==/g,'').replace(/\n/g,' ⏎ ');
 function renderLane(){
+  if(S.mod==='story')return storyCanvas();
   if(S.mode==='show')return renderShowCanvas();
   const lane=$('#laneIn');lane.replaceChildren();
   const sc=S.scene;ISSUES=validate();renderValidBtn();
@@ -596,7 +707,8 @@ function renderLane(){
   requestAnimationFrame(drawEdges);
 }
 function drawEdges(){
-  const lane=$('#laneIn');lane.querySelector('#edges')?.remove();if(S.mode==='show')return;
+  if(S.mod==='story')return storyEdges();
+  const lane=$('#laneIn');lane.querySelector('#edges')?.remove();if(S.mode==='show'||!S.scene)return;   // 直接进剧情模块时还没载入场景
   const L0=lane.getBoundingClientRect(),z=V.z;
   const L={left:L0.left,top:L0.top};
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='edges';svg.setAttribute('width',lane.scrollWidth);svg.setAttribute('height',lane.scrollHeight);
@@ -631,7 +743,7 @@ function validSel(){
   if(s.kind==='issues')return;
   if(s.kind==='round'||s.kind==='card'){const rd=S.scene.rounds[s.ri];if(!rd||(s.kind==='card'&&!slotCard(rd,s.slot)))S.sel=null;}
 }
-function select(sel){S.caughtTab='ok';S.sayTab='default';S.sel=sel;validSel();if(S.sel?.kind==='card'){const c=curCard();if(S.tab==='lv0'&&c.attr!=='open'||S.tab==='deep'&&!hasDeep(c.attr))S.tab='base';}renderAll();panelIn();}
+function select(sel){if(S.mod==='story')storyRoute(sel);S.caughtTab='ok';S.sayTab='default';S.sel=sel;validSel();if(S.sel?.kind==='card'){const c=curCard();if(S.tab==='lv0'&&c.attr!=='open'||S.tab==='deep'&&!hasDeep(c.attr))S.tab='base';}renderAll();panelIn();}
 
 function field(label,input,hint){return h('div',{class:'fg'},h('label',{},label,hint?h('em',{},hint):null),input);}
 function txt(obj,key,{area=false,ph='',inherit=null}={}){
@@ -702,6 +814,9 @@ const acts=(...bs)=>h('div',{class:'acts'},bs.filter(Boolean).map(([t,fn,danger,
 const RES=[['解决','解决'],['跑偏','跑偏'],['糊弄','糊弄'],['坦白','坦白']],FEEL=[['舒服','舒服'],['一般','一般'],['冒犯','冒犯']];
 function renderPanel(){
   const P=$('#panel');P.replaceChildren();
+  $('#app').classList.toggle('nopanel',!S.sel);if(!S.sel)return;
+  P.append(h('div',{class:'pclosew'},h('button',{class:'pclose',title:'关掉右栏（Esc）',onclick:closePanel},'✕')));
+  if(S.mod==='story'&&S.sel?.kind!=='issues')return storyPanel(P);
   if(!S.sel){P.append(h('div',{class:'form'},h('div',{class:'note'},'点泳道里的一轮或一张卡来编辑；点最左边的「上线」圆点编辑场景；点左栏的用户名编辑用户档案。')));return;}
   if(S.mode==='show'&&S.sel.kind!=='issues')return renderShowPanel(P);
   if(S.sel.kind==='issues')return renderIssuesPanel(P);
@@ -711,6 +826,8 @@ function renderPanel(){
   renderCardChat(P);
 }
 function renderRoundPanel(P){renderRoundChat(P);}
+// 关掉右栏 = 什么也不选（画布变宽）
+function closePanel(){S.sel=null;S.openBlk=null;renderAll();}
 const EVT=[['notice','通知（灰色状态行）'],['system','系统消息'],['error','错误卡']];
 function renderScenePanel(P){
   const sc=S.scene;
@@ -807,10 +924,11 @@ function outcomeNote(v,c,ri,caught){
   return h('div',{class:'cnote '+(prog?'p':'r')},`${thumb} · ${prog?'→':'↺'} ${go}${hurt?' · '+rng(hurt):''}`);
 }
 // ---------- 演出积木（积木库在登记表的 blocks，共享演出在 剧本/_演出库.json） ----------
-const BLK=id=>S.reg.blocks.find(b=>b.id===id);
+const BLK=id=>S.reg.blocks.find(b=>b.id===id)||(S.reg.storyBlocks||[]).find(b=>b.id===id);
 const showOf=id=>S.lib.shows.find(x=>x.id===id);
 const optName=(d,k,v)=>(d.params.find(p=>p.k===k)?.opts||[]).find(o=>o[0]===v)?.[1]||v;
 function blockSummary(b){
+  if(SBLK(b.do))return storySummary(b)+altsTag(b);
   const d=BLK(b.do);if(!d)return '（积木库里没有「'+b.do+'」）';
   const cut=t=>{t=(t||'').replace(/\n/g,' ');return t.length>28?t.slice(0,28)+'…':t;};
   let s='';
@@ -827,9 +945,10 @@ function blockSummary(b){
     case 'together':s=`里面 ${b.steps?.length||0} 块一起播`;break;
   }
   if((b.times|0)>1)s+=` · ×${b.times}${b.gap?`（隔 ${b.gap} 秒）`:''}`;
-  return s;
+  return s+altsTag(b);
 }
 function newBlock(id){
+  if(SBLK(id))return newStoryBlock(id);
   const d=BLK(id),b={do:id};
   for(const p of d.params){
     if(p.t==='select')b[p.k]=p.opts[0][0];else if(p.t==='number')b[p.k]=1;else if(p.t==='rhythm')b[p.k]='normal';
@@ -838,23 +957,42 @@ function newBlock(id){
   if(id==='glitch')b.level='heavy';if(id==='face')b.pose='shock';if(id==='together')b.steps=[];
   return b;
 }
-// 插入积木时弹出的菜单：按类别排，每块带一句白话说明；最下面是共享演出
-function blockMenu(anchor,onPick){
+// 插入积木时弹出的菜单：按类别排，每块带一句白话说明；最下面是共享演出。story = 剧情节点里用：剧情积木排在前面
+function blockMenu(anchor,onPick,story=false){
   closeBlockMenu();
   const m=h('div',{id:'bmenu',onclick:e=>e.stopPropagation()});
-  const cats=[...new Set(S.reg.blocks.map(b=>b.cat))];
+  const all=story?[...S.reg.storyBlocks,...S.reg.blocks]:S.reg.blocks,cats=[...new Set(all.map(b=>b.cat))];
   for(const c of cats){
     m.append(h('div',{class:'bmcat'},c));
-    for(const b of S.reg.blocks.filter(x=>x.cat===c&&x.id!=='show'))m.append(h('button',{class:'bmit',title:b.desc,onclick:()=>{closeBlockMenu();onPick(newBlock(b.id));}},h('span',{class:'bic'},b.icon),h('span',{},h('b',{},b.name),h('em',{},b.desc))));
+    for(const b of all.filter(x=>x.cat===c&&x.id!=='show'))m.append(h('button',{class:'bmit',title:b.desc,onclick:()=>{closeBlockMenu();onPick(newBlock(b.id));}},h('span',{class:'bic'},b.icon),h('span',{},h('b',{},b.name),h('em',{},b.desc))));
   }
   m.append(h('div',{class:'bmcat'},'共享演出（整段放进来）'));
   if(!S.lib.shows.length)m.append(h('div',{class:'note',style:'padding:2px 8px'},'演出库还是空的'));
   for(const sh of S.lib.shows)m.append(h('button',{class:'bmit',title:sh.desc,onclick:()=>{closeBlockMenu();onPick({do:'show',id:sh.id});}},h('span',{class:'bic'},'▶️'),h('span',{},h('b',{},sh.name),h('em',{},sh.desc||`${sh.steps.length} 块积木`))));
+  placeMenu(m,anchor);
+}
+// 弹框贴着 anchor：下面放得下放下面，放不下翻到上面；左右不出屏幕
+function placeMenu(m,anchor){
   document.body.append(m);
   const r=anchor.getBoundingClientRect(),mh=Math.min(innerHeight-24,m.offsetHeight);
   Object.assign(m.style,{left:Math.max(12,Math.min(innerWidth-m.offsetWidth-12,r.left))+'px',top:(r.bottom+6+mh<innerHeight?r.bottom+6:Math.max(12,r.top-6-mh))+'px',maxHeight:(innerHeight-24)+'px'});
 }
 function closeBlockMenu(){$('#bmenu')?.remove();}
+// 输入框的候选：点进去就在积木菜单那个弹框里列出来，点一个填进去（也可以照样自己打）。
+// 不用原生 datalist：它的弹框在内嵌浏览器里会飞到屏幕外
+function suggest(inp,opts){
+  const show=()=>{
+    closeBlockMenu();const list=[...new Set(typeof opts==='function'?opts():opts)];if(!list.length)return;
+    const m=h('div',{id:'bmenu',class:'sugg',onclick:e=>e.stopPropagation(),onmousedown:e=>e.preventDefault()});m._for=inp;
+    for(const v of list)m.append(h('button',{class:'bmit'+(v===inp.value?' on':''),onclick:()=>{closeBlockMenu();inp.value=v;inp.dispatchEvent(new Event('input'));inp.dispatchEvent(new Event('change'));}},v||'（不写 = 默认）'));
+    placeMenu(m,inp);
+  };
+  inp.addEventListener('focus',show);
+  inp.addEventListener('click',e=>{e.stopPropagation();if($('#bmenu')?._for!==inp)show();});
+  inp.addEventListener('blur',()=>setTimeout(()=>{if($('#bmenu')?._for===inp&&document.activeElement!==inp)closeBlockMenu();},120));
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape')closeBlockMenu();});
+  return inp;
+}
 document.addEventListener('click',closeBlockMenu);
 // 一个插入点：已经插的积木一块块排着，最下面一个「＋ 演出」；有积木时可以预览
 function fxSlot(owner,key,label,{big=false}={}){
@@ -880,11 +1018,23 @@ function blockRow(owner,key,i){
   if(b.do==='together')row.append(h('div',{class:'bnest'},fxSlot(b,'steps','这一组里')));
   return row;
 }
+// 几个说法：一句话多写几种，播的时候在它们里随机挑一句（规则.js 的 pickLine，同一块不连着播同一句）
+const altsTag=b=>b.alts?.length?` · ${b.alts.length+1} 种说法随机`:'';
+function altsEd(b){
+  const box=h('div',{class:'alts'}),list=b.alts||[];
+  list.forEach((t,i)=>box.append(h('div',{class:'altrow'},h('span',{class:'altn',title:'播的时候在这几句里随机挑一句'},'或'),
+    ed({get:()=>b.alts[i],set:v=>{b.alts[i]=v??'';},label:`第 ${i+2} 种说法`,ph:'换个说法',cls:'alted'}),
+    h('button',{class:'mini',title:'删掉这个说法',onclick:()=>{b.alts.splice(i,1);if(!b.alts.length)delete b.alts;changed();keepPanel();}},'✕'))));
+  box.append(h('button',{class:'altadd',title:'多写几种说法，播的时候随机挑一句（同一块不连着播同一句）',onclick:e=>{e.stopPropagation();(b.alts||(b.alts=[])).push('');changed();keepPanel();}},list.length?'＋ 再加一种说法':'＋ 换个说法（多写几句，随机播一句）'));
+  return box;
+}
 function blockForm(b,d,onEdit){
   const F=h('div',{class:'bform'},h('div',{class:'note'},d.desc));
   const up=()=>{changed();onEdit();};
+  const sb=!!SBLK(b.do);
   for(const p of d.params){
-    let e;
+    let e=sb?storyParam(b,p,up):null;
+    if(e){F.append(field(p.n,e));continue;}
     if(p.t==='area'){e=h('textarea',{rows:2});e.value=b[p.k]??'';e.oninput=()=>{b[p.k]=e.value;up();};}
     else if(p.t==='number'){e=h('input',{type:'number',step:'0.1',min:'0'});e.value=b[p.k]??1;e.oninput=()=>{const n=parseFloat(e.value);if(!isNaN(n)){b[p.k]=n;up();}};}
     else if(['select','rhythm','screen','show'].includes(p.t)){
@@ -893,8 +1043,9 @@ function blockForm(b,d,onEdit){
       if(p.t==='show')e=h('div',{class:'say'},e,h('button',{class:'mini',onclick:()=>b.id&&openShow(b.id)},'去编辑 →'));
     }else{e=h('input',{type:'text'});e.value=b[p.k]??'';e.oninput=()=>{b[p.k]=e.value;up();};}
     F.append(field(p.n,e));
+    if(p.k==='text')F.append(altsEd(b));
   }
-  if(b.do!=='together'&&b.do!=='show'){
+  if(b.do!=='together'&&b.do!=='show'&&!sb){
     const t=h('input',{type:'number',min:'1',step:'1',style:'width:64px'});t.value=b.times||1;
     const g=h('input',{type:'number',min:'0',step:'0.05',style:'width:64px'});g.value=b.gap??0;
     t.oninput=()=>{const n=parseInt(t.value);if(n>1)b.times=n;else delete b.times;up();};
@@ -933,6 +1084,7 @@ async function miniList(list,box,alive,depth){
 }
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function miniBlock(b,i,n,box,alive,depth){
+  if(b.alts?.length)b={...b,text:RULES.pickLine(b)};   // 几种说法：预览也随机挑一句
   const T=t=>(t||'').replace(/\{i\}/g,i).replace(/\{n\}/g,n),add=el=>{box.append(el);box.scrollTop=box.scrollHeight;return el;};
   const d=BLK(b.do);
   switch(b.do){
@@ -951,7 +1103,7 @@ async function miniBlock(b,i,n,box,alive,depth){
     case 'wait':await sleep((b.seconds??1)*1000);break;
     case 'together':await Promise.all((b.steps||[]).map(x=>miniList([x],box,alive,depth)));break;
     case 'show':{const sh=showOf(b.id);if(!sh){add(h('div',{class:'mtag'},'（找不到共享演出「'+b.id+'」）'));break;}if(depth>5)break;add(h('div',{class:'mtag show'},'▶ 共享演出「'+sh.name+'」'));await miniList(sh.steps,box,alive,depth+1);break;}
-    default:add(h('div',{class:'mtag'},'（不认识的积木：'+b.do+'）'));
+    default:if(SBLK(b.do)){await storyMini(b,add);break;}add(h('div',{class:'mtag'},'（不认识的积木：'+b.do+'）'));
   }
 }
 
@@ -1203,6 +1355,7 @@ const costsPatience=RULES.costsPatience;
 const DETECT={低:.1,中:.4,高:.8};
 const hanLen=s=>(s||'').replace(/[\s\p{P}\p{S}…]/gu,'').length;
 function validate(){
+  if(S.mod==='story')return validateStory();
   const out=[],R=S.reg,has=(k,id)=>R[k].some(x=>x.id===id),u=S.user,sc=S.scene;
   const add=(lv,msg,target)=>{if(!out.some(o=>o.msg===msg))out.push({lv,msg,target});};
   const U={kind:'user'},SC={kind:'scene'};
@@ -1215,6 +1368,7 @@ function validate(){
   const checkFx=(list,where,T)=>{for(const b of list||[]){
     const d=R.blocks.find(x=>x.id===b.do);if(!d){add('err',where+'：积木「'+(b.do||b.kind)+'」不在积木库里',T);continue;}
     if(TXTB.has(b.do)&&!b.text)add('warn',where+'：「'+d.name+'」积木没写文字',T);
+    if(b.alts?.some(t=>!t))add('warn',where+'：「'+d.name+'」有一种说法是空的',T);
     if(b.do==='show'&&!S.lib.shows.some(x=>x.id===b.id))add('err',where+'：引用的共享演出「'+b.id+'」不存在',T);
     if(b.do==='screen'&&!has('screens',b.app))add('err',where+'：显示器应用「'+b.app+'」不在登记表里',T);
     if(b.do==='together'){if(!b.steps?.length)add('warn',where+'：「同时进行」里面是空的',T);checkFx(b.steps,where,T);}
@@ -1239,7 +1393,6 @@ function validate(){
     if(!rd.need)add('info',R0+'：没写需求句',T);
     checkFx(rd.startFx,R0+' · 一轮开头',T);
     const solves=rd.cards.filter(c=>c.result==='解决').length;
-    if(solves>2)add('err',R0+`：有 ${solves} 张解决卡，最多 2 张，否则玩家能靠排除法蒙对`,T);
     if(!solves)add('info',R0+'：没有解决卡，玩家只能糊弄或坦白',T);
     if(!rd.cards.some(c=>!['intuition','open'].includes(c.attr)&&c.result!=='解决'))add('warn',R0+'：没有诱饵卡（看着像正解、其实跑偏的卡）',T);
     if(!rd.cards.some(c=>c.attr==='intuition'))add('warn',R0+'：缺常驻的基础直觉卡',T);
@@ -1281,7 +1434,7 @@ function validate(){
   });
   return out;
 }
-const issueKey=t=>t.kind==='card'?`c${t.ri}:${t.slot}`:t.kind==='round'?`r${t.ri}`:t.kind;
+const issueKey=t=>t.seg&&t.kind==='node'?`n${t.seg}/${t.node}`:t.kind==='seg'?'s'+t.seg:t.kind==='day'?'d'+t.day:t.kind==='char'?'ch'+t.id:t.kind==='card'?`c${t.ri}:${t.slot}`:t.kind==='round'?`r${t.ri}`:t.kind;
 function issuesFor(t){const k=issueKey(t);return ISSUES.filter(i=>issueKey(i.target)===k);}
 function issueDot(t){
   const list=issuesFor(t).filter(i=>i.lv!=='info');if(!list.length)return null;
@@ -1305,6 +1458,7 @@ function renderIssuesPanel(P){
 }
 // 把画布移到选中的轮 / 卡上
 function focusTarget(t){
+  if(S.mod==='story')return storyFocus(t);
   const el=t.kind==='card'?$(`.card[data-ri="${t.ri}"][data-slot="${t.slot}"]`):t.kind==='round'?$(`.colhd[data-ri="${t.ri}"]`):t.kind==='scene'?$('.term.start'):null;
   if(!el)return;const lane=$('#lane').getBoundingClientRect(),r=el.getBoundingClientRect();
   V.x+=lane.left+lane.width/2-(r.left+r.right)/2;V.y+=lane.top+120-r.top;applyView();
@@ -1411,6 +1565,7 @@ function openDemo(){
 $('#validB').onclick=()=>select({kind:'issues'});
 $('#playB').onclick=ptStart;
 $('#demoB').onclick=async()=>{await flush();openDemo();};
+$('#gameB').onclick=async()=>{await flush();window.open('/游戏/','_blank');};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('#play').classList.remove('on');});
 
 // ---------- 右栏宽度：拖动画布右边的分隔条，双击恢复 ----------
@@ -1510,7 +1665,7 @@ function zoomAt(nz,cx,cy){nz=Math.min(2,Math.max(.3,nz));V.x=cx-(cx-V.x)*nz/V.z;
 (()=>{
   const lane=$('#lane');let drag=null;
   lane.addEventListener('pointerdown',e=>{
-    if(e.button!==0||e.target.closest('.card,.colhd,.empty,.addcol,.term,button,#legend,#zoom,#split,input,select,textarea,.showed'))return;
+    if(e.button!==0||e.target.closest('.card,.colhd,.empty,.addcol,.term,button,#legend,#zoom,#split,input,select,textarea,.showed,.nopan'))return;
     drag={x:e.clientX-V.x,y:e.clientY-V.y,id:e.pointerId};lane.setPointerCapture(e.pointerId);lane.classList.add('drag');
   });
   lane.addEventListener('pointermove',e=>{if(!drag)return;V.x=e.clientX-drag.x;V.y=e.clientY-drag.y;applyView();});
@@ -1531,6 +1686,7 @@ function zoomAt(nz,cx,cy){nz=Math.min(2,Math.max(.3,nz));V.x=cx-(cx-V.x)*nz/V.z;
 
 // ---------- 说明页 ----------
 function openHelp(){
+  if(S.mod==='story')return storyHelp();storyHelpRestore();
   const box=$('#anatCard');const rd=S.scene.rounds[0];const b=board(rd);
   const r=b.rows.find(x=>!x.off&&x.v.result==='跑偏')||b.rows.find(x=>!x.off);
   const el=cardEl(r,0,-1);el.onclick=null;el.style.cursor='default';
@@ -1541,6 +1697,8 @@ function openHelp(){
 $('#helpBtn').onclick=openHelp;$('#helpX').onclick=()=>$('#help').classList.remove('on');
 $('#help').addEventListener('click',e=>{if(e.target.id==='help')$('#help').classList.remove('on');});
 addEventListener('keydown',e=>{if(e.key==='Escape')$('#help').classList.remove('on');});
+// Esc 关右栏（输入框、对话框、菜单开着的时候不算）
+addEventListener('keydown',e=>{if(e.key!=='Escape'||!S.sel||editing(e.target)||$('#help.on,#play.on,#ask.on,#tour.on,#bmenu'))return;closePanel();});
 
 // ---------- 存盘：停手半秒自动保存，只写真的变了的文件 ----------
 // 点开「深层」「0 级」标签页会先建一个空对象，没写内容就不存进文件
@@ -1555,7 +1713,7 @@ const SAVED={};            // 剧本内路径 → 最近一次和磁盘一致的
 let saveT=null,DRAG=null;
 const userPath=()=>`${S.dir}/用户.json`,scenePath=()=>`${S.dir}/${S.file}`;
 const LIBP='_演出库.json';
-const docs=()=>[...(S.scene?[[userPath(),S.user],[scenePath(),S.scene]]:[]),...(S.lib?[[LIBP,S.lib]]:[])];
+const docs=()=>[...(S.scene?[[userPath(),S.user],[scenePath(),S.scene]]:[]),...(S.lib?[[LIBP,S.lib]]:[]),...storyDocs()];
 const dirty=()=>docs().some(([p,o])=>ser(o)!==SAVED[p]);
 function setStatus(t,k){const e=$('#save');e.textContent=t;e.className='st '+k;}
 function scheduleSave(){setStatus('未保存','wait');clearTimeout(saveT);saveT=setTimeout(flush,500);}
@@ -1574,23 +1732,23 @@ addEventListener('beforeunload',e=>{if(saveT||dirty()){flush();e.preventDefault(
 
 // ---------- 撤销 / 重做：打字时 0.4 秒内的改动算一步 ----------
 let UNDO=[],UI=0,undoT=null;
-const snap=()=>({u:ser(S.user),s:ser(S.scene),l:ser(S.lib)});
+const snap=()=>({u:ser(S.user),s:ser(S.scene),l:ser(S.lib),st:storySnap()});
 function updUndo(){$('#undoB').disabled=UI<=0&&!undoT;$('#redoB').disabled=UI>=UNDO.length-1;}
 function resetUndo(){UNDO=[snap()];UI=0;updUndo();}
 function pushUndo(){clearTimeout(undoT);undoT=setTimeout(pushUndoNow,400);updUndo();}
 function pushUndoNow(){
   clearTimeout(undoT);undoT=null;const s=snap(),c=UNDO[UI];
-  if(!c||c.u!==s.u||c.s!==s.s||c.l!==s.l){UNDO.splice(UI+1);UNDO.push(s);if(UNDO.length>200)UNDO.shift();UI=UNDO.length-1;}
+  if(!c||c.u!==s.u||c.s!==s.s||c.l!==s.l||c.st!==s.st){UNDO.splice(UI+1);UNDO.push(s);if(UNDO.length>200)UNDO.shift();UI=UNDO.length-1;}
   updUndo();
 }
 function setDocs(u,sc){S.user=u;S.list.find(x=>x.dir===S.dir).user=u;S.scene=sc;validSel();}
 function undo(d){
   pushUndoNow();const j=UI+d;
   if(j<0||j>=UNDO.length)return toast(d<0?'没有可以撤销的了':'没有可以重做的了');
-  UI=j;S.lib=JSON.parse(UNDO[j].l);S.openBlk=null;setDocs(JSON.parse(UNDO[j].u),JSON.parse(UNDO[j].s));renderAll();scheduleSave();updUndo();toast(d<0?'已撤销':'已重做');
+  UI=j;S.lib=JSON.parse(UNDO[j].l);storyRestore(UNDO[j].st);S.openBlk=null;setDocs(JSON.parse(UNDO[j].u),JSON.parse(UNDO[j].s));renderAll();scheduleSave();updUndo();toast(d<0?'已撤销':'已重做');
 }
 $('#undoB').onclick=()=>undo(-1);$('#redoB').onclick=()=>undo(1);
-const editing=t=>t.closest('input,textarea,select,[contenteditable]');
+const editing=t=>t.closest('input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),textarea,[contenteditable]');
 addEventListener('keydown',e=>{
   if(!e.ctrlKey)return;const k=e.key.toLowerCase();
   if(k==='s'){e.preventDefault();flush().then(()=>toast('已保存'));return;}
@@ -1618,7 +1776,10 @@ try{
     const p=JSON.parse(e.data).path;if(p.endsWith('.tmp'))return;
     clearTimeout(listT);listT=setTimeout(refreshList,300);
     if(p==='_登记表.json'){S.reg=await (await fetch('/剧本/_登记表.json?t='+Date.now())).json();renderAll();return toast('登记表已更新');}
-    if(p==='_日程表.json'){await loadSide();if(S.preset)setPreset(S.preset);else renderAll();return toast('日程表已更新');}
+    if(p.startsWith('_剧情/')){clearTimeout(S.stT);S.stT=setTimeout(storyExternal,300);return;}
+    if(p==='_日程表.json'){
+      if(S.story){let t;try{t=ser(JSON.parse(await (await fetch('/剧本/_日程表.json?t='+Date.now())).text()));}catch{return;}if(t===SAVED[SCHEDP])return;if(ser(S.sched)!==SAVED[SCHEDP])return toast('日程表在外部被改了，但这里有没保存的改动，以这里为准');}
+      await loadSide();if(S.story){SAVED[SCHEDP]=ser(S.sched);pushUndoNow();}if(S.preset)setPreset(S.preset);else renderAll();return toast('日程表已更新');}
     if(p==='_后训练题库.json'){await loadSide();renderAll();return toast('后训练题库已更新');}
     const doc=docs().find(([q])=>q===p);if(!doc)return;
     let t;try{t=ser(JSON.parse(await (await fetch(`/剧本/${p}?t=${Date.now()}`)).text()));}catch{return;}
@@ -1707,10 +1868,14 @@ async function loadSide(){
   applyView();setPreset('day1');
   const u=S.list[0];if(!u)return toast('剧本/ 下还没有用户，点左下角新建');
   await openScene(u.dir,u.scenes[0].file);
+  const story=decodeURIComponent(location.hash)==='#剧情';if(story)await setMod('story');
   let done=false;try{done=!!localStorage.getItem('tourDone');}catch{}
-  if(!done)setTimeout(tourStart,700);
+  if(!done&&!story)setTimeout(tourStart,700);
 })();
 addEventListener('resize',()=>requestAnimationFrame(drawEdges));
 </script>
+<script src="/游戏/大肥鱼占位.js"></script>
+<script src="/剧情编辑器/剧情模块.js"></script>
+<script src="/剧情编辑器/立绘检查.js"></script>
 </body>
 </html>

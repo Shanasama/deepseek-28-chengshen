@@ -33,7 +33,7 @@ function renderSL(stagger) {
     if (s && s.ok) {
       const f = s.info;
       d.innerHTML = `<div class="sthumb r2"><img src="${s.thumb}"></div><div class="inf"><div class="no">No.${no}</div><div class="tt">Day ${f.day} · 白天 · ${f.time}</div>
-        <div class="chips"><span class="r2">❤ ${f.hearts}</span><span class="r2">额度 ${f.quota}/${f.quotaMax}</span><span class="r2">行动点 ${f.ap}/${f.apMax}</span></div><div class="t2 who"></div><div class="dt">${s.real}</div></div>${tag}${fx}`;
+        <div class="chips"><span class="r2">❤ ${f.hearts}</span><span class="r2">额度 ${f.quota}/${f.quotaMax}</span><span class="r2">行动点 ${f.ap}/${f.apMax}</span><span class="r2" title="这个存档里解锁的成就">🏆 ${(s.state?.achievements || []).length}</span></div><div class="t2 who"></div><div class="dt">${s.real}</div></div>${tag}${fx}`;
       d.querySelector('.who').textContent = f.tonight.length ? '今晚：' + f.tonight.join('、') : '';
     } else if (s) d.innerHTML = `<div class="sthumb r2">OLD</div><div class="inf"><div class="no">No.${no}</div><div class="tt">旧版本存档</div><div class="t3">游戏更新过，这份读不了</div><div class="dt">${s.real || ''}</div></div>${tag}${fx}`;
     else d.innerHTML = `<div class="sthumb r2">NO DATA</div><div class="inf"><div class="no">No.${no}</div><div>${auto ? '— 还没有自动存档 —' : '— 空 —'}</div></div>${tag}${fx}`;

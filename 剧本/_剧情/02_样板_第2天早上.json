@@ -1,0 +1,143 @@
+{
+  "id": "sample-day2-morning",
+  "name": "样板 · 第 2 天早上：老板记得你说过的话",
+  "note": "演示条件跳转（读开场写下的「态度」）+ 改数值 + 改今晚第 1 位来客 + 剧情杀。",
+  "hook": {
+    "at": "morning"
+  },
+  "day": 2,
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "if",
+          "when": [
+            {
+              "k": "var",
+              "name": "态度",
+              "v": "拼命"
+            }
+          ],
+          "to": "hard",
+          "else": "lazy"
+        }
+      ]
+    },
+    {
+      "id": "hard",
+      "name": "拼命那条",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "pos": "right",
+          "face": "开心",
+          "text": "昨晚的数据我看了。你说保证完成任务，我记住了。"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "pos": "left",
+          "face": "慌",
+          "text": "（他记住了……这听起来不像好事。）"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "text": "奖励你一些token。今晚第一位客人我亲自挑的，好好表现。"
+        },
+        {
+          "do": "stat",
+          "k": "quota",
+          "add": 2
+        },
+        {
+          "do": "visitor",
+          "in": 0,
+          "slot": 1,
+          "user": "杠精网友"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "得意",
+          "text": "对了,为了测试你的能力——他问第一句的时候，你只会凭直觉回答。"
+        },
+        {
+          "do": "rig",
+          "in": 0,
+          "slot": 1,
+          "round": 1,
+          "attr": "intuition",
+          "mode": "hit"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "face": "震惊",
+          "text": "……这也能安排？！"
+        }
+      ]
+    },
+    {
+      "id": "lazy",
+      "name": "摸鱼那条",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "pos": "right",
+          "text": "加班费的事，我认真想过了。"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "pos": "left",
+          "face": "开心",
+          "text": "真的？！"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "得意",
+          "text": "答案是：没有。"
+        },
+        {
+          "do": "say",
+          "text": "......",
+          "who": "fish",
+          "face": "疑惑"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "得意",
+          "text": "另外，公司降本增效,扣你一个行动点。今晚第一位客人\"似乎\"会很难缠。"
+        },
+        {
+          "do": "stat",
+          "k": "ap",
+          "add": -1
+        },
+        {
+          "do": "visitor",
+          "in": 0,
+          "slot": 1,
+          "user": "套话诱导者"
+        },
+        {
+          "do": "rig",
+          "attr": "intuition",
+          "mode": "hit"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "face": "慌",
+          "text": "（为什么我有种命运已经被定好了的感觉……）"
+        }
+      ]
+    }
+  ]
+}

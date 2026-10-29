@@ -1,0 +1,28 @@
+{
+  "id": "sample-heart-lost",
+  "name": "样板 · 第一次掉心",
+  "note": "演示事件挂点「心变少」：对话中间掉的心，等这位用户走了再播（没勾「立即」）。只用窗口里的积木。",
+  "hook": {
+    "at": "heartLost"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "glitch",
+          "level": "light"
+        },
+        {
+          "do": "notice",
+          "text": "心 −1 · 老板（样板） 正在查看日志",
+          "tone": "red"
+        },
+        {
+          "do": "aiSay",
+          "text": "……我是不是搞砸了？下一位，下一位一定好好说。"
+        }
+      ]
+    }
+  ]
+}

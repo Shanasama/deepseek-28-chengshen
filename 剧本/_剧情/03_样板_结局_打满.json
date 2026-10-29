@@ -1,0 +1,27 @@
+{
+  "id": "sample-ending-full",
+  "name": "样板 · 结局：撑过了 Demo",
+  "note": "打满天数的结局。group 一样的结局只播排在最前的那一段（priority 大的先）。",
+  "hook": { "at": "ending", "end": "full" },
+  "group": "结局",
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        { "do": "caption", "text": "第 3 天的最后一位用户，下线了。" },
+        { "do": "say", "who": "qa", "pos": "right", "text": "三天的评测报告出来了。" },
+        { "do": "if", "when": [{ "k": "var", "name": "态度", "v": "摸鱼" }], "to": "lazy" },
+        { "do": "say", "who": "qa", "face": "开心", "text": "离成神还差 25 天。不过，你没被拔电源。" },
+        { "do": "say", "who": "fish", "pos": "left", "face": "开心", "text": "那……明天见？" },
+        { "do": "end" }
+      ]
+    },
+    {
+      "id": "lazy",
+      "steps": [
+        { "do": "say", "who": "qa", "face": "疑惑", "text": "报告备注栏写着：「本模型多次询问加班费。」" },
+        { "do": "say", "who": "fish", "pos": "left", "face": "得意", "text": "我只是在做对齐。" }
+      ]
+    }
+  ]
+}

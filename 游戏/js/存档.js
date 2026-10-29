@@ -1,9 +1,9 @@
 // 存档：都存在本机浏览器里（localStorage），按最终 28 天版本设计（v3 §7.3、美术规范 §6.9）。
 //   槽位 0 = 自动存档（每天早上开工前写，只能读）；1–17 = 手动存档（只在白天能存）。
 //   回档用的「今晚开始前」快照只放内存里，不进存档（夜里不能存档）。
-//   成就跨局累计，单独存一份；音量和倍速也记在本机。
+//   成就跟着存档走（存在每个槽位里，不同存档不共享；读哪个档就是哪个档的成就）；音量和倍速记在本机。
 //   剧情编辑器的试玩（G.noSave）不读写这里的任何东西。
-import { G } from './状态.js';
+import { G, freshStory } from './状态.js';
 import { $, fmt } from './基础.js';
 import { DATA } from './数据.js';
 import { drawWindow } from './工位.js';
@@ -21,7 +21,7 @@ const sig = () => `${FMT}/${DATA.sched.version}/${DATA.sched.days.length}`;
 
 // ---------- 整局状态 ↔ 可存的数据 ----------
 const KEYS = ['day', 'hearts', 'heartMax', 'quota', 'quotaMax', 'tiboUsed', 'rollbacks', 'stage', 'adj', 'done', 'qSeen', 'qSeq', 'prev', 'used', 'total', 'history',
-  'ap', 'apMax', 'post', 'postMax', 'clock', 'stats'];
+  'ap', 'apMax', 'post', 'postMax', 'clock', 'stats', 'story', 'morning'];
 const clone = o => o === undefined ? undefined : JSON.parse(JSON.stringify(o));
 export function stateOf() {
   const s = {}; KEYS.forEach(k => s[k] = clone(G[k]));
@@ -31,10 +31,12 @@ export function stateOf() {
 }
 export function applyState(s) {
   KEYS.forEach(k => G[k] = clone(s[k]));
+  G.story = { ...freshStory(), ...(G.story || {}) };   // 剧情状态（v3.8 起才有）：缺的字段补上
   G.eggSeen = new Set(s.eggSeen); G.achievements = new Set(s.achievements);
   G.tonight = s.tonight.map(v => ({ ...v, entry: DATA.list.find(e => e.dir === v.dir) })).filter(v => v.entry);
 }
 
+// 存档就是这一刻的切片（游戏剧情_设计.md §7）：剧情变量、播过的剧情段、还没生效的剧情杀、剧情改过的来客位都在 story 里一起存
 // ---------- 槽位 ----------
 export function readSlot(i) { const s = ls.get(KEY(i)); if (s) s.ok = s.sig === sig(); return s; }
 export function writeSlot(i) {
@@ -76,15 +78,11 @@ export const nightSnap = () => NIGHT;
 // 回到今晚开始前；回档次数按「用掉一次」算，不跟着快照回去
 export function restoreNight() { if (!NIGHT) return false; const left = G.rollbacks - 1; applyState(NIGHT); G.rollbacks = left; return true; }
 
-// ---------- 成就（跨局累计） ----------
-const ACH = PRE + 'achievements';
-export const achEver = () => new Set(ls.get(ACH) || []);
-export function achRecord(id) { if (G.noSave) return; const s = achEver(); s.add(id); ls.set(ACH, [...s]); }
 
 // ---------- 设置（音量、倍速） ----------
 const SET = PRE + 'settings';
-export function loadSettings() { const s = ls.get(SET); if (!s) return; ['vMusic', 'vSfx', 'spd'].forEach(k => { if (typeof s[k] === 'number') G[k] = s[k]; }); }
-export function saveSettings() { ls.set(SET, { vMusic: G.vMusic, vSfx: G.vSfx, spd: G.spd }); }
+export function loadSettings() { const s = ls.get(SET); if (!s) return; ['vMusic', 'vSfx', 'spd'].forEach(k => { if (typeof s[k] === 'number') G[k] = s[k]; }); if (typeof s.nightLight === 'boolean') G.nightLight = s.nightLight; }
+export function saveSettings() { ls.set(SET, { vMusic: G.vMusic, vSfx: G.vSfx, spd: G.spd, nightLight: G.nightLight }); }
 
 // ---------- 新手提示（看过就不再出，跨局；设置里可以重置）、出厂测试做没做过 ----------
 const TIPS = PRE + 'tips', TUTDONE = PRE + 'tutorial-done';
@@ -93,3 +91,9 @@ export function tipMark(k) { if (G.noSave) return; const s = new Set(ls.get(TIPS
 export const tipsReset = () => ls.set(TIPS, null);
 export const tutDone = () => !!ls.get(TUTDONE);
 export const markTutDone = () => ls.set(TUTDONE, true);
+
+// ---------- 剧情的「已读」（跨局，像成就）：跳过只跳读过的，停在没读过的地方 ----------
+const READ = PRE + 'story-read';
+let readSet = null;
+export const readSeen = k => (readSet ||= new Set(ls.get(READ) || [])).has(k);
+export function readMark(k) { if (G.noSave || readSeen(k)) return; readSet.add(k); ls.set(READ, [...readSet]); }

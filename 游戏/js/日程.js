@@ -1,8 +1,9 @@
 // 日程：一天一天往下走。白天 → 开始营业 → 一晚几位用户接连上线（一位一个会话）→ 每晚结算 → 下一天。
 // 每天的安排全在 剧本/_日程表.json；3 天 Demo 和 28 天本体是同一套代码，只是表的行数不同。
 // 存档（v3 §7.3）：每天早上开工前自动存；手动存读档只在白天；心归零时回档到今晚开始前（次数看日程表）。
-// 新游戏：剧情占位页 → Day 0 出厂测试（日程表 event: tutorial 那一行；做过一次以后可以跳过）→ 第 1 天。
-import { G, QT, freshStats, spd } from './状态.js';
+// 新游戏：开场剧情（没有就放剧情占位页）→ Day 0 出厂测试（日程表 event: tutorial 那一行；做过一次以后可以跳过）→ 第 1 天。
+// 游戏剧情挂在这些地方（游戏剧情_设计.md §2）：开场、早上开工前、开始营业前（白天.js）、每位用户上线前 / 离开后、每晚结算前 / 后、结局。
+import { G, QT, freshStats, freshStory, spd } from './状态.js';
 import { $, wait, shuffle, restart, toast, fmt, stage } from './基础.js';
 import { SFX } from './音频.js';
 import { glitch } from './特效.js';
@@ -18,6 +19,7 @@ import { showReport, showEnd, showFinal, renderSelf } from './报告.js';
 import { autoSave, applyState, snapNight, restoreNight, nightSnap, tutDone, markTutDone } from './存档.js';
 import { story, tutNight, tutEnd, installCorpus, day1Guide, closeSpot } from './教学.js';
 import { showTitle, leaveTitle } from './标题.js';
+import { hook, fire, flushEvents, clearEvents, storyAbort, HANDLERS } from './剧情.js';
 
 const days = () => DATA.sched.days.filter(d => !d.skip && d.event !== 'tutorial');
 const tutDay = () => DATA.sched.days.find(d => d.event === 'tutorial');
@@ -28,7 +30,7 @@ const nextDayOf = n => days().map(d => d.day).filter(d => d > n).sort((a, b) => 
 export async function newGame() {
   leaveTitle(); TRIAL = null; G.noSave = false; resetGame(); G.started = true; G.startT = performance.now();
   setSessionPicker(pickSession); clearConvs();
-  await story();
+  if (!(await hook('opening'))) await story();
   const d0 = tutDay(); let tut = !!d0;
   // 第一次玩必须做出厂测试；做过一次以后可以跳过（跳过就直接拿到教学的结果）
   if (d0 && tutDone()) tut = await confirmBox('要做出厂测试吗？', '新手教学：教转盘、剔除重转，装上口语模块，再做一道后训练。', '做出厂测试', '跳过');
@@ -53,22 +55,24 @@ export async function loadSave(s) {
   setMode('day'); drawRoomItems(); $('calday').textContent = G.day; restart($('cal'), 'flip'); renderClock(); setUrl(HOME(), true);
   const conv = newConv(); writeTo(conv); showConv(conv, true);
   addNote(`读档 · 第 ${G.day} 天 · ${fmt(G.clock)}`, 'day');
-  fishSay(G.ap > 0 ? `……刚才说到哪了？还剩 ${G.ap} 个行动点，接着来！` : '……行动点用完了，可以开始营业啦。');
   bubble(true); view('menu'); renderSelf(); renderHUD(); renderAP(); renderDrawer(); SFX.morning();
+  // 读的是早上的自动存档：穿越回早上，早上的剧情重新播（选项能重选）
+  if (G.morning) { const d = G.day; G.busy = true; await hook('morning'); if (G.day !== d || G.mode !== 'day') return; G.busy = false; G.morning = false; }
+  fishSay(G.ap > 0 ? `……刚才说到哪了？还剩 ${G.ap} 个行动点，接着来！` : '……行动点用完了，可以开始营业啦。');
 }
 // 整局状态回到日程表的开局（出厂状态）
 function resetGame() {
   const s = DATA.sched.start;
-  Object.assign(G, { tutorial: false,
+  Object.assign(G, { tutorial: false, morning: false,
     hearts: s.hearts, heartMax: s.heartMax, quota: s.quota, quotaMax: s.quotaMax, rollbacks: s.rollbacks, tiboUsed: false, over: false,
-    stage: { ...s.stage }, adj: JSON.parse(JSON.stringify(s.adj || {})), done: {}, qSeen: {}, qSeq: 0, used: {}, eggSeen: new Set(), achievements: new Set(),
+    stage: { ...s.stage }, adj: JSON.parse(JSON.stringify(s.adj || {})), done: {}, qSeen: {}, qSeq: 0, used: {}, eggSeen: new Set(), achievements: new Set(), story: freshStory(),
     total: freshStats(), stats: freshStats(), history: [], sessions: [], cur: -1, busy: false,
   });
   QT.forEach(t => { G.adj[t] = G.adj[t] || {}; });
 }
 // 停下正在进行的一切（回到标题、读档之前）
 export async function quitRun() {
-  NIGHT++; TRIAL = null; abortRun(); closeSpot(); tutEnd(); G.tutorial = false; $('qlbl').textContent = '额度'; $('story').classList.remove('on'); if (NODE.state !== 'hidden') closeNode(); clearFlights();
+  NIGHT++; TRIAL = null; abortRun(); storyAbort(); closeSpot(); tutEnd(); G.tutorial = false; $('qlbl').textContent = '额度'; $('story').classList.remove('on'); if (NODE.state !== 'hidden') closeNode(); clearFlights();
   ['report', 'endcard', 'final', 'restore', 'modal'].forEach(id => $(id).classList.remove('on')); $('phone').classList.remove('show');
   $('cursor').style.display = 'none'; stage.classList.remove('rewind'); clearWipe(); drawer(false); bubble(false);
   Object.assign(G, { over: false, busy: false, started: false, cur: -1, sessions: [], skipping: false });
@@ -111,30 +115,60 @@ export function startDay(n, { tut = false } = {}) {
   const save = () => { if (!TRIAL) { autoSave(); addLog('已自动存档（存读档界面第 1 格）', 'sys'); } };
   if (tut) {
     const q = (DATA.bank.questions || []).find(x => x.id === tutDay()?.question);
-    (async () => { if (q && q.pair) await tutorialQuestion(q); else view('menu'); await day1Guide(); save(); })();
+    // 出厂测试后的第 1 天：早上的剧情先播，再做教学题和引导、存档（教学题必须在存档之前做完）
+    (async () => { G.busy = true; await hook('morning'); G.busy = false; if (q && q.pair) await tutorialQuestion(q); else view('menu'); await day1Guide(); save(); })();
     return;
   }
-  fishSay(`早上好！今天有 ${G.ap} 个行动点，干点啥？` + (G.tonight.some(v => v.boss) ? '（听说今晚有个不好惹的家伙要来……）' : ''));
-  view('menu'); save();
+  // 先存档、再播早上的剧情：存档是这一刻的切片，读档回到这里会重播剧情（选项能重选）
+  G.morning = true; save(); G.busy = true;   // morning：早上的剧情还没播（自动存档就切在这一刻，读档会接着播）
+  (async () => {
+    const d = G.day; await hook('morning'); if (G.day !== d || G.mode !== 'day') return; G.busy = false; G.morning = false;
+    fishSay(`早上好！今天有 ${G.ap} 个行动点，干点啥？` + (G.tonight.some(v => v.boss) ? '（听说今晚有个不好惹的家伙要来……）' : ''));
+    view('menu');
+  })();
 }
-// 今晚来访：日程表指定的人（Boss）先定下来，其余从「还有没用过的场景」的用户里随机抽；
-// 剧本不够时让已有用户再来一次（占位 · 重复来访），等剧本库补上新人就自动换掉
+// 今晚来访：日程表这一天的来客位（slots），剧情在这一局改过的位以剧情为准（G.story.slots[第几天][第几位]）。
+//   写死的位（{user, scene}）先定；随机位从「还有没用过的场景」的用户里抽；
+//   剧本不够时让已有用户再来一次（占位 · 重复来访），排在随机位的后面，等剧本库补上新人就自动换掉
+// 旧格式（visitors + fixed）照样认：fixed 的人排在最后
+const slotsOf = cfg => cfg.slots || [...Array(Math.max(0, (cfg.visitors ?? 4) - (cfg.fixed || []).length)).fill('random'), ...(cfg.fixed || []).map(user => ({ user }))];
+function slotsFor(day) {
+  const base = slotsOf(DATA.sched.days.find(d => d.day === day) || {}).slice(), ov = G.story.slots[day] || {};
+  for (const [k, v] of Object.entries(ov)) base[+k - 1] = v;
+  return base.map(v => v || 'random');
+}
+const visitorOf = (e, i, repeat) => ({ name: e.user.name, bio: e.user.bio, dir: e.dir, avatar: e.user.avatar, boss: !!e.user.boss, repeat, file: e.scenes[i]?.file, entry: e });
+// 写死的位：指定了场景就用那个，没指定就是这个用户下一个没用过的场景
+function pinned(e, scene) {
+  const used = G.used[e.dir] || 0, at = scene ? e.scenes.findIndex(x => x.file === scene) : -1, i = at >= 0 ? at : Math.min(used, e.scenes.length - 1);
+  G.used[e.dir] = used + 1; return visitorOf(e, i, at < 0 && used >= e.scenes.length);
+}
 export function rollTonight() {
-  const cfg = dayToday(), want = cfg.visitors ?? 4, list = DATA.list.filter(e => !e.user.tutorial);
-  const fixed = (cfg.fixed || []).map(dir => list.find(e => e.dir === dir)).filter(Boolean);
-  const normal = list.filter(e => !e.user.boss && !fixed.includes(e));
-  const out = [], visitor = (e, i, repeat) => ({ name: e.user.name, bio: e.user.bio, dir: e.dir, avatar: e.user.avatar, boss: !!e.user.boss, repeat, file: e.scenes[i]?.file, entry: e });
-  for (const e of shuffle(normal.filter(e => (G.used[e.dir] || 0) < e.scenes.length))) { if (out.length >= want - fixed.length) break; out.push(visitor(e, G.used[e.dir] || 0, false)); G.used[e.dir] = (G.used[e.dir] || 0) + 1; }
-  shuffle(out);
+  const list = DATA.list.filter(e => !e.user.tutorial), slots = slotsFor(G.day), out = slots.map(() => null);
+  slots.forEach((v, i) => { const e = v !== 'random' && list.find(x => x.dir === v.user); if (e) out[i] = pinned(e, v.scene); });
+  const taken = new Set(out.filter(Boolean).map(v => v.dir)), normal = list.filter(e => !e.user.boss && !taken.has(e.dir));
+  const R = out.map((v, i) => v ? -1 : i).filter(i => i >= 0), got = [];
+  for (const e of shuffle(normal.filter(e => (G.used[e.dir] || 0) < e.scenes.length))) { if (got.length >= R.length) break; got.push(visitorOf(e, G.used[e.dir] || 0, false)); G.used[e.dir] = (G.used[e.dir] || 0) + 1; }
   // 占位排在后面，并且不紧挨着同一个人
   const pool = shuffle(normal.filter(e => e.scenes.length));
-  for (let k = 0; out.length < want - fixed.length && pool.length; k++) {
-    const prev = out[out.length - 1]?.dir, e = pool.find(x => x.dir !== prev && !out.some(o => o.repeat && o.dir === x.dir)) || pool[k % pool.length];
-    out.push(visitor(e, Math.random() * e.scenes.length | 0, true));
+  for (let k = 0; got.length < R.length && pool.length; k++) {
+    const prev = got[got.length - 1]?.dir, e = pool.find(x => x.dir !== prev && !got.some(o => o.repeat && o.dir === x.dir)) || pool[k % pool.length];
+    got.push(visitorOf(e, Math.random() * e.scenes.length | 0, true));
   }
-  fixed.forEach(e => { const i = Math.min(G.used[e.dir] || 0, e.scenes.length - 1); out.push(visitor(e, i, (G.used[e.dir] || 0) >= e.scenes.length)); G.used[e.dir] = (G.used[e.dir] || 0) + 1; });
-  G.tonight = out;
+  R.forEach((i, k) => { out[i] = got[k]; });
+  G.tonight = out.filter(Boolean);
 }
+// 白天剧情改了今晚第 k 位：只换那一位，别的预告不动
+function patchSlot(k) {
+  const i = k - 1, old = G.tonight[i], v = slotsFor(G.day)[i]; if (i < 0 || i > G.tonight.length) return;
+  if (old && !old.repeat) G.used[old.dir] = Math.max(0, (G.used[old.dir] || 1) - 1);
+  const list = DATA.list.filter(e => !e.user.tutorial), others = new Set(G.tonight.filter((_, j) => j !== i).map(x => x.dir));
+  let nv = null;
+  if (v !== 'random') { const e = list.find(x => x.dir === v.user); if (e) nv = pinned(e, v.scene); }
+  if (!nv) { const e = shuffle(list.filter(e => !e.user.boss && !others.has(e.dir) && (G.used[e.dir] || 0) < e.scenes.length))[0]; if (e) { nv = visitorOf(e, G.used[e.dir] || 0, false); G.used[e.dir] = (G.used[e.dir] || 0) + 1; } }
+  if (!nv) return; G.tonight[i] = nv; renderDrawer(); restart($('vdot'), 'bump'); toast(`今晚第 ${k} 位来客换成了 ${nv.name}`);
+}
+HANDLERS.slot = patchSlot;
 
 // ---------- 夜里 ----------
 let NIGHT = 0;
@@ -155,6 +189,7 @@ export async function startNight() {
     if (my !== NIGHT) return;
     const s = G.sessions[i]; G.cur = i; s.status = 'live'; renderDrawer();
     writeTo(s.conv); showConv(s.conv, i > 0);
+    await hook('beforeVisitor', { slot: i + 1 }); if (my !== NIGHT) return;
     if (G.tutorial) s.onRoundEnd = async ri => { if (ri === 0) for (const a of tutDay().unlock || []) await installCorpus(a); };
     // 这一场可能被打断：提前下班 / 开发面板跳过。不等被打断的那一场自己收尾（它可能卡在一个永远不来的回调上）
     let r = await Promise.race([runSession(s), new Promise(ok => { CUT = ok; })]); CUT = null;
@@ -164,7 +199,9 @@ export async function startNight() {
     if (r === 'abort') return;
     s.result = r; s.status = 'done'; s.resultLabel = { solved: '解决离开', win: '特殊胜利', offline: '下线', forced: '强制下线', drop: '掉线' }[r]; renderDrawer();
     G.clock += 20; renderClock();
+    await flushEvents(); if (my !== NIGHT) return;   // 对话中间发生的事件（心变少、额度见底……），排到这时候播
     if (G.hearts <= 0 && DATA.sched.start.heartsOutEnds && !TRIAL) { await wait(900); if (my !== NIGHT) return; return heartsOut(); }
+    await hook('afterVisitor', { slot: i + 1 }); if (my !== NIGHT) return;
     await wait(1400 / spd());
   }
   if (my !== NIGHT) return;
@@ -177,10 +214,13 @@ export async function startNight() {
 // 每晚结算 → 下一天（打满全部天数就进最终评测）
 async function nightOver(my) {
   G.history.push(dayLine());
+  await flushEvents(); if (my !== NIGHT) return;
   const last = G.day >= lastDay();
+  await hook('beforeReport'); if (my !== NIGHT) return;
   await showReport(last);
   if (my !== NIGHT) return;
-  if (last) { await showFinal('demo'); await quitRun(); return showTitle(); }
+  await hook('afterReport'); if (my !== NIGHT) return;
+  if (last) { endingAch('full'); await hook('ending', { end: 'full' }); if (my !== NIGHT) return; await showFinal('demo'); await quitRun(); return showTitle(); }
   await wipe(true); startDay(nextDayOf(G.day)); await wipe(false); SFX.morning();
 }
 const dayLine = (out = false) => ({ day: G.day, solved: G.stats.solved, lost: G.stats.lost, like: G.stats.like, eggs: G.stats.eggs, out });
@@ -211,6 +251,7 @@ async function finishEarly(i) {
   rest.forEach(s => { s.status = 'done'; s.result = 'early'; s.resultLabel = '提前下班'; }); renderDrawer(); setFish('panic');
   for (const _ of rest) { G.stats.lost++; G.total.lost++; loseHeart(); await wait(320); }
   await wait(900); if (my !== NIGHT) return;
+  await fire('heartLost'); if (my !== NIGHT) return;
   if (G.hearts <= 0 && DATA.sched.start.heartsOutEnds) return heartsOut();
   G.cur = -1; renderQueue(); setFish('idle'); nightOver(my);
 }
@@ -251,11 +292,23 @@ async function rollback() {
     SFX.tick(.2); if (my !== NIGHT) return;
   }
   stage.classList.remove('rewind'); glitch(2);
-  restoreNight(); G.over = false; clearConvs(); drawRoomItems(); renderHUD(); renderAP();
+  restoreNight(); G.over = false; clearConvs(); clearEvents(); drawRoomItems(); renderHUD(); renderAP();
   toast(`已回档到今晚开始前 · 回档${G.rollbacks > 0 ? '还剩 ' + G.rollbacks + ' 次' : '用完了'}`);
+  await fire('rollback'); if (my !== NIGHT) return;
   startNight();
 }
 function gameOver() {
-  G.over = true; G.history.push(dayLine(true));
-  showEnd('hearts', async () => { await showFinal('hearts'); await quitRun(); showTitle(); });
+  G.over = true; G.history.push(dayLine(true)); endingAch('hearts');
+  showEnd('hearts', async () => { await hook('ending', { end: 'hearts' }); await showFinal('hearts'); await quitRun(); showTitle(); });
 }
+
+// ---------- 结局（游戏剧情_设计.md §7）：每个结局一个成就；剧情的「进结局」积木走 storyEnding ----------
+const ENDING_ACH = { full: 'end-full', hearts: 'end-hearts' };
+function endingAch(kind) { const id = ENDING_ACH[kind] || kind; if (!(DATA.reg.achievements || []).some(a => a.id === id)) return; (G.achievements ||= new Set()).add(id); }
+// 剧情要结束这一局：心被扣光就走心尽的流程（夜里还有回档会先问），否则直接进那个结局
+async function storyEnding(id) {
+  if (id === 'hearts') { if (G.mode === 'night' && !G.tutorial && !TRIAL) return heartsOut(); return gameOver(); }
+  NIGHT++; stopSession(); G.over = true; G.busy = true; G.history.push({ ...dayLine(true), end: id }); endingAch(id);
+  await hook('ending', { end: id }); await showFinal(id); await quitRun(); showTitle();
+}
+HANDLERS.end = storyEnding;

@@ -6,8 +6,7 @@ import { confetti } from './特效.js';
 import { w } from './训练.js';
 import { mkRadar, dropRadar, radarLabels } from './六维图.js';
 import { setUrl, HOME } from './界面.js';
-import { DATA } from './数据.js';
-import { achEver } from './存档.js';
+import { DATA, regName } from './数据.js';
 
 function tabs(box, cur, onPick) {
   box.innerHTML = ''; QT.forEach(t => { const s = document.createElement('span'); s.className = 'r2' + (t === cur ? ' on' : ''); s.textContent = t + '类'; s.onclick = () => { SFX.click(); onPick(t); }; box.appendChild(s); });
@@ -71,16 +70,18 @@ export function showEnd(kind, restartFn) {
   onRestart = restartFn; $('erestart').onclick = () => { $('endcard').classList.remove('on'); SFX.click(); onRestart && onRestart(); };
 }
 
-// ---------- 徽章墙（成就跨局累计）：这一局拿到的标 NEW，以前拿过的亮，从没拿过的是剪影 ----------
-export function renderBadges(box, run) {
-  const ever = achEver(); box.innerHTML = '';
+// ---------- 徽章墙：成就跟着存档走，只看这一个存档拿到的。拿到的亮、没拿到的是剪影；
+// fresh = 最终评测（这一局刚打完：拿到的标 NEW、一个个响），否则是标题画面看「继续」那个存档 ----------
+export function renderBadges(box, have, fresh = false) {
+  box.innerHTML = '';
   (DATA.reg.achievements || []).forEach((a, i) => {
-    const st = run.has(a.id) ? 'new' : ever.has(a.id) ? 'got' : 'lock', lock = st === 'lock';
+    const st = have.has(a.id) ? (fresh ? 'new' : 'got') : 'lock', lock = st === 'lock';
     const d = document.createElement('div'); d.className = 'bdg r4 ' + st;
     d.appendChild(pxIcon(ICON.trophy, { k: lock ? P.k5 : P.ink, Y: lock ? P.k4 : P.gold, w: lock ? P.k5 : P.paper }, 3));
     d.insertAdjacentHTML('beforeend', '<span class="bn"></span><span class="bh"></span>' + (st === 'new' ? '<span class="nw r2">NEW</span>' : ''));
     d.querySelector('.bn').textContent = lock ? '？？？' : a.name;
-    d.querySelector('.bh').textContent = lock ? (a.hint || '某位用户的某个回答里藏着') : st === 'new' ? '这一局解锁' : '以前解锁过';
+    d.querySelector('.bh').textContent = lock ? (a.hint || '某位用户的某个回答里藏着') : st === 'new' ? '这一局解锁' : '这个存档里解锁了';
+    d.title = d.querySelector('.bh').textContent;   // 最终评测里说明藏起来了，悬停看
     box.appendChild(d); setTimeout(() => { d.classList.add('in'); if (st === 'new') SFX.unlock(); }, 250 + i * 140);
   });
 }
@@ -89,9 +90,10 @@ export function renderBadges(box, run) {
 let FR = null, onFinal = null;
 export function showFinal(kind) {
   return new Promise(ok => {
-    const out = kind === 'hearts', tot = G.total;
-    $('fh').textContent = out ? `第 ${G.day} 天下线 · 最终评测` : `大肥鱼 · ${G.day} 天总结`;
-    $('fstamp').textContent = out ? 'OFFLINE' : 'FINAL';
+    // kind：demo 打满天数 / hearts 心尽 / 其余是剧情触发的结局（成就编号，名字在登记表）
+    const out = kind === 'hearts', story = !out && kind !== 'demo', tot = G.total;
+    $('fh').textContent = story ? `结局：${regName('achievements', kind)}` : out ? `第 ${G.day} 天下线 · 最终评测` : `大肥鱼 · ${G.day} 天总结`;
+    $('fstamp').textContent = story ? 'THE END' : out ? 'OFFLINE' : 'FINAL';
     $('fsub').textContent = `${G.day > 1 ? 'Day 1–' + G.day : 'Day 1'} · dafeiyu-v3 · 最终评测`;
     let t = G.reportType || '知识';
     const draw = () => { tabs($('ftabs'), t, x => { t = x; G.reportType = x; draw(); }); dropRadar(FR); FR = mkRadar($('fradar'), 200, t); FR.dark = true; radarLabels($('fradarbox'), FR, 15, 15); };
@@ -100,7 +102,7 @@ export function showFinal(kind) {
     [...$('fdays').children].forEach((d, i) => setTimeout(() => { d.classList.add('in'); SFX.step(i); }, 300 + i * 120));
     $('fstats').innerHTML = [['解决离开', tot.solved, P.mint], ['点赞', tot.like, P.mint], ['点踩', tot.dislike, P.red], ['用户流失', tot.lost, 'var(--t1)'], ['蒙混过关', tot.bluff, P.lgold], ['被识破', tot.caught, 'var(--t1)'], ['彩蛋', tot.eggs, P.lpurple], ['剩余心', G.hearts, P.rose]]
       .map(([n, v, c]) => `<div class="r4"><b style="color:${c}">${v}</b><span class="t3">${n}</span></div>`).join('');
-    renderBadges($('fbadges'), G.achievements || new Set());
+    renderBadges($('fbadges'), G.achievements || new Set(), true);
     $('final').classList.add('on'); SFX[out ? 'confirm' : 'levelup'](); if (!out) setTimeout(() => confetti(480, 120, 60), 400);
     onFinal = () => { onFinal = null; $('final').classList.remove('on'); dropRadar(FR); FR = null; SFX.click(); ok(); };
     $('fnext').onclick = onFinal;

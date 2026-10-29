@@ -9,9 +9,11 @@ import { renderAP, renderHUD, spendAP, spendQuota, dropHeart, setUrl, HOME, adva
 import { pt, w, trainOne, pickPair, pickQuestions, isNoise, tagName, gib, learn } from './训练.js';
 import { mkRadar, retargetRadar, radarPt, radarLabels, radarStatic } from './六维图.js';
 import { DATA } from './数据.js';
+import { holds } from './立绘.js';
 import { spot, tipOnce } from './教学.js';
 import { startNight } from './日程.js';
 import { renderSelf } from './报告.js';
+import { hook, fire } from './剧情.js';
 
 const WORDS = { knowledge: ['瑞利散射', '是指', '也称', '词条', '参见', '定义', '研究表明', '光合作用', '引力'], colloquial: ['哈哈哈', '绝了', '家人们', '笑死', '离谱', '顶', '蹲', '6', '好家伙'],
   narrative: ['月光', '她说', '忽然', '那一夜', '风', '回眸', '……', '第一章', '雨'], logic: ['if', 'return', '步骤 1', 'for', 'def', '→', '条件', 'else', '{ }'],
@@ -29,7 +31,8 @@ export const ACTS = [
   { id: 'eat', name: '吃白饭', say: '吃白饭', icon: () => pxIcon(ICON.bowl, { k: P.ink, w: P.paper, B: P.cobalt }, 2), desc: '什么也不干，白吃一顿，心 +1',
     why: () => G.hearts >= G.heartMax ? '吃不下了' : null, sub: () => `心 ${G.hearts}/${G.heartMax}`, run: () => eat() },
 ];
-const enabled = () => { const ids = dayToday().activities; return ACTS.filter(a => !ids || ids.includes(a.id)); };
+// 日程表按天开放；剧情在这一局开过 / 关过的以剧情为准（G.story.acts）
+const enabled = () => { const ids = dayToday().activities, ov = G.story.acts || {}; return ACTS.filter(a => ov[a.id] ?? (!ids || ids.includes(a.id))); };
 const canAct = a => G.ap < 1 ? '行动点用完了' : a.why();
 
 // ---------- 思考气泡 ----------
@@ -76,6 +79,7 @@ export function pickActByIndex(i) { const a = enabled()[i]; if (a) { bubble(true
 async function pretrain(a) {
   if (G.busy) return; if (G.ap < 1) return deny('行动点用完了');
   const A = AT[a], lv = G.stage[a]; lock(true); spendAP();
+  await hook('beforeAct', { act: 'pretrain' });
   await youSay(pick([`今天去${A.site}读读吧。`, `去${A.site}泡一会儿？`]));
   bubble(false); fishSay(A.go); await wt(500);
   setUrl(`dafeiyu://corpus/<b>${A.slug}</b>`, true); SFX.page(); await wt(300);
@@ -90,13 +94,13 @@ async function pretrain(a) {
     await wait(16);
   }
   $('progb').style.width = '100%'; $('progn').textContent = (lv ? 2.4 : 1.2).toFixed(1) + 'M tokens'; await wt(350); $('prog').classList.remove('on'); $('dim').classList.remove('read'); G.musHype = false;
-  learn(a);
+  learn(a); if (lv === 1) await fire('deepFirst', { attr: a });   // 事件挂点「某属性第一次到深层」
   flash(); shake(true); drawRoomItems(); const p = deskXY(...POP[a]); ring(p.x, p.y, A.c, 40, 190); burst(p.x, p.y, A.c, 50, 260); confetti(p.x, p.y, 40); floatAt('啪！', p.x - 14, p.y - 26, P.ink, true);
   SFX.unlock(); vignette('gold'); setFish('happy'); banner(`${lv ? '深层' : '浅层'}解锁 · ${A.n}`, `学会了「${A.lv[lv]}」`, A.c === P.g3 ? P.mist : A.c);
   addLog(`预训练完成 · ${A.n} → ${lv ? '深层' : '浅层'}「${A.lv[lv]}」`, 'k');
   await wt(900); await fishSay('学会了「' + A.lv[lv] + '」！' + (a === 'knowledge' ? '书架又满了一层。' : '房间里又多了点东西。'));
   await advanceClock(120); await wt(300);
-  setUrl(HOME(), true); setScreen('idle'); setFish('idle'); G.tok = 0; lock(false); renderSelf(); view('menu'); bubble(true);
+  setUrl(HOME(), true); setScreen('idle'); setFish('idle'); G.tok = 0; await hook('afterAct', { act: 'pretrain' }); lock(false); renderSelf(); view('menu'); bubble(true);
 }
 
 // ---------- 后训练（按问题类型分开算） ----------
@@ -105,6 +109,7 @@ export const dayKeys = () => ({ KEYQ, KEYR, KEYSUM });
 async function postTrain(t) {
   if (G.busy) return; if (G.ap < 1) return deny('行动点用完了'); if (G.post >= G.postMax) return deny('今天练够了');
   lock(true); spendAP(deskXY(380, 150)); G.post++; renderAP();
+  await hook('beforeAct', { act: 'posttrain' });
   await youSay(pick([`练练${t}类的问题吧。`, `来几道${t}类的题。`]));
   fishSay('来吧，出题！我会认真挑的。');
   setUrl(`dafeiyu://rlhf/<b>${t}</b>`, true); setScreen('rlhf');
@@ -117,7 +122,7 @@ async function postTrain(t) {
   await summary(t, before, ch);
   const up = ch.filter(a => w(t, a) > before[a]).sort((x, y) => (w(t, y) - before[y]) - (w(t, x) - before[x]))[0];
   await fishSay(up ? `记住了！今晚再遇到${t}类的问题，我会更容易想到「${AT[up].n}」的说法。` : `${t}类问题……好像没练出什么来。`);
-  await advanceClock(120); setUrl(HOME(), true); setScreen('idle'); lock(false); renderSelf(); view('menu');
+  await advanceClock(120); setUrl(HOME(), true); setScreen('idle'); await hook('afterAct', { act: 'posttrain' }); lock(false); renderSelf(); view('menu');
 }
 function askOne(t, q, i, n, fixed) {
   return new Promise(done => {
@@ -200,7 +205,7 @@ export async function tutorialQuestion(q) {
 async function eat() {
   if (G.busy) return; if (G.ap < 1) return deny('行动点用完了'); if (G.hearts >= G.heartMax) return deny('吃不下了');
   await tipOnce('eat', 'hud', '吃白饭：花 1 个行动点，心 +1（最多 ' + G.heartMax + ' 颗）。心是整局共用的，夜里用户下线就扣。');
-  lock(true); spendAP(); await youSay(pick(['去吃点东西吧，别饿着。', '吃饭时间到！']));
+  lock(true); spendAP(); await hook('beforeAct', { act: 'eat' }); await youSay(pick(['去吃点东西吧，别饿着。', '吃饭时间到！']));
   bubble(false); fishSay('白饭！我来了！嗷呜——'); await wt(400);
   setUrl('dafeiyu://<b>waimai</b>/order/白饭×1', true); setScreen('eat'); showBowl(true); SFX.thud(); const bp = deskXY(128, DESK_Y - 12); ring(bp.x, bp.y, P.paper, 20, 90); setFish('eat');
   for (let i = 0; i < 9; i++) {
@@ -211,9 +216,10 @@ async function eat() {
   const hp = sp($('hearts').lastChild); ring(hp.x + 5, hp.y + 5, P.rose, 28, 120); burst(hp.x + 5, hp.y + 5, P.rose, 30, 180); floatAt('心 +1', hp.x - 20, hp.y - 20, P.rose, true); vignette('pink'); shake();
   addLog(`吃白饭 · 心 +1（${G.hearts}/${G.heartMax}）`, 'h');
   await fishSay('嗝。吃饱了！今晚多扛一个用户没问题。');
-  await advanceClock(60); await wt(300); setUrl(HOME(), true); setScreen('idle'); setFish('idle'); lock(false); view('menu'); bubble(true);
+  await advanceClock(60); await wt(300); setUrl(HOME(), true); setScreen('idle'); setFish('idle'); await hook('afterAct', { act: 'eat' }); lock(false); view('menu'); bubble(true);
 }
-function showBowl(on_) { const c = $('eat').getContext('2d'); c.clearRect(0, 0, 600, 486); if (!on_) return; const b = pxIcon(ICON.bowl, { k: P.ink, w: P.paper, B: P.cobalt }, 2); c.imageSmoothingEnabled = false; c.drawImage(b, 108, DESK_Y - 24, 40, 24); }
+// 桌上的白饭碗；立绘的 eat 把碗画在她手里时桌上不放
+function showBowl(on_) { const c = $('eat').getContext('2d'); c.clearRect(0, 0, 600, 486); if (!on_ || holds('eat')) return; const b = pxIcon(ICON.bowl, { k: P.ink, w: P.paper, B: P.cobalt }, 2); c.imageSmoothingEnabled = false; c.drawImage(b, 108, DESK_Y - 24, 40, 24); }
 
 // ---------- 开始营业 ----------
 export async function goNight() {
@@ -223,6 +229,7 @@ export async function goNight() {
   fishSay('伸个懒腰……好！今晚的用户们，来吧！'); addLog('开始营业', 'k');
   const from = G.clock, to = 18 * 60 + 40, t0 = performance.now();
   while (true) { const k = Math.min(1, (performance.now() - t0) / (1700 / [.5, 1, 2, 3][G.spd])); G.clock = Math.round(from + (to - from) * k); renderClock(); if (k >= 1) break; await wait(30); }
+  await hook('beforeNight'); if (G.mode !== 'day') return;
   lock(false); startNight();
 }
 

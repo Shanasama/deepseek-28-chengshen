@@ -1,0 +1,25 @@
+{
+  "id": "sample-rollback",
+  "name": "样板 · 回档之后",
+  "note": "演示事件挂点「回档之后」。",
+  "hook": {
+    "at": "rollback"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "caption",
+          "text": "……"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "face": "疑惑",
+          "text": "我好像做过一个很糟的梦。梦里，所有人都下线了。"
+        }
+      ]
+    }
+  ]
+}

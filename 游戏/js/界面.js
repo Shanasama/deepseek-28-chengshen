@@ -1,11 +1,13 @@
 // 界面外壳：HUD（心 / 额度 / 行动点）、侧栏、倍速滑杆、确认框、过场擦屏、昼夜切换、按钮反馈。
 import { G, SPEEDS } from './状态.js';
-import { P, $, sp, restart, pxIcon, ICON, TIBO, phAvatar, toast, fmt, wait, rand, stage } from './基础.js';
+import { P, $, sp, restart, pxIcon, ICON, phAvatar, toast, fmt, wait, rand, stage } from './基础.js';
 import { SFX, beep, ac, setSfxVolume } from './音频.js';
 import { parts, confetti, ring, burst, floatText, floatAt, flyCell, vignette, shake } from './特效.js';
 import { drawRoom, fishAvatar, setScreen } from './工位.js';
+// 剧情的事件挂点：动态引入，免得 界面 → 剧情 → 夜间 → 教学 → 转盘 → 界面 绕成圈、模块初始化顺序乱掉
+const fire = (...a) => import('./剧情.js').then(m => m.fire(...a));
 import { addNote, addLog, headerDay, setInp } from './对话栏.js';
-import { saveSettings, achRecord } from './存档.js';
+import { saveSettings } from './存档.js';
 
 // ---------- 昼夜切换 ----------
 export function setMode(m) {
@@ -39,17 +41,28 @@ export function spendAP(to) {
 }
 // 花一点控盘额度：格子从 HUD 飞到目标点；额度首次跌到 ≤2 时触发 Tibo 重置（全局一次）
 export function spendQuota(to, onArrive, n = 1) {
-  const cell = $('quota').children[G.quota - 1], from = sp(cell); G.quota = Math.max(0, G.quota - n); renderQuota(); floatText('−' + n + ' 额度', cell, P.sky);
+  const cell = $('quota').children[G.quota - 1], from = sp(cell), was = G.quota; G.quota = Math.max(0, G.quota - n); renderQuota(); floatText('−' + n + ' 额度', cell, P.sky);
+  if (was > 2 && G.quota <= 2 && !G.tutorial) fire('quotaLow', {}, { defer: true });   // 事件挂点「额度 ≤2」：等这位用户的对话结束再播
   flyCell(from, to, 'qcell', P.sky, () => { onArrive && onArrive(); if (G.quota <= 2 && !G.tiboUsed && !G.tutorial) setTimeout(tibo, 700); });   // 出厂测试的教学额度不算
 }
 export function addQuota(n) { G.quota = Math.min(G.quotaMax, G.quota + n); renderQuota(); restart($('quota'), 'refill'); }
+// 假手机（仿 X 手机端）升起来显示一条帖子；Tibo 重置和剧情的「假手机帖子」积木共用
+const TIBO_POST = { who: 'Tibo', handle: '@t•••', avatar: '素材/tibo.png', text: "we're back in action — resetting usage limits for everyone.\n\nsorry about the disruption!", note: '额度已重置', stats: '回复 4.1K · 转发 2.1K · 喜欢 17K' };
+export function phonePost(p) {
+  $('ph-who').textContent = p.who || ''; $('ph-handle').textContent = p.handle || ''; $('ph-text').textContent = p.text || ''; $('phone-rf').textContent = p.note || '';
+  $('ph-st').innerHTML = ''; for (const t of (p.stats || '').split(/\s*·\s*/).filter(Boolean)) { const s = document.createElement('span'); s.textContent = t; $('ph-st').appendChild(s); }
+  const av = $('tibo-av'); av.innerHTML = '';
+  if (p.avatar) { const im = new Image(); im.src = p.avatar; im.alt = p.who || ''; im.className = 'tav'; av.appendChild(im); } else av.appendChild(phAvatar(p.who || '?', 1));
+  $('phone-rf').style.visibility = 'visible'; $('phone').classList.add('show'); SFX.note();
+}
 async function tibo() {
-  if (G.tiboUsed) return; G.tiboUsed = true; $('phone-rf').style.visibility = 'hidden'; $('phone').classList.add('show'); SFX.note();
+  if (G.tiboUsed) return; G.tiboUsed = true; phonePost(TIBO_POST); $('phone-rf').style.visibility = 'hidden';
   await wait(900);
   for (let i = G.quota; i < G.quotaMax; i++) { G.quota = i + 1; renderQuota(); restart($('quota'), 'refill'); SFX.charge(i); await wait(70); }
   const q = sp($('quota')); confetti(q.x + 25, q.y, 30); $('phone-rf').style.visibility = 'visible'; addLog('Tibo 重置了额度 · ' + G.quotaMax + '/' + G.quotaMax, 'k');
-  // Tibo 重置也算一个彩蛋：彩蛋 +1，解锁「Tibo 重置」成就（跨局）
-  G.stats.eggs++; G.total.eggs++; (G.achievements ||= new Set()).add('tibo'); achRecord('tibo'); await wait(500); toast('🏆 成就解锁：Tibo 重置'); SFX.unlock();
+  // Tibo 重置也算一个彩蛋：彩蛋 +1，解锁「Tibo 重置」成就
+  G.stats.eggs++; G.total.eggs++; (G.achievements ||= new Set()).add('tibo'); await wait(500); toast('🏆 成就解锁：Tibo 重置'); SFX.unlock();
+  fire('tibo', {}, { defer: true });
 }
 export function loseHeart() {
   const cs = $('hearts').children; const c = cs[cs.length - 1]; G.hearts = Math.max(0, G.hearts - 1); if (!c) return; c.classList.add('lose'); SFX.heart();
@@ -112,9 +125,13 @@ export function confirmBox(q1, q2, yes = '确定', no = '再想想') {
 }
 // ---------- 像素抖动纹擦屏（白天 → 夜间从右往左擦成深色；第二天再擦回来） ----------
 const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+// 擦屏进行中（剧情等它擦完再上来）
+let WIPING = 0;
+export const wiping = () => WIPING > 0;
 export function wipe(toDark, mid) {
-  const c = $('wipe').getContext('2d'), cw = 4, cols = 240, rows = 135; SFX.wipe();
-  return new Promise(ok => {
+  const c = $('wipe').getContext('2d'), cw = 4, cols = 240, rows = 135; SFX.wipe(); WIPING++;
+  return new Promise(ok0 => {
+    const ok = () => { WIPING--; ok0(); };
     const t0 = performance.now(), dur = 900;
     (function step(now) {
       const k = Math.min(1, (now - t0) / dur); c.clearRect(0, 0, 960, 540); c.fillStyle = P.night;
@@ -148,7 +165,6 @@ export function initShell() {
   [['pn1', 'back'], ['pn2', 'fwd'], ['pn3', 'reload']].forEach(([id, k]) => ic(id, k, P.g2));
   $('meav').appendChild(pxIcon(ICON.user, { k: P.g2 })); $('send').appendChild(pxIcon(ICON.send, { k: P.paper }));
   $('pglobe').appendChild(pxIcon(ICON.globe, { k: P.g2 })); $('pglobe2').appendChild(pxIcon(ICON.chart, { k: P.g2 }));
-  $('tibo-av').appendChild(pxIcon(TIBO, { k: P.ink, h: P.c1, s: P.skin, S: P.skinS, K: P.ink, M: P.g1, w: P.paper }, 2));
   ic('spdic2', 'bolt', P.lgold); ic('spdreset', 'reload', P.t3);
   const snd = () => ic('ic-snd', G.muted ? 'mute' : 'snd', P.g2); snd();
   on('ic-snd', () => { G.muted = !G.muted; snd(); toast(G.muted ? '已静音' : '声音已打开'); });
@@ -167,6 +183,8 @@ export function initShell() {
   // 设置：音量（侧栏和标题画面各有一组滑杆，data-k 指向 G 里的字段；记在本机）
   document.querySelectorAll('.vol[data-k]').forEach(el => { const key = el.dataset.k; const set = e => { const r = el.getBoundingClientRect(); G[key] = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); renderSettings(); if (key === 'vSfx') setSfxVolume(G.vSfx); };
     el.addEventListener('pointerdown', e => { e.stopPropagation(); el.setPointerCapture(e.pointerId); set(e); el.onpointermove = set; }); el.addEventListener('pointerup', () => { el.onpointermove = null; SFX.click(); saveSettings(); }); });
+  // 开关（夜间光影）：同样 data-k 指向 G 里的字段
+  document.querySelectorAll('.tog[data-k]').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); G[el.dataset.k] = !G[el.dataset.k]; SFX.click(); renderSettings(); saveSettings(); }));
   renderSettings();
   // 倍速
   const st = $('sfill').querySelector('.stars'); for (let i = 0; i < 34; i++) { const s = document.createElement('i'); s.style.left = (Math.random() * 260 | 0) + 'px'; s.style.top = (2 + Math.random() * 18 | 0) + 'px'; s.style.animationDelay = (-Math.random() * 2.4) + 's'; st.appendChild(s); }
@@ -201,4 +219,5 @@ function sloganClick() {
 }
 export function renderSettings() {
   document.querySelectorAll('.vol[data-k]').forEach(el => { const v = G[el.dataset.k]; el.firstChild.style.width = v * 100 + '%'; el.nextElementSibling.textContent = Math.round(v * 100); });
+  document.querySelectorAll('.tog[data-k]').forEach(el => { const on = G[el.dataset.k] !== false; el.classList.toggle('on', on); el.nextElementSibling.textContent = on ? '开' : '关'; });
 }

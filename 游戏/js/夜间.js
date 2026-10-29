@@ -8,8 +8,9 @@ import { openNode, showPuff } from './转盘.js';
 import { addNote, addErr, addUser, addAI, addTool, finishThink, renderReply, userType, emit, setAnchor, scrollChat, setInp, addTrace, headerUser, nightBar } from './对话栏.js';
 import { loseHeart, addQuota, renderQuota } from './界面.js';
 import { DATA, showById, regName } from './数据.js';
-import { achRecord } from './存档.js';
 import { tipHeart, tipCaught } from './教学.js';
+import { fire, fateFor } from './剧情.js';
+import { NODE } from './转盘.js';
 
 const RULES = window.RULES;
 const DETECT = { 低: .1, 中: .4, 高: .8 };
@@ -48,9 +49,12 @@ async function aiLine(text, fast) {
   else { await emit(stripMd(text) || '……', a.txtCaret, { reply: true }); t.classList.add('md'); t.innerHTML = mdRender(text); }
   a.d.classList.add('fin'); scrollChat();
 }
-async function runFx(list, depth = 0) {
+// 写了几个说法（alts）的积木：每次播随机挑一句，同一块不连着播同一句（规则.js 的 pickLine）
+const LASTLINE = new WeakMap();
+export function lineOf(b) { if (!b.alts?.length) return b; const text = RULES.pickLine(b, LASTLINE.get(b)); LASTLINE.set(b, text); return { ...b, text, alts: undefined }; }
+export async function runFx(list, depth = 0) {
   for (const b0 of list || []) {
-    const b = b0.do ? b0 : { do: b0.kind === 'error' ? 'error' : b0.kind === 'system' ? 'system' : 'notice', text: b0.text };
+    const b = b0.do ? lineOf(b0) : { do: b0.kind === 'error' ? 'error' : b0.kind === 'system' ? 'system' : 'notice', text: b0.text };
     const n = Math.max(1, b.times | 0);
     for (let i = 1; i <= n; i++) { await runBlock(b, i, n, depth); if (i < n && b.gap) await wait(b.gap * 1000 / spd()); }
   }
@@ -125,10 +129,11 @@ async function playEnding(sess, c) {
   const e = c.ending; addTrace('分叉结局：' + ({ drop: '掉线', win: '特殊胜利', forced: '强制下线' }[e.type] || e.type), 'k');
   if (e.show) await runFx([{ do: 'show', id: e.show }]);
   await wait(500 / spd());
-  if (e.type === 'forced') { addNote(e.note || sess.U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); }
+  if (e.type === 'forced') { addNote(e.note || sess.U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); await fire('heartLost'); }
   else addNote(e.note || (e.type === 'win' ? sess.U.name + ' 特殊胜利' : sess.U.name + ' 已掉线'), e.type === 'win' ? 'on' : 'egg');
   if (e.type === 'win') stat('solved'); if (c.attr === 'egg') stat('eggs');
-  if (e.achievement) { await wait(400); toast('🏆 成就解锁：' + regName('achievements', e.achievement)); SFX.confirm(); (G.achievements ||= new Set()).add(e.achievement); achRecord(e.achievement); }
+  if (e.achievement) { await wait(400); toast('🏆 成就解锁：' + regName('achievements', e.achievement)); SFX.confirm(); (G.achievements ||= new Set()).add(e.achievement); }
+  if (c.attr === 'egg') await fire('egg', { id: e.achievement || c.id });
   return e.type;
 }
 
@@ -155,6 +160,7 @@ export async function runSession(sess) {
       G.phase = 'think'; const ai = addAI(); G.tok = 0; setFish('type'); showPuff(true); setScreen('console');
       await new Promise(res => emit(stripMd(pre) || '……', ai.thCaret, { onLaunch: res })); if (!alive()) return 'abort';
       const blank = document.createElement('span'); blank.className = 'blank'; blank.textContent = '＿＿'; ai.thCaret.before(blank); scrollChat();
+      NODE.fate = fateFor(ri + 1, ctx.first);   // 剧情杀（游戏剧情_设计.md §6）
       const c = await openNode(blank, cs, ctx.last, rd.style === 'terminal'); if (!alive()) return 'abort';
       setFish('type'); showPuff(true);
       if (c.post) await emit(stripMd(c.post), ai.thCaret); if (!alive()) return 'abort';
@@ -169,7 +175,7 @@ export async function runSession(sess) {
       if (c.ending) { if (c.ok) await sayLine(c.ok, c.rhythm); await runFx(c.fx.afterReaction); return await playEnding(sess, c); }
       const out = await react(sess, c, ai); if (!alive()) return 'abort';
       if (out !== 'offline') await runFx(c.fx.afterReaction); if (!alive()) return 'abort';
-      if (out === 'offline') { await sayBye(sess, 'offline'); addNote(U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); setFish('panic'); await wait(800); await tipHeart(); return 'offline'; }
+      if (out === 'offline') { await sayBye(sess, 'offline'); addNote(U.name + ' 已下线', 'off'); stat('lost'); loseHeart(); setFish('panic'); await wait(800); await tipHeart(); await fire('heartLost'); return 'offline'; }
       if (out === 'progress') {
         const rude = c.res === '解决' && c.feel === '冒犯';
         if (G.retry > 0) ctx.firstTry = false; if (rude) ctx.noOffend = false;

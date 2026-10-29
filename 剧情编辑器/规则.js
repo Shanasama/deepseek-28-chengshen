@@ -147,5 +147,43 @@
     return { stage, adj };
   }
 
-  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, afterTutorial, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT };
+  // ---------- 游戏剧情（游戏剧情_设计.md §3、§5） ----------
+  // st 是这一局的状态：{ day, hearts, quota, ap, rollbacks, stage: {属性: 0/1/2}, vars: {剧情变量}, ach: [这一局拿到的成就], played: [这一局播过的剧情段] }
+  const CMP = { '==': (a, b) => a === b, '!=': (a, b) => a !== b, '>=': (a, b) => a >= b, '<=': (a, b) => a <= b, '>': (a, b) => a > b, '<': (a, b) => a < b };
+  // 一组条件：全部满足才算满足，空的算满足。剧情段的进入条件和「条件跳转」积木都用它
+  function storyCond(list, st) {
+    return (list || []).every(c => {
+      const op = CMP[c.op || '=='] || CMP['=='], v = c.v === undefined ? true : c.v;
+      switch (c.k) {
+        case 'var': return op(st.vars ? st.vars[c.name] : undefined, v);
+        case 'day': case 'hearts': case 'quota': case 'ap': case 'rollbacks': return op(st[c.k], c.v);
+        case 'stage': return op((st.stage || {})[c.attr] || 0, c.v);
+        case 'ach': return (st.ach || []).includes(c.id) === (c.v !== false);
+        case 'played': return (st.played || []).includes(c.id) === (c.v !== false);
+        default: return false;
+      }
+    });
+  }
+  // 剧情段写的「哪一天」：不写 / every = 哪天都行；数字 = 那一天；数组 = 其中某天
+  const dayOK = (d, day) => d == null || d === 'every' || (Array.isArray(d) ? d.includes(day) : d === day);
+  // 挂点到了，这一次要播哪些剧情段。at = { at: 挂点编号, 其余是这个挂点的参数（act 哪种活动、slot 第几位来客、end 哪种结局……）}；
+  // 剧情段的 hook 里写了某个参数就必须对得上，没写就不限。
+  // 条件满足、「只播一次」的还没播过 → 按优先级从大到小全播；同一互斥组只留排在最前的那一段
+  function storyPick(segs, at, st) {
+    const hookOK = h => !!h && h.at === at.at && Object.keys(h).every(k => k === 'at' || h[k] == null || h[k] === at[k]);
+    const ok = (segs || []).filter(g => hookOK(g.hook) && dayOK(g.day, st.day) && (g.once === false || !(st.played || []).includes(g.id)) && storyCond(g.when, st));
+    const sorted = ok.map((g, i) => [g, i]).sort((a, b) => (b[0].priority || 0) - (a[0].priority || 0) || a[1] - b[1]).map(x => x[0]);
+    const groups = new Set();
+    return sorted.filter(g => { if (!g.group) return true; if (groups.has(g.group)) return false; groups.add(g.group); return true; });
+  }
+
+  // 一块带文字的积木写了几个说法（text + alts）：播的时候随机挑一句；prev 是这块上次播的那句，有得选就别连着重复。剧情和夜间演出共用
+  function pickLine(b, prev, rnd = Math.random) {
+    const all = [b.text, ...(b.alts || [])].filter(t => t != null && t !== '');
+    if (all.length <= 1) return all[0] ?? b.text ?? '';
+    const pool = prev != null && all.includes(prev) ? all.filter(t => t !== prev) : all;
+    return pool[Math.floor(rnd() * pool.length)];
+  }
+
+  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, afterTutorial, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT, storyCond, storyPick, pickLine };
 });

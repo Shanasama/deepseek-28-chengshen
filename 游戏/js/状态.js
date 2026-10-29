@@ -20,10 +20,12 @@ export const G = {
   eggSeen: new Set(),     // 本局盘面出现过的彩蛋（单局去重）
   total: { like: 0, dislike: 0, lost: 0, bluff: 0, caught: 0, solved: 0, eggs: 0 },
   history: [],            // 每晚结束时记一行：{day, solved, lost, like, eggs, out}（最终评测的每日小结）
+  story: null,            // 游戏剧情这一局的状态，见 freshStory（游戏剧情_设计.md）
   noSave: false,          // 剧情编辑器的试玩：不读写存档、不记成就
   inTitle: false,
   // —— 当天 ——
   ap: 4, apMax: 4, post: 0, postMax: 2,
+  morning: false,         // 早上的剧情还没播完（自动存档切在这一刻，读档时接着播）
   clock: 9 * 60,
   tonight: [],            // 今晚来访：[{name, bio, dir, avatar, boss, repeat, scene}]
   sessions: [],           // 今晚的会话（一位用户一个）
@@ -34,8 +36,11 @@ export const G = {
   timeScale: 1, tsTarget: 1, tok: 0,
   // —— 界面 ——
   started: false, startT: 0, busy: false, view: 'menu', tab: 'desk', selfType: '知识',
-  spd: 1, muted: false, vMusic: .6, vSfx: .8, glow: 0, bars: 0, nodeOn: false, musSlow: false, musHype: false, over: false,
+  spd: 1, muted: false, vMusic: .6, vSfx: .8, nightLight: true, glow: 0, bars: 0, nodeOn: false, musSlow: false, musHype: false, over: false,
 };
 
+// 游戏剧情这一局的状态：剧情变量、播过的剧情段、还没生效的剧情杀、剧情改过的来客位（slots[第几天][第几位]）、剧情开关的白天活动
+export const freshStory = () => ({ vars: {}, played: [], rigs: [], slots: {}, acts: {} });
+G.story = freshStory();
 export const freshStats = () => ({ like: 0, dislike: 0, lost: 0, bluff: 0, caught: 0, solved: 0, eggs: 0 });
 export const spd = () => SPEEDS[G.spd].m;

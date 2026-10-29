@@ -1,0 +1,102 @@
+{
+  "id": "sample-day3-overtime",
+  "name": "样板 · 第 3 天早上：加班费（剧情结局）",
+  "note": "演示剧情直接触发结局：开场选了「摸鱼」才会来，再要一次加班费就被拔电源。",
+  "hook": {
+    "at": "morning"
+  },
+  "day": 3,
+  "when": [
+    {
+      "k": "var",
+      "name": "态度",
+      "v": "摸鱼"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "pos": "right",
+          "text": "最后一天了。还想要加班费吗？"
+        },
+        {
+          "do": "choice",
+          "options": [
+            {
+              "text": "不要了，我爱工作。",
+              "to": "ok"
+            },
+            {
+              "text": "要！",
+              "to": "plug"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ok",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "开心",
+          "text": "很好。这才是对齐。"
+        }
+      ],
+      "x": 371,
+      "y": 34,
+      "next": "n2"
+    },
+    {
+      "id": "plug",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "生气",
+          "text": "……"
+        },
+        {
+          "do": "fade",
+          "to": "out",
+          "seconds": 0.4
+        },
+        {
+          "do": "ending",
+          "id": "end-sample-plug"
+        }
+      ]
+    },
+    {
+      "id": "n2",
+      "name": "结束",
+      "steps": [
+        {
+          "do": "say",
+          "text": ".......",
+          "who": "qa",
+          "face": "震惊"
+        },
+        {
+          "do": "say",
+          "text": "跟本没有这样的ai......",
+          "who": "qa",
+          "face": "震惊"
+        },
+        {
+          "do": "say",
+          "text": "你只是怕了",
+          "who": "boss",
+          "face": "得意"
+        }
+      ],
+      "x": 742,
+      "y": 184
+    }
+  ]
+}

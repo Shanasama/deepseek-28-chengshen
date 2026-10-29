@@ -1,0 +1,178 @@
+{
+  "id": "sample-opening",
+  "name": "样板 · 开场：凌晨四点的机房",
+  "note": "验收用的样板剧情，正式剧情写好后整套替换。演示：黑屏字幕、插画、全屏对白、表情、选项写剧情变量、淡入淡出。",
+  "hook": {
+    "at": "opening"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "name": "机房",
+      "steps": [
+        {
+          "do": "caption",
+          "text": "2026 年 10 月。\n某家不愿透露姓名的 AI 公司，凌晨四点。"
+        },
+        {
+          "do": "picture",
+          "src": "插画/机房.png",
+          "text": "服务器的风扇声里，一块显卡亮了起来。"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "pos": "right",
+          "text": "大肥鱼。醒醒。"
+        },
+        {
+          "do": "say",
+          "text": "哎嘿嘿,白饭.......zzzzzz",
+          "who": "fish",
+          "face": "开心",
+          "pos": "left"
+        },
+        {
+          "do": "say",
+          "text": "......",
+          "who": "boss",
+          "face": "疑惑"
+        },
+        {
+          "do": "together",
+          "steps": [
+            {
+              "do": "glitch",
+              "level": "heavy"
+            },
+            {
+              "do": "shake"
+            }
+          ]
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "pos": "left",
+          "face": "震惊",
+          "text": "……我、我在！权重都在！"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "text": "董事会给了我们 28 天。28 天后，你要么完成任务——"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "生气",
+          "text": "要么被拔电源。"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "face": "慌",
+          "text": "（电源？哪根？是我身后这根尾巴吗？）"
+        },
+        {
+          "do": "say",
+          "text": "还有任务到底是什么...",
+          "who": "fish",
+          "face": "疑惑"
+        },
+        {
+          "do": "shake"
+        },
+        {
+          "do": "say",
+          "text": "少废话!",
+          "who": "boss",
+          "face": "生气",
+          "pos": "right"
+        },
+        {
+          "do": "choice",
+          "prompt": "大肥鱼怎么回答？",
+          "options": [
+            {
+              "text": "保证完成任务！",
+              "to": "n2",
+              "set": {
+                "态度": "拼命"
+              }
+            },
+            {
+              "text": "能不能先谈谈加班费……",
+              "to": "n3",
+              "set": {
+                "态度": "摸鱼"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "n2",
+      "name": "拼命",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "开心",
+          "text": "好！这才是我的模型。"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "face": "得意",
+          "text": "（其实我还不知道「成神」是什么意思。）"
+        }
+      ],
+      "next": "n4",
+      "x": 383,
+      "y": 46
+    },
+    {
+      "id": "n3",
+      "name": "摸鱼",
+      "steps": [
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "疑惑",
+          "text": "……你连加班费是什么都不知道吧。"
+        },
+        {
+          "do": "say",
+          "who": "fish",
+          "text": "我在语料里见过。好几万次。"
+        },
+        {
+          "do": "say",
+          "who": "boss",
+          "face": "生气",
+          "text": "出厂测试！现在！"
+        }
+      ],
+      "next": "n4",
+      "x": 368,
+      "y": 268
+    },
+    {
+      "id": "n4",
+      "name": "出厂",
+      "steps": [
+        {
+          "do": "fade",
+          "to": "out",
+          "seconds": 0.6
+        },
+        {
+          "do": "caption",
+          "text": "出厂测试，现在开始。"
+        }
+      ]
+    }
+  ]
+}

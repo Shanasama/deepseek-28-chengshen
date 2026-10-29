@@ -1,0 +1,27 @@
+{
+  "note": "游戏剧情的角色表（游戏剧情_设计.md §4）。portraits 是「表情 → 图片」（相对 剧本/_剧情/），没有图就用大肥鱼的占位精灵；tint 是占位时的色相偏移（度），好分清是谁。",
+  "chars": [
+    {
+      "id": "fish",
+      "name": "大肥鱼",
+      "color": "#3F6EE8",
+      "portraits": {
+        "默认": ""
+      }
+    },
+    {
+      "id": "boss",
+      "name": "老板（样板）",
+      "color": "#E8A93A",
+      "portraits": {},
+      "tint": 142
+    },
+    {
+      "id": "qa",
+      "name": "质检员（样板）",
+      "color": "#2E9A5E",
+      "tint": 260,
+      "portraits": {}
+    }
+  ]
+}

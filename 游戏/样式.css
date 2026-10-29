@@ -1,5 +1,5 @@
 /* 大肥鱼 HARNESS · 样式。白天浅色、夜间深色，共用同一套布局；颜色都走下面的语义变量 */
-@font-face{font-family:FP;font-display:swap;src:url(https://cdn.jsdelivr.net/npm/@fontsource/fusion-pixel-12px-proportional-sc@5.3.0/files/fusion-pixel-12px-proportional-sc-latin-400-normal.woff2) format('woff2');}
+@font-face{font-family:FP;font-display:swap;src:url(素材/fp.woff2) format('woff2');}
 :root{
   --abyss:#0A1030;--night:#121A42;--navy:#1B2560;--deep:#263489;--cobalt:#3F6EE8;--sky:#5AA0FF;--cyan:#8FD3FF;--ice:#C9ECFF;
   --k0:#000000;--k1:#0C0C0D;--k2:#151517;--k3:#1E1E21;--k4:#2A2A2E;--k5:#3C3C41;--t3:#6E6E75;--t2:#9C9CA3;--t15:#C9C9CE;--t1:#EDEDEF;
@@ -84,6 +84,8 @@ body.night #title .hn{background:var(--k4)}
 .set .v{color:var(--tx3);text-align:right}
 .vol{height:8px;background:var(--hov);position:relative;cursor:pointer}
 .vol i{position:absolute;left:0;top:0;bottom:0;background:var(--cobalt)}
+.tog{width:28px;height:12px;background:var(--hov);position:relative;justify-self:start}.tog i{position:absolute;left:2px;top:2px;width:8px;height:8px;background:var(--tx3);transition:left .12s steps(3)}
+.tog.on{background:var(--cobalt)}.tog.on i{left:18px;background:var(--paper)}
 #drawer .me{margin-top:auto;display:flex;align-items:center;gap:8px;color:var(--tx2);padding-top:8px;box-shadow:inset 0 1px 0 var(--line)}
 
 /* ---------- 对话栏 ---------- */
@@ -288,6 +290,13 @@ body.day #glow{display:none}
 #scr{left:228px!important;top:274px!important}
 #fish{position:absolute;left:6px;top:204px;transform-origin:50% 100%}
 #mouth{left:111px!important;top:336px!important;transform-origin:-5px 74px}
+#fishspr,#fishguide{display:none}
+/* 夜间光影（光影.js）：屋里压暗偏冷，显示器、分词机是光源不压；光晕叠加混合，暗角盖在最上面 */
+#light,#vig{display:none}#light{mix-blend-mode:plus-lighter}body.lit #light,body.lit #vig,body.litday #light{display:block}
+/* 白天光影：屋里不压暗，只在傍晚 / 天擦黑时调一点暖色、暗一点（光影.js 按钟点设 --dayf） */
+body.litday #back,body.litday #wall,body.litday #slogan,body.litday #clock,body.litday #cal,body.litday #front,body.litday #onDesk,body.litday #eat,body.litday #mouth,body.litday #glow{filter:var(--dayf,none)}
+body.lit #back,body.lit #wall,body.lit #slogan,body.lit #clock,body.lit #cal,body.lit #front,body.lit #onDesk,body.lit #eat,body.lit #mouth,body.lit #cable{filter:brightness(.42) saturate(.85)}
+body.lit #win{filter:brightness(.6)}body.lit #glow{filter:brightness(.8)}#room.spr #fishspr{display:block}#room.spr #fish,#room.spr #mouth{visibility:hidden}   /* 有正式立绘时换下占位图（立绘.js） */
 #fish.idle,#mouth.idle{animation:bob 2.4s steps(1) infinite}
 #fish.type,#mouth.type{animation:bob .24s steps(1) infinite}
 #fish.think,#mouth.think{animation:bob 1.4s steps(1) infinite}
@@ -586,6 +595,7 @@ body.day .stats div{background:var(--mist)}
 
 /* ---------- 弹窗、过场、特效 ---------- */
 #dim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50;transition:opacity .35s}
+#dim.overvn{z-index:96}   /* 剧情对话时的「画面压暗」：压在对话框上面（剧情.js 的 overVN） */
 #dim.vig{background:radial-gradient(circle at 60% 36%,transparent 22%,#000 85%)}
 #dim.beat{animation:beat .9s ease-out infinite}
 @keyframes beat{0%{filter:brightness(1.6)}30%{filter:none}}
@@ -595,6 +605,7 @@ body.day .stats div{background:var(--mist)}
 #joy{position:absolute;inset:0;pointer-events:none;z-index:76;opacity:0;background:radial-gradient(circle at 50% 50%,transparent 45%,rgba(79,207,138,.5))}
 #joy.on{animation:vig .7s ease-out}
 #joy.pink{background:radial-gradient(circle at 50% 50%,transparent 45%,rgba(240,127,176,.55))}
+#joy.red{background:radial-gradient(circle at 50% 50%,transparent 40%,rgba(232,67,79,.6))}
 #joy.gold{background:radial-gradient(circle at 50% 50%,transparent 40%,rgba(255,213,122,.65))}
 @keyframes vig{0%{opacity:1}100%{opacity:0}}
 #fxl{position:absolute;inset:0;pointer-events:none;z-index:70}
@@ -754,6 +765,8 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 .ti.shk{animation:shk .1s steps(1) 3}
 .thint{margin-top:10px}
 .tver{position:absolute;right:14px;bottom:10px}
+/* 标题画面右下角的作者署名（压在版本号上方） */
+#tauthor{position:absolute;right:14px;bottom:28px;letter-spacing:1px;opacity:.9;pointer-events:none}
 .tpanel{position:absolute;left:420px;top:90px;width:480px;padding:14px 18px;background:var(--k2);box-shadow:0 0 0 1px var(--k5),6px 6px 0 rgba(0,0,0,.5);display:none;animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
 .tpanel.on{display:block}
 .tpanel .ph{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
@@ -852,3 +865,74 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 .cand.holding::after{content:'';position:absolute;left:0;top:0;bottom:0;width:calc(var(--hk) * 100%);background:rgba(232,67,79,.35);pointer-events:none}
 #spot .sgo.wait{color:var(--g2);animation:none}
 #spot .stip.shk{animation:shk .1s steps(1) 3}
+#phone .tav{width:32px;height:32px;border-radius:50%;image-rendering:auto;display:block;box-shadow:0 0 0 1px var(--ink)}
+
+/* ---------- 游戏剧情的画面层（剧情.js、游戏剧情_设计.md §4） ---------- */
+#ph-text{white-space:pre-line}
+#vn{position:absolute;inset:0;z-index:95;display:none;color:var(--t1);cursor:pointer}
+#vn.on{display:block;animation:tin .25s steps(4)}
+#vn.out{animation:tin .25s steps(4) reverse forwards}
+#vn .vbg{position:absolute;inset:0;background:rgba(6,8,22,.6)}
+#vn.cap .vbg{background:#000}
+#vpic{position:absolute;inset:0;display:none;background:#0A1030 center/cover no-repeat;image-rendering:pixelated}
+#vpic.on{display:block}#vpic.in{animation:tin .5s steps(6)}
+#vpic.ph{background:repeating-linear-gradient(45deg,#121A42 0 12px,#1B2560 12px 24px)}
+#vpic.ph::after{content:attr(data-name);position:absolute;left:16px;top:14px;padding:4px 12px;font-size:12px;line-height:16px;background:var(--k0);color:var(--t2);box-shadow:0 0 0 2px var(--k5)}
+#vn.cap #vpic,#vn.cap #vchars,#vn.cap #vbox{display:none}
+#vchars{position:absolute;inset:0;pointer-events:none}
+.vch{position:absolute;bottom:56px;width:322px;margin-left:-161px;transition:left .3s steps(6),filter .2s}
+.vch img{width:322px;height:330px;filter:drop-shadow(0 0 0 #000)}
+.vch.flip img{transform:scaleX(-1)}
+.vch.dim{filter:brightness(.45) saturate(.5)}
+.vch.in{animation:chup .3s steps(5)}
+@keyframes chup{from{transform:translateY(40px);opacity:0}}
+.vch img.hop{animation:hop .45s steps(4) 2}.vch img.shk{animation:shk .1s steps(1) 6}.vch img.shock{animation:shock .7s steps(1) 1}.vch img.sad{animation:sad 1.2s steps(3) 1}
+.vch.flip img.hop{animation:hopf .45s steps(4) 2}.vch.flip img.shk{animation:shkf .1s steps(1) 6}
+@keyframes sad{50%{transform:translateY(6px)}}@keyframes hopf{0%,100%{transform:scaleX(-1)}50%{transform:scaleX(-1) translateY(-8px)}}@keyframes shkf{0%{transform:scaleX(-1) translateX(-2px)}50%{transform:scaleX(-1) translateX(2px)}}
+.vch .emo{position:absolute;left:190px;top:46px;font-size:36px;line-height:40px;opacity:0}
+.vch.flip .emo{left:90px}
+.vch .emo.on{animation:emo 1.4s steps(6) forwards}
+@keyframes emo{0%{opacity:0;transform:translateY(10px) scale(.4)}15%{opacity:1;transform:translateY(-4px) scale(1.3)}25%{transform:none}85%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.vch .ph{display:none;position:absolute;left:50%;top:-6px;transform:translateX(-50%);padding:0 6px;background:rgba(0,0,0,.6);color:var(--t3)}
+.vch.placeholder .ph{display:block}
+#vbox{position:absolute;left:36px;right:36px;bottom:14px;height:124px;padding:22px 26px 10px;background:rgba(10,12,22,.94);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--g1),6px 6px 0 rgba(0,0,0,.55)}
+#vbox.hidden{display:none}
+#vbox.narr #vtext{color:var(--t15)}
+#vname{position:absolute;left:18px;top:-16px;padding:2px 14px;font-size:24px;line-height:28px;color:var(--paper);box-shadow:0 0 0 2px var(--ink),3px 3px 0 rgba(0,0,0,.5)}
+#vname.in{animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
+#vtext{font-size:24px;line-height:32px;letter-spacing:1px;white-space:pre-line}
+#vnext{position:absolute;right:18px;bottom:10px;width:12px;height:8px;background:var(--lgold);clip-path:polygon(0 0,100% 0,50% 100%);opacity:0}
+#vnext.on{opacity:1;animation:sarr .6s steps(2) infinite}
+#vcap{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:0 120px;font-size:24px;line-height:40px;letter-spacing:3px;text-align:center;white-space:pre-line}
+#vn.cap #vcap{display:flex}
+#vcap.in{animation:tin .4s steps(4)}
+#vchoice{position:absolute;left:50%;top:120px;width:480px;margin-left:-240px;display:flex;flex-direction:column;gap:12px}
+.vopt{display:flex;gap:14px;align-items:center;padding:10px 18px;font-size:24px;line-height:28px;background:var(--k2);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--k5),5px 5px 0 rgba(0,0,0,.55);cursor:pointer;animation:optin .3s steps(5) backwards;transition:transform .08s steps(2)}
+.vopt .k{color:var(--t3);font-size:12px;line-height:16px;padding:2px 6px;background:var(--k4)}
+.vopt.sel{background:var(--cobalt);transform:translateX(8px);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--ice),5px 5px 0 rgba(0,0,0,.55)}
+.vopt.sel .k{background:var(--paper);color:var(--ink)}
+.vopt.picked{animation:picked .5s steps(5) forwards;background:var(--lgold);color:var(--ink)}
+.vopt.gone{animation:gone .3s steps(4) forwards}
+@keyframes optin{from{transform:translateX(-40px);opacity:0}}
+@keyframes picked{0%{transform:scale(1.08)}30%{transform:scale(1.12) translateX(8px)}100%{transform:translateX(8px)}}
+@keyframes gone{to{opacity:0;transform:translateX(30px)}}
+#vbar{position:absolute;right:46px;bottom:146px;display:flex;gap:4px}
+#vn.cap #vbar{bottom:14px;right:14px}
+#vbar .vb{padding:2px 8px;background:rgba(10,12,22,.88);color:var(--t2);box-shadow:0 0 0 1px var(--k5);cursor:pointer}
+#vbar .vb i{font-style:normal;color:var(--t3);margin-left:2px}
+#vbar .vb:hover{color:var(--t1);box-shadow:0 0 0 1px var(--t3)}
+#vbar .vb.on{background:var(--lgold);color:var(--ink)}#vbar .vb.on i{color:var(--g1)}
+#vlog{position:absolute;left:110px;right:110px;top:36px;bottom:36px;z-index:2;display:none;flex-direction:column;padding:14px 20px;background:rgba(6,8,16,.97);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--g1),6px 6px 0 rgba(0,0,0,.6);cursor:default}
+#vlog.on{display:flex;animation:pop .2s cubic-bezier(.3,1.6,.5,1)}
+#vlog .lh{display:flex;gap:8px;align-items:baseline;margin-bottom:12px}
+#vlog .lh .x{padding:2px 8px;background:var(--k4)}
+#vlog .lbody{flex:1;overflow:auto;padding-right:6px}
+#vlog .le{margin-bottom:12px;font-size:12px;line-height:20px;white-space:pre-line}
+#vlog .le b{display:block}
+/* 淡出的黑幕只盖住背景（游戏画面、插画），字幕、对白、选项还在它上面 */
+#vfade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+
+/* 最终评测的徽章墙：结局也算成就以后徽章变多了，一排放 8 个、说明藏到悬停里，免得页面撑出舞台 */
+#final .badges{grid-template-columns:repeat(8,1fr);gap:6px}
+#final .bdg{padding:6px 4px}
+#final .bdg .bh{display:none}

@@ -1,0 +1,23 @@
+{
+  "id": "sample-ending-plug",
+  "name": "样板 · 结局：被拔了电源",
+  "hook": {
+    "at": "ending",
+    "end": "end-sample-plug"
+  },
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "caption",
+          "text": "啪。"
+        },
+        {
+          "do": "caption",
+          "text": "大肥鱼在第 3 天早上，因为要加班费，被拔了电源。"
+        }
+      ]
+    }
+  ]
+}

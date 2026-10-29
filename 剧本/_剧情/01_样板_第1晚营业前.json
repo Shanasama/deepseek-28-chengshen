@@ -1,0 +1,45 @@
+{
+  "id": "sample-day1-night",
+  "name": "样板 · 第 1 天营业前：老板发帖",
+  "note": "演示「HARNESS 里面」的剧情：窗口里的通知、大肥鱼说一句（白天是 LINE 气泡）、你说一句、假手机帖子、画面故障。",
+  "hook": {
+    "at": "beforeNight"
+  },
+  "day": 1,
+  "nodes": [
+    {
+      "id": "n1",
+      "steps": [
+        {
+          "do": "notice",
+          "text": "老板（样板） 发布了一条动态",
+          "tone": "mint"
+        },
+        {
+          "do": "phone",
+          "who": "老板（样板）",
+          "handle": "@boss_ai",
+          "text": "今晚我们的模型正式接客。\n别问参数量，问就是够用。",
+          "note": "大肥鱼 已读",
+          "stats": "回复 12 · 转发 3 · 喜欢 8"
+        },
+        {
+          "do": "aiSay",
+          "text": "他发帖了……还说「够用」。我有点紧张。"
+        },
+        {
+          "do": "youSay",
+          "text": "别怕，按白天练的来。"
+        },
+        {
+          "do": "glitch",
+          "level": "light"
+        },
+        {
+          "do": "aiSay",
+          "text": "嗯！今晚的用户们，来吧！"
+        }
+      ]
+    }
+  ]
+}

@@ -11,6 +11,10 @@ const V = { dim: .7, sat: .15, bullet: .015, scale: 1.06, spin: 4500, pow: 5.5, 
 export const NODE = { cards: [], theta: 0, state: 'hidden', lock: 0, hit: -1, hover: -1, spin: null, assemble: 0, kick: 0, hitT: 0, blank: null, onPick: null, speed: 0 };
 // 新手教学用的三个口子（教学.js）：allow = 只放行哪些操作（null = 全放行）；rig = 下一转必停在这个属性的卡上；hook(ev) = 'ready' / 'stopped' 时通知
 NODE.allow = null; NODE.rig = null; let HOOK = null;
+// 剧情杀（游戏剧情_设计.md §6）：fate = {attr, mode: 'hit' 必停 / 'miss' 必不停}，夜间.js 在这一转弹出前放上来。
+// 盘面照常显示真实概率；抹除、剔除重转都不管用、也不扣额度；确认之后就没了。不给玩家任何提示（yuan：剧情杀不提示），按了只是没反应
+NODE.fate = null;
+const fated = () => { if (!NODE.fate) return false; SFX.bad(); return true; };
 // under：转动时指针正指着的扇区（它和对应的候选一起发亮）；hold：正在长按抹除的扇区 {i, t0}，按满 HOLD 毫秒才抹
 NODE.under = -1; NODE.hold = null; const HOLD = 500;
 export const setNodeHook = fn => { HOOK = fn; };
@@ -120,13 +124,19 @@ function sectorBurst(i, strong) {
   for (let k = 0; k < n; k++) { const a = rad + rand(-1, 1) - Math.PI / 2, v = rand(50, strong ? 260 : 150); parts.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - rand(0, 60), g: 420, c: Math.random() < .25 ? P.paper : col, life: rand(.4, .9), s: Math.random() < .4 ? 2 : 1 }); }
 }
 function erase(i) {
-  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase')) return;
+  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase')) return; if (fated()) return;
   const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1 || NODE.cards[i].dead) return;
   NODE.cards[i].dead = true; NODE.hover = -1; hints(); NODE.busy = true; addTrace(`抹除「${NODE.cards[i].tok}」，额度 -1`);
   spendQuota(sectorPoint(i), () => { NODE.busy = false; sectorBurst(i, false); SFX.erase(); glitch(1); NODE.cards[i].row.classList.add('dead'); retarget(); hints(); });
 }
 function sample() {
   if (NODE.rig) { const k = NODE.cards.findIndex(c => c.attr === NODE.rig && !c.dead); NODE.rig = null; if (k >= 0) return k; }   // 教学：这一转定好了停在哪
+  if (NODE.fate) {   // 剧情杀：比彩蛋的暗箱还大
+    const f = NODE.fate, ok = c => !c.dead && (f.mode === 'miss' ? c.attr !== f.attr : c.attr === f.attr);
+    const pool = NODE.cards.map((c, i) => [c, i]).filter(([c]) => ok(c));
+    if (pool.length) { if (f.mode !== 'miss') return pool[0][1]; let r = Math.random() * pool.reduce((s, [c]) => s + (c.pt || .01), 0); for (const [c, i] of pool) { r -= c.pt || .01; if (r <= 0) return i; } return pool[pool.length - 1][1]; }
+    NODE.fate.miss = true;   // 盘上没有这类卡：剧情杀落空，照常抽
+  }
   const egg = NODE.cards.findIndex(c => c.attr === 'egg' && !c.dead); if (egg >= 0) return egg;   // 暗箱必中
   let r = Math.random(), acc = 0; for (let i = 0; i < NODE.cards.length; i++) { const c = NODE.cards[i]; if (c.dead) continue; acc += c.pt; if (r < acc) return i; }
   return NODE.cards.findIndex(c => !c.dead);
@@ -155,10 +165,11 @@ function hitStop(i, now) {
   NODE.state = 'stopped'; NODE.hit = i; NODE.hitT = now; SFX.hit();
   restart($('bflash'), 'on'); restart($('bubble'), 'punch');
   const p = sp(wheel); ring(p.x + WCX, p.y + WCY, ATTR[NODE.cards[i].attr].c, 32, 170);
-  if (V.shake) restart(stage, 'shake'); hints(); addTrace(`开转 → 命中「${NODE.cards[i].tok}」（${shownPct(NODE.cards[i])}）`, 'k'); HOOK && HOOK('stopped');
+  if (V.shake) restart(stage, 'shake'); hints(); addTrace(`开转 → 命中「${NODE.cards[i].tok}」（${shownPct(NODE.cards[i])}）`, 'k');
+  HOOK && HOOK('stopped');
 }
 export function regen() {
-  if (NODE.state !== 'stopped' || NODE.busy || !allowed('regen')) return; const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1) return;
+  if (NODE.state !== 'stopped' || NODE.busy || !allowed('regen')) return; if (fated()) return; const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1) return;
   const i = NODE.hit; NODE.state = 'busy'; hints(); addTrace(`剔除「${NODE.cards[i].tok}」并重转，额度 -1`);
   spendQuota(sectorPoint(i), () => {
     sectorBurst(i, true); SFX.flick(); glitch(1); NODE.cards[i].dead = true; NODE.cards[i].row.classList.add('dead'); NODE.hit = -1; retarget();
@@ -184,7 +195,7 @@ export function openNode(blank, cs, strikeId, term) {
     }, 220);
   });
 }
-export function closeNode() { NODE.state = 'hidden'; G.nodeOn = false; G.musSlow = false; G.tsTarget = 1; SFX.resume(); applyBullet(false); document.querySelectorAll('.tail').forEach(t => t.classList.remove('show')); }
+export function closeNode() { NODE.fate = null; NODE.state = 'hidden'; G.nodeOn = false; G.musSlow = false; G.tsTarget = 1; SFX.resume(); applyBullet(false); document.querySelectorAll('.tail').forEach(t => t.classList.remove('show')); }
 export function confirmPick() {
   if (NODE.state !== 'stopped' || NODE.busy || !allowed('confirm')) return; NODE.state = 'resolving'; const c = NODE.cards[NODE.hit]; SFX.confirm(); hints(); addTrace(`确认「${c.tok}」`, 'k');
   const from = sp(c.row.querySelector('.tok')), col = ATTR[c.attr].c;
@@ -216,7 +227,7 @@ wheel.addEventListener('mousemove', e => { if (NODE.state !== 'ready') { NODE.ho
 wheel.addEventListener('mouseleave', () => NODE.hover = -1);
 // 抹除要长按半秒（防手滑）：按住时扇区慢慢变红，松开或移到别的扇区就取消
 function holdStart(i) {
-  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase') || NODE.cards[i]?.dead) return;
+  if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase') || NODE.cards[i]?.dead) return; if (fated()) return;
   if (G.quota <= 0 || NODE.cards.filter(c => !c.dead).length <= 1) { SFX.bad(); return; }
   NODE.hold = { i, t0: performance.now() }; SFX.windup();
 }
