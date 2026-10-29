@@ -3,14 +3,17 @@ import { G, QT, AXES } from './状态.js';
 import { $, fit, updateStageRect, toast, AT, P, pxIcon } from './基础.js';
 import { ac, musUpdate, SFX } from './音频.js';
 import { drawParts } from './特效.js';
-import { drawWindow, drawDust, drawScreen, drawDevice, drawRoomItems, whenFishReady } from './工位.js';
+import { drawWindow, drawDust, drawScreen, drawDevice, drawRoomItems, whenFishReady, setFish } from './工位.js';
+import { useSprite, showGuides } from './立绘.js';
+import { drawLight } from './光影.js';
 import { emitUpdate, flightsUpdate, refreshFishAvatars, chatTab } from './对话栏.js';
 import { NODE, nodeTick, spin, confirmPick, regen } from './转盘.js';
 import { radarTick } from './六维图.js';
-import { initShell, drawer, renderAP, renderHUD, closeMenus, on } from './界面.js';
+import { initShell, drawer, renderAP, renderHUD, closeMenus, on, setMode } from './界面.js';
 import { initDay, dayKeys, pickActByIndex, view, goNight } from './白天.js';
 import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun, endEarly } from './日程.js';
 import { spotKey, storyOn, storyKey, ARROW } from './教学.js';
+import { storyKeyDown, storyKeyUp } from './剧情.js';
 import { setTab, reportNext, finalNext, renderSelf } from './报告.js';
 import { loadSettings, latest, readSlot, tipsReset } from './存档.js';
 import { initSL, openSL, slOpen, slKey } from './存读档.js';
@@ -44,7 +47,7 @@ function loop(now) {
   G.timeScale += (G.tsTarget - G.timeScale) * Math.min(1, dt * (G.tsTarget < G.timeScale ? 7 : 4));
   emitUpdate(dt); flightsUpdate(dt); nodeTick(now, dt); musUpdate(); radarTick(dt);
   if (G.mode === 'night') { const breath = .12 + .08 * Math.sin(now / 1300); G.glow = Math.max(0, G.glow - dt * 5 * G.timeScale); $('glow').style.opacity = Math.min(.75, breath + G.glow * .55).toFixed(2); }
-  if (frame % 3 === 0) drawWindow(now, dt * 3); if (frame % 2 === 0 && titleOn()) drawTitleBg(); drawDust(dt * G.timeScale, now); if (frame % 2 === 0) drawScreen(now); drawDevice(now, dt * Math.max(.15, G.timeScale));
+  if (frame % 3 === 0) drawWindow(now, dt * 3); if (frame % 2 === 0 && titleOn()) drawTitleBg(); drawDust(dt * G.timeScale, now); if (frame % 2 === 0) drawScreen(now); drawDevice(now, dt * Math.max(.15, G.timeScale)); drawLight(now, dt);
   drawParts(fxc, dt, now);
   if (frame % 20 === 0) devRender();
   requestAnimationFrame(loop);
@@ -52,8 +55,10 @@ function loop(now) {
 
 // ---------- 开始 ----------
 // 剧情编辑器打开时会带参数：?play=用户/场景.json（单场试玩）或 ?show=演出编号（只播一段共享演出）
-const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show');
-if (!PLAY && !SHOW) { $('start').style.display = 'none'; $('titlescr').classList.add('on'); }   // 载入时先只露出标题画面的底
+const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show'), SPRV = Q.get('立绘预览');
+if (SPRV) $('start').style.display = 'none';
+else if (!PLAY && !SHOW) { $('start').style.display = 'none'; $('titlescr').classList.add('on'); }   // 载入时先只露出标题画面的底
+if (location.protocol === 'dfy:') $('dev').style.display = 'none';   // 桌面版（封装/）不放开发面板
 function trialArgs() {
   const i = PLAY.lastIndexOf('/'), stages = {};
   for (const kv of (Q.get('st') || '').split(',').filter(Boolean)) { const [k, v] = kv.split(':'); if (AXES.includes(k)) stages[k] = +v; }
@@ -73,6 +78,7 @@ addEventListener('keydown', e => {
   if (slOpen()) return slKey(e);
   if ($('modal').classList.contains('on')) { if (e.code === 'Enter') $('myes').click(); if (e.code === 'Escape') $('mno').click(); return; }
   if ($('restore').classList.contains('on')) { if (e.code === 'Enter') $('ryes').click(); return; }
+  if (storyKeyDown(e)) return;   // 游戏剧情正在播
   if (titleOn()) { titleKey(e); return; }
   if (!G.started) { if (e.code === 'Space') { e.preventDefault(); start(); } return; }
   if ($('final').classList.contains('on')) { if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); finalNext(); } return; }
@@ -95,6 +101,8 @@ addEventListener('keydown', e => {
   else if (e.code === 'Enter') goNight();
 });
 
+addEventListener('keyup', storyKeyUp);
+
 // ---------- 开发面板（不属于设计） ----------
 $('devh').onclick = () => $('dev').classList.toggle('min');
 $('d-ap').onclick = () => { G.ap = G.apMax; G.post = 0; renderAP(); if (G.mode === 'day' && !G.busy) view('menu'); };
@@ -115,6 +123,24 @@ function devRender() {
 // 调试用：控制台里能拿到状态和几个操作（自动试玩脚本用）
 window.__dfy = { G, NODE, spin, confirmPick, regen, goNight, reportNext, finalNext, skipCurrent, DATA, loadSave, latest, readSlot, showTitle, quitRun };
 
+// 编辑器「工位动画」检查页把游戏放在 iframe 里（?立绘预览=day|night）：不进标题，直接摆出工位；
+// 检查页用 postMessage 送来帧、要播的动作、白天 / 夜里、参考线开关
+function spritePreview() {
+  G.noSave = true; $('dev').style.display = 'none'; let cur = 'idle';
+  setMode(SPRV === 'night' ? 'night' : 'day'); setFish(cur);
+  addEventListener('message', e => {
+    if (e.origin !== location.origin) return; const m = e.data || {};
+    if (m.type === '立绘') {
+      const acts = {}; for (const [k, fs] of Object.entries(m.acts || {})) acts[k] = fs.map(f => { const c = document.createElement('canvas'); c.width = f.bmp.width; c.height = f.bmp.height; c.getContext('2d').drawImage(f.bmp, 0, 0); return { c, ms: f.ms }; });
+      useSprite(acts); setFish(cur); refreshFishAvatars();
+    }
+    if (m.type === '动作') { cur = m.act; setFish(cur); }
+    if (m.type === '模式') { setMode(m.mode); setFish(cur); }
+    if (m.type === '参考线') showGuides(!!m.on);
+  });
+  parent.postMessage({ type: '立绘就绪' }, location.origin);
+}
+
 // ---------- 载入 ----------
 (async () => {
   try {
@@ -122,7 +148,8 @@ window.__dfy = { G, NODE, spin, confirmPick, regen, goNight, reportNext, finalNe
     const n = DATA.list.filter(e => !e.user.boss && !e.user.tutorial).reduce((s, e) => s + e.scenes.length, 0);
     $('startinfo').textContent = PLAY ? `单场试玩：${PLAY.replace('/', ' / ')} · 训练状态来自剧情编辑器` : `共享演出预览：${SHOW}`;
     $('startinfo2').textContent = `dafeiyu-v3 · 剧本库 ${DATA.list.length} 个用户、${n} 个普通场景 · 存档在本机`;
-    if (!PLAY && !SHOW) { $('start').style.display = 'none'; showTitle(); }
+    if (SPRV) spritePreview();
+    else if (!PLAY && !SHOW) { $('start').style.display = 'none'; showTitle(); }
   } catch (e) { console.error(e); $('startinfo').textContent = '读不到剧本库：' + e.message + '（请用 node 剧情编辑器/serve.js 打开）'; }
 })();
 requestAnimationFrame(loop);

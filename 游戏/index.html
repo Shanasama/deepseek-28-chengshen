@@ -37,7 +37,7 @@
     <h6 id="h-set">设置</h6>
     <div class="sets">
       <div class="set"><span>音乐</span><div class="vol r2" data-k="vMusic"><i></i></div><span class="v"></span></div>
-      <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div>
+      <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div><div class="set" title="白天阳光从窗户照进来、跟着钟点从早到晚变；夜里屋子变暗、显示器发光、她身上有亮边。电脑带不动可以关掉"><span>光影效果</span><span class="tog btn r2" data-k="nightLight"><i></i></span><span class="v"></span></div>
       <div class="tiprow"><span class="tipreset btn r2">重新显示新手提示</span></div>
     </div>
     <div class="me"><span id="meav"></span><span>已登录 · 大肥鱼</span><span class="offbtn btn r2" id="d-off" style="display:none" title="提前结束今晚：没服务完的每位用户扣 1 颗心">提前下班</span></div>
@@ -95,14 +95,14 @@
         <div id="cal" class="abs r2"><div class="hd">第</div><div class="n" id="calday">1</div></div>
         <canvas id="glow" width="600" height="486"></canvas>
         <canvas id="dust" width="600" height="486"></canvas>
-        <img id="fish" class="idle" alt=""><canvas id="mouth" width="10" height="6"></canvas>
+        <img id="fish" class="idle" alt=""><canvas id="mouth" width="10" height="6"></canvas><canvas id="fishspr" width="120" height="120"></canvas>
         <canvas id="front" width="600" height="486"></canvas>
         <canvas id="scr" width="142" height="96"></canvas><div id="scrtitle" class="abs">桌面</div>
         <canvas id="onDesk" width="600" height="486"></canvas>
         <canvas id="eat" width="600" height="486"></canvas>
         <canvas id="cable" width="96" height="14"></canvas>
         <canvas id="tokdev" width="76" height="104" title="token 分词机"></canvas>
-        <div id="hots"></div>
+        <canvas id="light" width="600" height="486"></canvas><canvas id="vig" width="600" height="486"></canvas><canvas id="fishguide" width="120" height="120"></canvas><div id="hots"></div>
         <div id="fishhit" title="点她：收起 / 打开思考气泡"></div>
       </div>
       <div id="hud" class="r4"><div id="hearts"></div><i class="div"></i><span class="t3" id="qlbl">额度</span><div id="quota"></div><span id="qtxt"></span></div>
@@ -145,10 +145,10 @@
   <div id="phone" class="r12"><i class="notch r2"></i><div class="scr r8">
     <div class="sb"><span>4:58</span><span>5G</span></div>
     <div class="hdr"><span>← 发帖</span><span class="x r4" id="phone-x">×</span></div>
-    <div class="who"><span id="tibo-av"></span><div>Tibo <u>✓</u><br><span style="color:#6D7594">@t•••</span></div></div>
-    <div>we're back in action — resetting usage limits for everyone.<br><br>sorry about the disruption!</div>
-    <div class="rf" id="phone-rf">额度已重置</div>
-    <div class="st"><span>回复 4.1K</span><span>转发 2.1K</span><span>喜欢 17K</span></div>
+    <div class="who"><span id="tibo-av"></span><div><span id="ph-who"></span> <u>✓</u><br><span id="ph-handle" style="color:#6D7594"></span></div></div>
+    <div id="ph-text"></div>
+    <div class="rf" id="phone-rf"></div>
+    <div class="st" id="ph-st"></div>
   </div></div>
 
   <div id="modal"><div class="box r4"><div class="q1" id="mq1"></div><div class="q2" id="mq2"></div><div class="btns"><span class="btn3 r2" id="mno">再想想</span><span class="btn2 r2" id="myes">确定</span></div></div></div>
@@ -209,6 +209,19 @@
   <div id="spot"><div class="hole"></div><div class="sarr"></div><div class="stip r4"><div class="st"></div><div class="sgo">点一下继续 ▸</div></div></div>
   <div id="spotcatch"></div>
 
+  <!-- 游戏剧情的画面层（剧情.js）：全屏对白、黑屏字幕、插画、淡入淡出、选项、回看 -->
+  <div id="vn">
+    <div class="vbg"></div>
+    <div id="vpic"></div>
+    <div id="vfade"></div>
+    <div id="vchars"></div>
+    <div id="vcap"></div>
+    <div id="vbox"><span id="vname" class="r2"></span><div id="vtext"></div><i id="vnext"></i></div>
+    <div id="vchoice"></div>
+    <div id="vbar"><span class="vb r2" data-k="log">回看 <i>L</i></span><span class="vb r2" data-k="auto">自动 <i>A</i></span><span class="vb r2" data-k="fast">快进 <i>Ctrl</i></span><span class="vb r2" data-k="skip">跳过 <i>S</i></span></div>
+    <div id="vlog" class="r8"><div class="lh"><b>回看</b><span class="t3">这一段的对白</span><span class="sp"></span><span class="x btn r2">返回 Esc</span></div><div class="lbody"></div></div>
+  </div>
+
   <!-- 剧情占位页：新游戏开头，剧情写好以后整页换掉 -->
   <div id="story"><div class="sline" id="storyline"></div><div class="sgo2 t3" id="storygo">点击 / 按任意键继续</div></div>
 
@@ -223,12 +236,13 @@
       <div id="tmenu"></div>
       <div class="thint t3">↑ ↓ 选择 · Enter 确认 · 鼠标也可以</div>
     </div>
+    <div id="tauthor" class="t2">作者:贽殿遮那</div>
     <div class="tver t3" id="startinfo2">dafeiyu-v3 · 本机存档</div>
-    <div id="tach" class="tpanel r8"><div class="ph"><b>成就</b><span class="t3">跨局累计</span><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div><div class="badges" id="tbadges"></div></div>
+    <div id="tach" class="tpanel r8"><div class="ph"><b>成就</b><span class="t3" id="tachwho"></span><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div><div class="badges" id="tbadges"></div></div>
     <div id="tset" class="tpanel r8"><div class="ph"><b>设置</b><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div>
       <div class="sets">
         <div class="set"><span>音乐</span><div class="vol r2" data-k="vMusic"><i></i></div><span class="v"></span></div>
-        <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div>
+        <div class="set"><span>音效</span><div class="vol r2" data-k="vSfx"><i></i></div><span class="v"></span></div><div class="set" title="白天阳光从窗户照进来、跟着钟点从早到晚变；夜里屋子变暗、显示器发光、她身上有亮边。电脑带不动可以关掉"><span>光影效果</span><span class="tog btn r2" data-k="nightLight"><i></i></span><span class="v"></span></div>
         <div class="tiprow"><span class="tipreset btn r2">重新显示新手提示</span></div>
       </div></div>
   </div>

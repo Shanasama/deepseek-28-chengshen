@@ -1,0 +1,242 @@
+{
+ "frames": [
+  {
+   "filename": "吃饭 0.aseprite",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 1.aseprite",
+   "frame": {
+    "x": 120,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 2.aseprite",
+   "frame": {
+    "x": 240,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 3.aseprite",
+   "frame": {
+    "x": 360,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 4.aseprite",
+   "frame": {
+    "x": 480,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 5.aseprite",
+   "frame": {
+    "x": 600,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 6.aseprite",
+   "frame": {
+    "x": 720,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 7.aseprite",
+   "frame": {
+    "x": 840,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 8.aseprite",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  },
+  {
+   "filename": "吃饭 9.aseprite",
+   "frame": {
+    "x": 1080,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 120
+   },
+   "duration": 130
+  }
+ ],
+ "meta": {
+  "app": "由合伙人的吃饭样稿 GIF 转出（测试用：100×116 → 放进 120×120，右移 2、下移 22，米色底抠掉）",
+  "image": "大肥鱼.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1200,
+   "h": 120
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "eat",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

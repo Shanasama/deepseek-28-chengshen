@@ -2,6 +2,7 @@
 import { G } from './状态.js';
 import { P, $, R, dith, rand } from './基础.js';
 import { NODE } from './转盘.js';
+import { loadSprite, playSprite, holds, spriteAvatar, bindHit, HOLD } from './立绘.js';
 
 export const DESK_Y = 390;
 export const MON = { x: 222, y: 268, w: 154, h: 112 };
@@ -39,7 +40,7 @@ function drawFront() {
   R(f, P.k3, m.x + 2, m.y + m.h - 10, m.w - 4, 8); R(f, P.sky, m.x + m.w / 2 - 2, m.y + m.h - 7, 4, 2);
   R(f, P.k0, m.x + m.w / 2 - 12, m.y + m.h, 24, DESK_Y - m.y - m.h); R(f, P.k4, m.x + m.w / 2 - 10, m.y + m.h, 20, DESK_Y - m.y - m.h); R(f, P.k0, m.x + m.w / 2 - 24, DESK_Y - 3, 48, 3);
   R(f, P.k0, 34, DESK_Y - 5, 144, 7); R(f, P.k5, 35, DESK_Y - 5, 142, 5); for (let x = 38; x < 174; x += 5) R(f, P.t3, x, DESK_Y - 4, 3, 1); for (let x = 40; x < 172; x += 5) R(f, P.t3, x, DESK_Y - 2, 3, 1);
-  const cx = 184, o = night() ? P.k0 : P.ink; R(f, o, cx, DESK_Y - 26, 20, 27); R(f, P.paper, cx + 1, DESK_Y - 25, 18, 25); R(f, P.cobalt, cx + 1, DESK_Y - 17, 18, 4); R(f, o, cx + 20, DESK_Y - 21, 5, 12); R(f, P.paper, cx + 20, DESK_Y - 19, 3, 8);
+  if (!MUG_OFF) { const cx = 184, o = night() ? P.k0 : P.ink; R(f, o, cx, DESK_Y - 26, 20, 27); R(f, P.paper, cx + 1, DESK_Y - 25, 18, 25); R(f, P.cobalt, cx + 1, DESK_Y - 17, 18, 4); R(f, o, cx + 20, DESK_Y - 21, 5, 12); R(f, P.paper, cx + 20, DESK_Y - 19, 3, 8); }
 }
 
 // ---------- 房间物件：家具常驻，预训练往里填东西（美术规范 §8.5） ----------
@@ -145,7 +146,7 @@ export function drawWindow(now, dt) {
     R(c, P.g1, 87, 0, 4, WH_); R(c, P.g1, 0, 108, WW_, 4);
   }
 }
-const DUST = Array.from({ length: 30 }, () => ({ x: Math.random() * 600, y: Math.random() * 380, vx: rand(-3, 3), vy: rand(-4, -1), p: Math.random() * 6 }));
+export const DUST = Array.from({ length: 30 }, () => ({ x: Math.random() * 600, y: Math.random() * 380, vx: rand(-3, 3), vy: rand(-4, -1), p: Math.random() * 6 }));
 const STEAM = [];
 export function drawDust(dt, now) {
   const c = $('dust').getContext('2d'); c.clearRect(0, 0, 600, 486);
@@ -293,10 +294,14 @@ export function drawDevice(now, dt) {
   DEV.packets = DEV.packets.filter(p => p < 1); DEV.packets.forEach((p, i) => { DEV.packets[i] += dt * 2.2; const t = DEV.packets[i]; R(cb, hi, Math.min(88, t * 100) | 0, t * 100 > 88 ? Math.max(2, 10 - (t * 100 - 88)) | 0 : 10, 2, 2); });
 }
 
-// ---------- 大肥鱼：参考图抠图占位（正式立绘由美术部交付） ----------
+// ---------- 大肥鱼：合伙人交的逐帧动画（立绘.js）；没交的时候用参考图抠图占位 ----------
 export const fishImg = $('fish');
-const onFishReady = [];
-export function whenFishReady(fn) { if (fishImg.naturalWidth) fn(); else onFishReady.push(fn); }
+export const FISH = { base: null, day: '' };   // 占位图：白天那张（canvas + dataURL）；夜间光影换图时、头像、剧情画面都用它
+const onFishReady = [], onSprite = [];
+// 占位图好了调一次；正式立绘读进来以后再调一次（头像要换）
+export function whenFishReady(fn) { onSprite.push(fn); if (fishImg.naturalWidth) fn(); else onFishReady.push(fn); }
+let MUG_OFF = false;   // 她手里端着杯子（coffee）时，桌上那只不画
+loadSprite().then(() => { bindHit($('fishhit')); setFish(fishImg.className || 'idle'); onSprite.forEach(f => f()); });
 (function () {
   const im = new Image(); im.onload = () => {
     const wd = im.width, h = im.height, c = document.createElement('canvas'); c.width = wd; c.height = h; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
@@ -309,14 +314,18 @@ export function whenFishReady(fn) { if (fishImg.naturalWidth) fn(); else onFishR
     // 水平翻转：让她侧向右边的显示器
     const m = document.createElement('canvas'); m.width = wd; m.height = h; const mx = m.getContext('2d'); mx.translate(wd, 0); mx.scale(-1, 1); mx.drawImage(c, 0, 0);
     fishImg.onload = () => onFishReady.splice(0).forEach(f => f());
-    fishImg.src = m.toDataURL(); fishImg.style.width = wd + 'px'; fishImg.style.height = h + 'px';
+    FISH.base = m; FISH.day = m.toDataURL(); fishImg.src = FISH.day; fishImg.style.width = wd + 'px'; fishImg.style.height = h + 'px';
   }; im.src = window.FISH_SRC;
 })();
-export function setFish(s) { fishImg.className = ''; $('mouth').className = ''; void fishImg.offsetWidth; fishImg.className = s; $('mouth').className = s; }
+export function setFish(s) {
+  fishImg.className = ''; $('mouth').className = ''; void fishImg.offsetWidth; fishImg.className = s; $('mouth').className = s;
+  playSprite(s, () => { if (fishImg.className === s) setFish('idle'); });   // 播一次的动作播完回待机
+  const mug = HOLD[s] === 'mug' && holds(s); if (mug !== MUG_OFF) { MUG_OFF = mug; drawFront(); }
+}
 // 大肥鱼的头像：从精灵上裁脸
 export function fishAvatar() {
   const c = document.createElement('canvas'); c.width = 24; c.height = 24; const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.fillStyle = P.ice; x.fillRect(0, 0, 24, 24);
-  if (fishImg.naturalWidth) x.drawImage(fishImg, 74, 78, 72, 72, 0, 0, 24, 24); return c;
+  if (!spriteAvatar(x) && FISH.base) x.drawImage(FISH.base, 74, 78, 72, 72, 0, 0, 24, 24); return c;
 }
 // 嘴型：叠在精灵嘴上的一小块，白天说话时开合
 export const MOUTH = { open: false };

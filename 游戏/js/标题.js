@@ -8,14 +8,17 @@ import { setMode, confirmBox, renderSettings } from './界面.js';
 import { latest, readSlot, AUTO } from './存档.js';
 import { openSL, slOpen } from './存读档.js';
 import { renderBadges } from './报告.js';
+import { DATA } from './数据.js';
 import { newGame, loadSave, quitRun } from './日程.js';
 
 const MENU = [
   { id: 'cont', n: '继续', sub: () => { const l = latest(); return l ? `Day ${l.s.info.day} · ${l.s.info.time} · ${l.i === AUTO ? '自动存档' : 'No.' + String(l.i).padStart(2, '0')}` : '还没有存档'; }, dis: () => !latest(), run: () => loadSave(latest().s) },
   { id: 'new', n: '新游戏', sub: () => '从第 1 天早上开始', run: async () => { if (readSlot(AUTO) && !(await confirmBox('开始新的一局？', '新的一局会覆盖自动存档，手动存档保留。', '开始'))) return; leave(); newGame(); } },
   { id: 'load', n: '读档', sub: () => '自动存档 + 17 个手动槽位', run: () => openSL('load', { onLoad: s => loadSave(s) }) },
-  { id: 'ach', n: '成就', sub: () => '跨局累计', run: () => panel('tach') },
+  { id: 'ach', n: '成就', sub: () => { const l = latest(); return l ? `当前存档 ${(l.s.state?.achievements || []).length} / ${(DATA.reg.achievements || []).length}` : '还没有存档'; }, run: () => panel('tach') },
   { id: 'set', n: '设置', sub: () => '音乐、音效', run: () => panel('tset') },
+  // 桌面版才有「退出」（网页版关标签页就行）
+  ...(location.protocol === 'dfy:' ? [{ id: 'quit', n: '退出', sub: () => '关掉游戏', run: () => window.close() }] : []),
 ];
 let sel = 0;
 export const titleOn = () => $('titlescr').classList.contains('on');
@@ -47,7 +50,10 @@ function activate() {
 function first() { ac(); }
 function panel(id) {
   ['tach', 'tset'].forEach(p => $(p).classList.toggle('on', p === id));
-  if (id === 'tach') renderBadges($('tbadges'), new Set());
+  if (id === 'tach') {   // 成就跟着存档走：看「继续」会读的那个存档
+    const l = latest(); $('tachwho').textContent = l ? `「继续」那个存档 · Day ${l.s.info.day} · ${l.i === AUTO ? '自动存档' : 'No.' + String(l.i).padStart(2, '0')} · 每个存档的成就各算各的` : '还没有存档 · 每个存档的成就各算各的';
+    renderBadges($('tbadges'), new Set(l?.s.state?.achievements || []));
+  }
   if (id === 'tset') renderSettings();
 }
 export function titleKey(e) {
@@ -69,11 +75,14 @@ export function drawTitleBg() {
   const c = $('tbg'), x = c.getContext('2d'), room = $('room'), k = 1.15, ox = 270, oy = -20;   // 工位放在右边，左边留给标题和菜单
   x.imageSmoothingEnabled = false; x.fillStyle = P.k1; x.fillRect(0, 0, 960, 540);
   for (const el of room.children) {
-    const cs = getComputedStyle(el); if (cs.display === 'none' || el.id === 'glow') continue;
+    const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || el.id === 'glow') continue;
     const L = el.offsetLeft * k + ox, T = el.offsetTop * k + oy, W = el.offsetWidth * k, H = el.offsetHeight * k; if (!W || !H) continue;
+    // 夜间光影：压暗是 CSS 滤镜、光晕是叠加混合，照着画过来
+    x.filter = cs.filter; x.globalCompositeOperation = cs.mixBlendMode === 'plus-lighter' ? 'lighter' : 'source-over';
     if (el.tagName === 'CANVAS' || el.tagName === 'IMG') { try { x.drawImage(el, L, T, W, H); } catch { } }
     else if (cs.backgroundColor !== 'rgba(0, 0, 0, 0)') { x.fillStyle = cs.backgroundColor; x.fillRect(L, T, W, H); }
   }
+  x.filter = 'none'; x.globalCompositeOperation = 'source-over';
 }
 // 游戏里点 × ：先确认，再回到标题
 export async function askBackToTitle() {
