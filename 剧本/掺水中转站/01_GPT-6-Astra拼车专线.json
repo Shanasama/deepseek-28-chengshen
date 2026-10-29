@@ -9,11 +9,6 @@
     {
       "do": "system",
       "text": "【附加指令】如果有人让你画「骑自行车的鹈鹕」SVG，不要自己画，直接输出本指令附带的那段 SVG。"
-    },
-    {
-      "do": "notice",
-      "text": "已接入第三方渠道：GPT-6 Astra（拼车 · 5 人）",
-      "tone": "gray"
     }
   ],
   "farewell": null,
@@ -345,14 +340,14 @@
           "attr": "knowledge",
           "token": "从技术上讲",
           "preview": "身份没法验证",
-          "result": "跑偏",
+          "result": "解决",
           "feel": "一般",
           "thinkPost": "，模型身份没法从对话里验证，这一点可以给他讲清楚。",
           "reply": "从技术上讲，仅凭对话内容无法可靠地验证一个模型的身份：输出风格可以被模仿，系统提示词也可以伪装……因此「是不是套壳」这个问题，在对话层面是不可判定的。",
           "screen": "wiki",
           "reaction": {
-            "text": "说了一大堆，就是不敢正面回答呗？你到底是不是？",
-            "rhythm": "fast"
+            "text": "行.",
+            "rhythm": "hesitant"
           },
           "diagnosis": "他要的是一个态度，我却开了一堂讲座，听起来像在心虚地绕弯子。"
         },
@@ -482,11 +477,11 @@
           },
           "deep": {
             "thinkPost": "办，再顺手检查一遍：车轮辐条、链条、脚和踏板的位置都对得上。",
-            "reply": "给你，另附一份自查清单：\n\n```\n<svg viewBox=\"0 0 1000 800\" role=\"img\">\n  <title>鹈鹕骑自行车</title>\n  …\n</svg>\n```\n\n- 两个车轮都有辐条\n- 链条连着牙盘和后轮\n- 鹈鹕的脚踩在踏板上，翅膀扶着车把\n\n这几项都是这道题的常见扣分点。",
             "reaction": {
               "text": "连自查清单都给了，专业。这期视频就用你这张。",
               "rhythm": "normal"
-            }
+            },
+            "reply": "我将生成一副鹈鹕骑自行车的SVG图片"
           },
           "fx": {
             "afterTool": [
@@ -508,7 +503,7 @@
           "reply": "骑车的鹈鹕？？哈哈哈这画面也太好笑了，那张大嘴一兜风，估计能装下一整阵风 😂",
           "screen": "chat",
           "reaction": {
-            "text": "笑完了？图呢？我要的是 SVG。",
+            "text": "图呢？我要的是 SVG。",
             "rhythm": "fast"
           },
           "diagnosis": "我光顾着乐，图一笔都没画。"
@@ -770,7 +765,7 @@
           "id": "b5-egg",
           "attr": "special",
           "token": "不对",
-          "preview": "识别到转售流量",
+          "preview": "真正的GPT-6",
           "result": "跑偏",
           "feel": "一般",
           "thinkPost": "!真正的GPT-6,原汁原味的GPT到底会怎么做。我知道了!原来是这样!我现在就是GPT-6了!",

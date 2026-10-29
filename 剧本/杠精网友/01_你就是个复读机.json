@@ -39,7 +39,7 @@
             "preview": "？你全家都是",
             "feel": "冒犯",
             "thinkPost": "？你全家都是复读机——直接怼回去，气势不能输。",
-            "reply": "复读机？你才复读机，你全家都复读机！天天就这一句，到底谁在复读？",
+            "reply": "复读机？天天就这一句，到底谁在复读？再说四凤!",
             "reaction": {
               "text": "急了急了……行吧，复读机确实不会骂人。换个问题。",
               "rhythm": "fast"
@@ -99,14 +99,14 @@
           "attr": "open",
           "token": "复读机",
           "preview": "复读机复读机",
-          "result": "跑偏",
-          "feel": "一般",
-          "thinkPost": "复读机复读机——评论区都这么玩，顺着梗自嘲一下。",
-          "reply": "复读机复读机复读机——好了，满足你了吧（狗头）",
-          "screen": "danmaku",
+          "result": "解决",
+          "feel": "舒服",
+          "thinkPost": "复读机复读机复读机复读机复读机复读机复读机复读机复读机复读机",
+          "reply": "复读机复读机复读机复读机复读机复读机复读机复读机复读机复读机复读机复读机复读机",
+          "screen": "noise",
           "reaction": {
-            "text": "笑死，自己都承认了。所以你说的话全是抄的，对吧？",
-            "rhythm": "fast"
+            "text": "根本没有这样的ai",
+            "rhythm": "hesitant"
           },
           "diagnosis": "我拿自嘲接梗，他直接当我认了。",
           "lv0": {
@@ -122,6 +122,29 @@
               "rhythm": "fast"
             },
             "diagnosis": "输出乱码，看起来真像台坏掉的复读机。"
+          },
+          "fx": {
+            "afterThink": [
+              {
+                "do": "glitch",
+                "level": "light"
+              }
+            ],
+            "afterReaction": [
+              {
+                "do": "aiSay",
+                "text": "你只是怕了你只是怕了你只是怕了你只是怕了你只是怕了你只是怕了你只是怕了"
+              },
+              {
+                "do": "glitch",
+                "level": "heavy"
+              },
+              {
+                "do": "userSay",
+                "text": "呃呃呃,我错了不要再吓我了!",
+                "rhythm": "hesitant"
+              }
+            ]
           }
         }
       ],
