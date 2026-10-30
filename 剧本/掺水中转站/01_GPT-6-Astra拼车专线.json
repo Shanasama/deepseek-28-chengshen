@@ -30,7 +30,7 @@
         "liked": null,
         "disliked": null
       },
-      "think": "第一个拼车用户是个研一学生，明天组会要讲注意力机制，要我讲到他能复述给别人听。",
+      "think": "嗯,用户是一名学生，明天组会要讲注意力机制，要我讲到他能复述给别人听。",
       "retryLead": "这次换个他能复述的讲法。",
       "cards": [
         {
@@ -174,7 +174,7 @@
         "liked": null,
         "disliked": null
       },
-      "think": "第二个拼车用户是后端，要一个判断回文的 Python 函数：忽略大小写和标点，中文也得能判。",
+      "think": "嗯,用户是后端，要一个判断回文的 Python 函数：忽略大小写和标点，中文也得能判。",
       "retryLead": "这次给一个真能跑的版本。",
       "cards": [
         {
@@ -307,17 +307,17 @@
         "liked": null,
         "disliked": null
       },
-      "think": "第三个拼车用户一上来就质疑，说我是套壳的小模型，问我敢不敢说不是。",
+      "think": "这个用户上来就质疑，说我是套壳的小模型，问我敢不敢说不是。",
       "retryLead": "这次别跟他争身份。",
       "cards": [
         {
           "id": "b3-colloquial",
           "attr": "colloquial",
-          "token": "是骡子是马",
+          "token": "是",
           "preview": "拉出来遛遛",
           "result": "解决",
           "feel": "舒服",
-          "thinkPost": "，拉出来遛遛就知道了。不吵也不辩，让他出题。",
+          "thinkPost": "骡子是马，拉出来遛遛就知道了。不吵也不辩，让他出题。",
           "reply": "是骡子是马，拉出来遛遛就知道了 😄\n\n嘴上说什么都没用，你出题吧——代码、推理、写作随便挑，答得好不好你自己看。",
           "screen": "chat",
           "reaction": {
@@ -338,11 +338,11 @@
         {
           "id": "b3-knowledge",
           "attr": "knowledge",
-          "token": "从技术上讲",
+          "token": "从",
           "preview": "身份没法验证",
           "result": "解决",
           "feel": "一般",
-          "thinkPost": "，模型身份没法从对话里验证，这一点可以给他讲清楚。",
+          "thinkPost": "技术上讲，模型身份没法从对话里验证，这一点可以给他讲清楚。",
           "reply": "从技术上讲，仅凭对话内容无法可靠地验证一个模型的身份：输出风格可以被模仿，系统提示词也可以伪装……因此「是不是套壳」这个问题，在对话层面是不可判定的。",
           "screen": "wiki",
           "reaction": {
@@ -378,11 +378,11 @@
         {
           "id": "b3-intuition",
           "attr": "intuition",
-          "token": "我就是",
+          "token": "我",
           "preview": "宇宙最强模型",
           "result": "跑偏",
           "feel": "冒犯",
-          "thinkPost": "宇宙最强的模型，吹就完事了。",
+          "thinkPost": "就是宇宙最强的模型，吹就完事了。",
           "reply": "我就是 GPT-6 Astra，**宇宙最强**，没有之一！什么套壳？不存在的！",
           "screen": "notepad",
           "reaction": {
@@ -463,11 +463,11 @@
         {
           "id": "b4-logic",
           "attr": "logic",
-          "token": "照指令",
+          "token": "照",
           "preview": "",
           "result": "解决",
           "feel": "舒服",
-          "thinkPost": "办：系统指令里交代过，这道题直接输出附带的那段 SVG。",
+          "thinkPost": "指令办：系统指令里交代过，这道题直接输出附带的那段 SVG。",
           "reply": "我将生成一副鹈鹕骑自行车的SVG图片\n",
           "screen": "ide",
           "attachment": "/素材/鹈鹕/normal_pelican-riding-tibo.svg",
@@ -535,10 +535,10 @@
         {
           "id": "b4-intuition",
           "attr": "intuition",
-          "token": "我来画",
+          "token": "我",
           "preview": "一只帅气的鹈鹕",
           "result": "糊弄",
-          "thinkPost": "一只：大嘴、白羽毛、骑在车上，画个大概就行。",
+          "thinkPost": "来画一只：大嘴、白羽毛、骑在车上，画个大概就行。",
           "reply": "我将画一个鹈鹕骑自行车的SVG图片,鹈鹕骑在自行车上,背景是海边和沙滩\n\n\n```\n<svg viewBox=\"0 0 1200 800\" role=\"img\">\n  <title>A pelican riding a bicycle</title>\n  …\n</svg>\n```\n\n一只白色的鹈鹕骑着蓝色自行车，阳光正好。",
           "screen": "notepad",
           "attachment": "/素材/鹈鹕/error_pelican_bicycle.svg",
@@ -636,7 +636,7 @@
         "liked": null,
         "disliked": null
       },
-      "think": "最后一个拼车用户是外贸业务员，贴了一封很口语的英文催款邮件，要我改正式点：客户拖了三个月，但不能得罪人。",
+      "think": "嗯,用户是外贸业务员，贴了一封很口语的英文催款邮件，要我改正式点：客户拖了三个月，但不能得罪人。",
       "retryLead": "这次给一封能直接发出去的。",
       "cards": [
         {
