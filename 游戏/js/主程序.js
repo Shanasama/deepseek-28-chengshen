@@ -1,5 +1,5 @@
 // 入口：载入数据、装配界面、主循环、键盘。
-import { G, QT, AXES } from './状态.js';
+import { G, QT, AXES, freshStory } from './状态.js';
 import { $, fit, updateStageRect, toast, AT, P, pxIcon } from './基础.js';
 import { ac, musUpdate, SFX } from './音频.js';
 import { drawParts } from './特效.js';
@@ -13,7 +13,7 @@ import { initShell, drawer, renderAP, renderHUD, closeMenus, on, setMode } from 
 import { initDay, dayKeys, pickActByIndex, view, goNight, trialIdle, trialQuestion } from './白天.js';
 import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun, endEarly } from './日程.js';
 import { spotKey, storyOn, storyKey, ARROW } from './教学.js';
-import { storyKeyDown, storyKeyUp } from './剧情.js';
+import { storyKeyDown, storyKeyUp, playPreview, storyAbort, HANDLERS } from './剧情.js';
 import { setTab, reportNext, finalNext, renderSelf } from './报告.js';
 import { loadSettings, latest, readSlot, tipsReset } from './存档.js';
 import { initSL, openSL, slOpen, slKey } from './存读档.js';
@@ -55,8 +55,8 @@ function loop(now) {
 
 // ---------- 开始 ----------
 // 剧情编辑器打开时会带参数：?play=用户/场景.json（单场试玩）或 ?show=演出编号（只播一段共享演出）
-const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show'), SPRV = Q.get('立绘预览'), TPRV = Q.get('后训练预览');
-if (SPRV || TPRV) $('start').style.display = 'none';
+const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show'), SPRV = Q.get('立绘预览'), TPRV = Q.get('后训练预览'), GPRV = Q.get('剧情预览');
+if (SPRV || TPRV || GPRV) $('start').style.display = 'none';
 else if (!PLAY && !SHOW) { $('start').style.display = 'none'; $('titlescr').classList.add('on'); }   // 载入时先只露出标题画面的底
 if (location.protocol === 'dfy:') $('dev').style.display = 'none';   // 桌面版（封装/）不放开发面板
 function trialArgs() {
@@ -155,6 +155,25 @@ function trainPreview() {
   trialIdle(); parent.postMessage({ type: '后训练就绪' }, location.origin);
 }
 
+// 编辑器「剧情」模块的预览（?剧情预览=1）：在真的工位上播编辑器送来的剧情段，选项能点、条件照真的算。
+// 消息：剧情 {seg 剧情段, from 从哪个节点, mode day/night, st {day, hearts, quota, vars}}；停 = 停下。不存档，播完回一句 剧情播完 {end}
+function storyPreview() {
+  G.noSave = true; $('dev').style.display = 'none'; setMode('day'); setFish('idle');
+  HANDLERS.slot = k => toast(`（预览）剧情改了今晚第 ${k} 位来客`);
+  addEventListener('message', async e => {
+    if (e.origin !== location.origin) return; const m = e.data || {};
+    if (m.type === '停') return storyAbort();
+    if (m.type !== '剧情') return;
+    const st = m.st || {};
+    if (G.mode !== m.mode) setMode(m.mode === 'night' ? 'night' : 'day');
+    G.day = st.day ?? 1; G.hearts = st.hearts ?? 3; G.quota = st.quota ?? 10; G.story = freshStory(); Object.assign(G.story.vars, st.vars || {}); G.busy = false;
+    renderHUD(); renderAP();
+    const end = await playPreview(m.seg, m.from);
+    parent.postMessage({ type: '剧情播完', end, id: m.id }, location.origin);   // id 原样带回去：被下一次预览打断的那次，编辑器认得出来
+  });
+  parent.postMessage({ type: '剧情就绪' }, location.origin);
+}
+
 // ---------- 载入 ----------
 (async () => {
   try {
@@ -164,6 +183,7 @@ function trainPreview() {
     $('startinfo2').textContent = `dafeiyu-v3 · 剧本库 ${DATA.list.length} 个用户、${n} 个普通场景 · 存档在本机`;
     if (SPRV) spritePreview();
     else if (TPRV) trainPreview();
+    else if (GPRV) storyPreview();
     else if (!PLAY && !SHOW) { $('start').style.display = 'none'; showTitle(); }
   } catch (e) { console.error(e); $('startinfo').textContent = '读不到剧本库：' + e.message + '（请用 node 剧情编辑器/serve.js 打开）'; }
 })();

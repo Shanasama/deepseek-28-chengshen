@@ -403,10 +403,19 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 .dkb{font-size:11px;line-height:16px;padding:0 5px;background:#3a2c10;color:var(--lgold);border:1px solid #6a5420}
 .badge.mk{color:var(--t3)}.m-好{background:#12301f!important;color:var(--mint)!important}.m-一般{background:var(--k4)!important;color:var(--t15)!important}.m-坏{background:#3a1d20!important;color:#ff9aa1!important}
 .mkrow{display:flex;gap:6px}.mkrow .mini.on{box-shadow:0 0 0 1px var(--sky)}
-.trybox{position:absolute;right:12px;bottom:44px;z-index:5;background:var(--k1);border:1px solid var(--k4);box-shadow:0 6px 24px #0008}
-.trybar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 8px;font-size:12px;white-space:nowrap}.trybar b{font-weight:normal;color:var(--t1)}.trybar .sp{flex:1}
-.tgwrap{width:461px;height:260px;overflow:hidden}.tgame{width:768px;height:432px;border:0;background:#000;transform:scale(.6);transform-origin:0 0}
-.trybox.min .tgwrap{display:none}
+.colhd .tryb{margin-left:6px;padding:0 6px;font-size:11px;line-height:16px}
+/* 「游戏预览」大窗（gamePreview）：后训练试做、剧情预览共用 */
+#gpv{position:fixed;inset:0;z-index:40;background:#000b;display:none;align-items:center;justify-content:center}
+#gpv.on{display:flex;animation:popIn .25s cubic-bezier(.3,1.5,.5,1)}
+.gpvd{background:var(--k1);border:1px solid var(--k4);box-shadow:0 16px 60px #000}
+.gpvbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 10px;font-size:12px;border-bottom:1px solid var(--k3);max-width:calc(100vw - 64px)}
+.gpvbar>b{font-weight:normal;color:var(--t1);margin-right:6px}.gpvbar .sp{flex:1}.gpvbar .note{color:var(--t3)}
+.gpvbar input[type=number]{width:52px}.gpvbar input[type=text]{width:90px}
+.gpvbar .lbl{color:var(--t3)}
+.gpvw iframe{display:block;border:0;background:#000}
+.apick{border:1px solid var(--k4);background:var(--k2);padding:1px 8px;cursor:pointer;font-size:12px;position:relative}
+.apick.on{background:var(--c);color:#fff;border-color:var(--c)}.apick i{font-style:normal;font-size:10px;margin-left:4px;opacity:.85}
+.gpst{color:var(--mint)}
 .sgt{display:flex;gap:8px;align-items:center}.sgt b{font-size:16px}
 .sgraph{position:relative}
 .snode{position:absolute;width:270px;background:var(--k2);border:1px solid var(--k4);cursor:pointer;transition:border-color .15s}
@@ -414,6 +423,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 .snode.enter{animation:colIn .45s cubic-bezier(.2,1.2,.4,1) both}
 .snh{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--k3);cursor:grab}.snh:active{cursor:grabbing}.snh b{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .snst{font-size:11px;padding:0 6px;background:var(--sky);color:var(--k0)}
+.snpv{border:1px solid var(--k5);background:transparent;color:var(--t2);font-size:11px;line-height:16px;padding:0 6px;cursor:pointer}.snpv:hover{color:var(--k0);background:var(--sky);border-color:var(--sky)}
 .snb{padding:6px 8px;display:flex;flex-direction:column;gap:2px}
 .snl{display:flex;gap:4px;font-size:12px;line-height:18px;color:var(--t15);white-space:nowrap;overflow:hidden}.snl span:last-child{overflow:hidden;text-overflow:ellipsis}
 .snps{border-top:1px solid var(--k3);padding:4px 0}
@@ -1090,6 +1100,26 @@ function finBlock(c,v,ri,isOv,caught){
   }
   return box;
 }
+
+// ---------- 「游戏预览」大窗：真游戏放进 iframe，按窗口能放下的最大 16:9 显示（后训练试做、剧情预览共用） ----------
+// gamePreview({src 游戏网址, title, controls: () => [顶栏里的控件], onReady 游戏载好 / 已经载好时调}); 同一个 src 的游戏留着不重新载入
+const GPV={frame:null,src:null,ready:false,onReady:null,controls:null,title:''};
+function gamePreview({src,title,controls,onReady}){
+  let ov=$('#gpv');
+  if(!ov){
+    ov=h('div',{id:'gpv',onclick:e=>{if(e.target===ov)gpvClose();}},h('div',{class:'gpvd'},h('div',{class:'gpvbar'}),h('div',{class:'gpvw'})));document.body.append(ov);
+    addEventListener('message',e=>{if(!GPV.frame||e.source!==GPV.frame.contentWindow)return;const t=e.data?.type||'';if(/就绪$/.test(t)){GPV.ready=true;GPV.onReady?.();}GPV.onMsg?.(e.data);});
+    addEventListener('resize',gpvFit);
+    addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#gpv.on')){e.stopImmediatePropagation();gpvClose();}},true);
+  }
+  GPV.title=title;GPV.controls=controls;GPV.onReady=onReady;
+  if(GPV.src!==src){GPV.src=src;GPV.ready=false;GPV.frame=h('iframe',{src,title:'游戏预览'});ov.querySelector('.gpvw').replaceChildren(GPV.frame);}
+  gpvBar();ov.classList.add('on');gpvFit();if(GPV.ready)onReady?.();
+}
+function gpvBar(){const b=$('#gpv .gpvbar');if(b)b.replaceChildren(h('b',{},'🎮 '+GPV.title),...(GPV.controls?.()||[]).filter(Boolean),h('span',{class:'sp'}),h('button',{class:'mini',onclick:gpvClose},'关闭 Esc'));}
+const gpvPost=m=>{if(GPV.ready)GPV.frame.contentWindow.postMessage(m,location.origin);else toast('游戏还在载入，载好了会自动开始');};
+function gpvClose(){$('#gpv')?.classList.remove('on');if(GPV.ready)GPV.frame.contentWindow.postMessage({type:'停'},location.origin);GPV.onReady=null;GPV.onMsg=null;}
+function gpvFit(){if(!GPV.frame)return;const w=Math.round(Math.max(480,Math.min(innerWidth-64,(innerHeight-120)*16/9)));GPV.frame.style.width=w+'px';GPV.frame.style.height=Math.round(w*9/16)+'px';$('#gpv .gpvbar').style.maxWidth=w+'px';}   // 顶栏跟游戏画面一样宽，放不下就换行
 
 // ---------- 编辑器里的迷你预览：在小窗口里把积木按顺序播一遍 ----------
 let PVR=0;

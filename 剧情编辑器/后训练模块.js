@@ -73,7 +73,6 @@ function trainSideList() {
 function trainCanvas() {
   const lane = $('#laneIn'); lane.replaceChildren(); ISSUES = validate(); renderValidBtn();
   $('#legend').replaceChildren(h('span', { style: 'cursor:pointer;color:var(--lgold)', onclick: openHelp }, '？ 后训练模块怎么用'));
-  tryBox();
   if (S.tmode === 'types') return typesCanvas(lane);
   bankCanvas(lane);
 }
@@ -117,7 +116,8 @@ function bankCanvas(lane) {
 function qCol(q) {
   const dk = dkAttr(q.qtype), c = h('div', { class: 'col' + (S.enter ? ' enter' : '') + (q.tutorial ? ' tut' : '') });
   c.append(h('div', { class: 'colhd' + (S.sel?.kind === 'tq' && S.sel.q === q.id ? ' sel' : ''), 'data-q': q.id, onclick: () => select({ kind: 'tq', q: q.id }) },
-    h('div', { class: 'no' }, h('b', {}, q.id + ' ', issueDot({ kind: 'tq', q: q.id })), h('span', {}, h('span', { class: 'qt' }, q.qtype), q.tutorial ? ' · 教学' : '')),
+    h('div', { class: 'no' }, h('b', {}, q.id + ' ', issueDot({ kind: 'tq', q: q.id })), h('span', {}, h('span', { class: 'qt' }, q.qtype), q.tutorial ? ' · 教学' : '',
+      h('button', { class: 'mini tryb', title: '在游戏里做一下这道题：弹出玩家看到的成对回答', onclick: e => { e.stopPropagation(); tryOpen(q); } }, '▶ 试做'))),
     h('div', { class: 'bubble' }, q.q || '（还没写问题）')));
   for (const a of QA) {
     const sel = S.sel?.kind === 'tqa' && S.sel.q === q.id && S.sel.a === a, m = q.marks?.[a], col = qaCol(a), inPair = q.pair?.includes(a);
@@ -132,33 +132,28 @@ function qCol(q) {
   return c;
 }
 
-// ---------- 在游戏里试做：画布外面右下角一个小窗（不跟着画布重画，免得每打一个字游戏就重新载入） ----------
-const TRY = { ready: false, q: null, pair: null, min: false };
-let TRYBOX = null;
-function tryBox() {
-  if (!TRYBOX) {
-    const frame = h('iframe', { class: 'tgame', src: '/游戏/?后训练预览=1', title: '在游戏里试做' });
-    addEventListener('message', e => { if (e.source === frame.contentWindow && e.data?.type === '后训练就绪') TRY.ready = true; });
-    TRYBOX = h('div', { class: 'trybox nopan' }, h('div', { class: 'trybar' }), h('div', { class: 'tgwrap' }, frame));
-    $('#lane').append(TRYBOX);
+// ---------- 在游戏里试做：「游戏预览」大窗（index.html 的 gamePreview）里弹出玩家看到的成对回答 ----------
+// 顶栏点两个属性选一对（默认：对口属性 vs 标了「坏」的第一个）；乱码版 open0 = 开放多样性没学时的样子
+const TRY = { q: null, pair: [] };
+function tryOpen(q) {
+  if (TRY.q !== q.id) {
+    TRY.q = q.id; const dk = dkAttr(q.qtype) || 'knowledge', bad = QA.find(a => a !== 'open0' && a !== dk && q.marks?.[a] === '坏');
+    TRY.pair = q.pair ? [...q.pair] : [dk, bad || (dk === 'formal' ? 'colloquial' : 'formal')];
   }
-  const on = S.mod === 'train' && S.tmode !== 'types';
-  TRYBOX.style.display = on ? '' : 'none'; if (!on) return;
-  TRYBOX.classList.toggle('min', TRY.min);
-  const k = Math.max(.3, Math.min(.6, ($('#lane').clientWidth - 24) / 768));   // 画布窄（右栏开着、窗口小）就缩小一点
-  TRYBOX.querySelector('.tgwrap').style.cssText = `width:${Math.round(768 * k)}px;height:${Math.round(432 * k)}px`; TRYBOX.querySelector('.tgame').style.transform = `scale(${k})`; TRYBOX.style.width = Math.round(768 * k) + 'px';
-  const q = qOf(S.sel?.q) || qsOf(S.tmode)[0], bar = TRYBOX.querySelector('.trybar');
-  if (q && TRY.q !== q.id) { TRY.q = q.id; const dk = dkAttr(q.qtype) || 'knowledge'; TRY.pair = q.pair ? [...q.pair] : [dk, dk === 'formal' ? 'colloquial' : 'formal']; }
-  const pick = k => { const s = h('select', { class: 'chipsel' }, ...QA.map(a => h('option', { value: a }, qaName(a)))); s.value = TRY.pair?.[k] || QA[k]; s.onchange = () => { TRY.pair[k] = s.value; }; return s; };
-  bar.replaceChildren(h('b', {}, '🎮 在游戏里试做'), q ? h('span', { class: 'note' }, q.id) : h('span', { class: 'note' }, '这一类还没有题'),
-    ...(q && !TRY.min ? [pick(0), h('span', { class: 'note' }, 'vs'), pick(1), h('button', { class: 'mini', onclick: () => tryQ(q) }, '▶ 试做这道题')] : []),
-    h('span', { class: 'sp' }), h('button', { class: 'mini', title: TRY.min ? '展开' : '收起', onclick: () => { TRY.min = !TRY.min; tryBox(); } }, TRY.min ? '▴' : '▾'));
+  gamePreview({ src: '/游戏/?后训练预览=1', title: `试做 · ${q.id} · ${q.q || '（还没写问题）'}`, controls: () => tryControls(q), onReady: () => tryRun(q) });
 }
-function tryQ(q) {
-  if (!TRY.ready) return toast('游戏预览还在载入，等一下再点');
+function tryControls(q) {
+  const tag = a => { const k = TRY.pair.indexOf(a); return k < 0 ? null : h('i', {}, k ? 'B' : 'A'); };
+  return [h('span', { class: 'lbl' }, '配对：'),
+    ...QA.map(a => h('button', { class: 'apick' + (TRY.pair.includes(a) ? ' on' : ''), style: `--c:${qaCol(a)};color:${TRY.pair.includes(a) ? '#fff' : qaCol(a)}`, title: q.marks?.[a] ? '标的是「' + q.marks[a] + '」' : '还没标好坏',
+      onclick: () => { if (TRY.pair.includes(a)) TRY.pair = TRY.pair.filter(x => x !== a); else TRY.pair = [...TRY.pair, a].slice(-2); gpvBar(); } }, qaName(a), q.marks?.[a] ? '·' + q.marks[a] : '', tag(a))),
+    h('button', { class: 'mini', onclick: () => tryRun(q) }, '▶ 再做一次')];
+}
+function tryRun(q) {
+  if (TRY.pair.length < 2) return toast('先在顶栏点两个属性');
   const pair = TRY.pair.map(a => a === 'open0' ? 'open' : a);
-  if (pair[0] === pair[1]) return toast('两段回答要是不同的属性');
-  TRYBOX.querySelector('iframe').contentWindow.postMessage({ type: '试做', q: JSON.parse(JSON.stringify(q)), pair, stages: TRY.pair.includes('open0') ? { open: 0 } : {} }, location.origin);
+  if (pair[0] === pair[1]) return toast('开放多样性和它的乱码版不能配成一对');
+  gpvPost({ type: '试做', q: JSON.parse(JSON.stringify(q)), pair, stages: TRY.pair.includes('open0') ? { open: 0 } : {} });
 }
 
 // ---------- 新建 / 复制 / 删除 ----------
@@ -220,7 +215,7 @@ function qPanel(P) {
   }
   const marked = QA.filter(a => q.marks?.[a]).length;
   F.append(h('div', { class: 'note' }, `点画布上的每段回答改内容、标好坏（已标 ${marked}/${QA.length}）。对口属性那段必须标「好」，六个属性里至少一段标「坏」（乱码版不算），成对回答才有反差。`));
-  P.append(acts(['▶ 在游戏里试做', () => { TRY.min = false; tryBox(); tryQ(q); }], ['复制一道', () => dupQ(q)], ['删除这道题', () => delQ(q), true, '删错了可以撤销']));
+  P.append(acts(['▶ 在游戏里试做', () => tryOpen(q)], ['复制一道', () => dupQ(q)], ['删除这道题', () => delQ(q), true, '删错了可以撤销']));
 }
 function qaPanel(P) {
   const q = qOf(S.sel.q), a = S.sel.a; if (!q) { S.sel = null; return; }
@@ -283,6 +278,6 @@ function trainHelp() {
     h('p', { class: 't2' }, '这一半管白天的「后训练」：玩家挑一类问题，每道题两个回答选一个，选中的属性在这一类问题上更容易被转到。术语见 CONTEXT.md 的「对口属性」「反例轮」。'),
     h('h3', {}, '问题类型'), h('p', {}, '一类一列。每一类有一个对口属性：这一类大多数轮里能解决问题的那个属性，玩家练它大体能练对。列下面是全库里这一类的反例轮（对口属性浅层解决不了的轮）和缺对口卡的轮，点一张就去夜间剧本打开那一轮。「⚙ 推荐上限」只是推荐值，超了只提醒。'),
     h('h3', {}, '后训练题'), h('p', {}, '左栏点开一类，画布上一道题一列：问题，加 7 段回答（6 个属性 + 开放多样性没学时的乱码版）。点一段改内容、标好坏。好坏标记只给写剧本的人看，游戏不读；校验要求对口属性那段标「好」、六个属性里至少一段标「坏」（乱码版不算）。'),
-    h('h3', {}, '在游戏里试做'), h('p', {}, '右下角的小窗是真游戏：选好一对属性，点「▶ 试做这道题」，就弹出玩家看到的成对回答，选完看六维图怎么弹缩。不存档，每次都从全浅层、没练过的盘面开始。'));
+    h('h3', {}, '在游戏里试做'), h('p', {}, '点每道题列头的「▶ 试做」，弹出一个大窗，里面是真游戏：顶栏点两个属性选一对（默认是对口属性对一个标「坏」的），游戏里弹出玩家看到的成对回答，选完看六维图怎么弹缩。不存档，每次都从全浅层、没练过的盘面开始。Esc 关掉。'));
   $('#help').classList.add('on');
 }

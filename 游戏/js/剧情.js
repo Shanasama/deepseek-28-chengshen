@@ -82,6 +82,12 @@ async function play(g) {
   await close();
   S.on = false; S.seg = null; G.busy = busy;
 }
+// 编辑器的剧情预览（?剧情预览=1）：不看挂点和条件，直接把这一段从 from 节点（不写就是开始节点）播下去；
+// 进结局只记下来、不收尾整局。返回进了哪个结局（没进就是 null）
+export async function playPreview(g, from) {
+  storyAbort(); await play(from ? { ...g, start: from } : g);
+  const end = S.endReq; S.endReq = null; return end;
+}
 // 回标题 / 读档时：停下正在播的剧情
 export function storyAbort() {
   S.gen++; S.on = false; S.seg = null; S.adv?.(); S.pick?.(null);

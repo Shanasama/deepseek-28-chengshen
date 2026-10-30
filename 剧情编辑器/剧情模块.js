@@ -198,13 +198,14 @@ function storyCanvas() {
     h('div', { class: 'shbtns' },
       h('button', { class: 'mini', onclick: () => select({ kind: 'seg', seg: S.segFile }) }, '⚙ 什么时候播'),
       h('button', { class: 'mini', onclick: () => { const n = newNode(g, S.sel?.node || start); changed(); select({ kind: 'node', seg: S.segFile, node: n.id }); } }, '＋ 新节点'),
-      h('button', { class: 'mini', title: '在旁边的小窗口里从开始节点一路播下去（选项取第一个，条件按「满足」走）', onclick: () => previewSeg(g) }, '▶ 预览'))));
+      h('button', { class: 'mini', title: '在游戏里从开始节点播这一段：全屏对白、选项都是真的', onclick: () => openStoryPreview(g) }, '▶ 预览'))));
   const graph = h('div', { class: 'sgraph' }); lane.append(graph);
   let W = 0, H = 0;
   for (const n of g.nodes) {
     const p = nodePos(g, n.id), sel = S.sel?.kind === 'node' && S.sel.node === n.id, list = n.steps || [];
     const el = h('div', { class: 'snode nopan' + (sel ? ' sel' : '') + (S.enter ? ' enter' : ''), 'data-node': n.id, style: `left:${p.x}px;top:${p.y}px`, onclick: e => { if (!e.target.closest('.snp')) select({ kind: 'node', seg: S.segFile, node: n.id }); } },
-      h('div', { class: 'snh', title: '拖这里移动节点' }, n.id === start ? h('span', { class: 'snst', title: '这一段从这里开始播' }, '▶ 开始') : null, h('b', {}, n.name || n.id), issueDot({ kind: 'node', seg: S.segFile, node: n.id })),
+      h('div', { class: 'snh', title: '拖这里移动节点' }, n.id === start ? h('span', { class: 'snst', title: '这一段从这里开始播' }, '▶ 开始') : null, h('b', {}, n.name || n.id), issueDot({ kind: 'node', seg: S.segFile, node: n.id }),
+        h('button', { class: 'snpv', title: '在游戏里从这个节点播', onpointerdown: e => e.stopPropagation(), onclick: e => { e.stopPropagation(); openStoryPreview(g, n.id); } }, '▶')),
       h('div', { class: 'snb' }, list.length ? list.slice(0, 6).map(b => { const d = BLK(b.do); return h('div', { class: 'snl', title: d?.desc || '' }, h('span', { class: 'bic' }, d?.icon || '❓'), h('span', {}, blockSummary(b) || d?.name || b.do)); }) : h('div', { class: 'note' }, '（还没有积木，点开在右边加）'),
         list.length > 6 ? h('div', { class: 'note' }, `…还有 ${list.length - 6} 块`) : null),
       h('div', { class: 'snps' }, outs(n).map((o, i) => h('div', { class: 'snp ' + o.k + (o.end ? ' end' : '') + (!o.end && !o.to ? ' open' : ''), 'data-port': i, title: o.end ? '这一段到这里结束' : o.to ? '连到「' + (nodeOf(g, o.to)?.name || o.to) + '」' : '还没连到哪个节点：在右边选' }, o.lbl, h('i', {}, o.end ? '■' : o.to ? '→' : '?')))));
@@ -447,7 +448,7 @@ function nodePanel(P) {
   const start = (g.start || g.nodes[0]?.id) === n.id;
   P.append(hd('节点 · ' + (n.name || n.id), `剧情段「${g.name || g.id}」· 编号 ${n.id}${start ? ' · 从这里开始播' : ''}`, '积木'));
   P.append(acts(start ? null : ['▶ 设为开始节点', () => { g.start = n.id; if (g.nodes[0].id === n.id) delete g.start; changed(); renderPanel(); }],
-    ['▶ 从这里预览', () => previewSeg(g, n.id)],
+    ['▶ 从这里预览', () => openStoryPreview(g, n.id)],
     g.nodes.length > 1 ? ['删除这个节点', () => { g.nodes.splice(g.nodes.indexOf(n), 1); if (g.start === n.id) delete g.start; S.sel = { kind: 'seg', seg: S.segFile }; changed(); renderPanel(); toast('已删除节点（Ctrl+Z 撤销）；连到它的路校验会报出来'); }, true] : null));
   const W = h('div', { class: 'chatwrap' }); P.append(W);
   W.append(h('div', { class: 'shname' }, ed({ ...fieldIO(n, 'name'), label: '节点名字', single: true, ph: '节点名字' })));
@@ -643,25 +644,34 @@ function storyParam(b, p, up) {
   return null;
 }
 
-// ---------- 迷你预览：从某个节点一路播下去（选项取第一个，条件按「满足」走） ----------
-async function previewSeg(g, from) {
-  const ov = $('#fxpv'); ov.classList.add('on'); ov.querySelector('.pvt').textContent = '预览 · ' + (g.name || g.id);
-  const box = ov.querySelector('.pvchat'); box.replaceChildren(); const my = ++PVR, alive = () => my === PVR;
-  let id = from || g.start || g.nodes[0]?.id, guard = 0;
-  while (id && alive() && guard++ < 40) {
-    const n = nodeOf(g, id); if (!n) break; box.append(h('div', { class: 'mtag show' }, '▸ 节点「' + (n.name || n.id) + '」'));
-    let next = n.next;
-    for (const b of n.steps || []) {
-      if (!alive()) return;
-      if (b.do === 'choice') { box.append(h('div', { class: 'mtag' }, '🔀 选项：' + (b.options || []).map((o, k) => (k ? '' : '【') + (o.text || '…') + (k ? '' : '】')).join(' / '))); if (b.options?.[0]?.to) { next = b.options[0].to; break; } continue; }
-      if (b.do === 'if') { if (b.to) { next = b.to; box.append(h('div', { class: 'mtag' }, '❓ 条件（预览按满足走）')); break; } continue; }
-      if (b.do === 'goto') { next = b.to; break; }
-      if (b.do === 'end' || b.do === 'ending') { next = null; box.append(h('div', { class: 'mtag' }, b.do === 'ending' ? '🏁 进结局：' + endName(b.id) : '⏹ 结束这一段')); break; }
-      await miniBlock(b, 1, 1, box, alive, 0);
-    }
-    id = next;
+// ---------- 在游戏里预览：「游戏预览」大窗（index.html 的 gamePreview）里用真游戏播这一段 ----------
+// 选项能点、条件照真的算：顶栏设从哪个节点播、白天还是夜里、第几天、心、额度、这一段用到的剧情变量。不存档
+const NIGHT_HOOKS = new Set(['opening', 'beforeVisitor', 'afterVisitor', 'beforeReport', 'afterReport', 'ending']);
+const PRV = { id: 0, seg: null, from: null, mode: 'day', day: 1, hearts: 3, quota: 10, vars: {}, status: '' };
+// 这一段的条件跳转、进入条件里读了哪些剧情变量
+const segVars = g => [...new Set([...(g.when || []), ...(g.nodes || []).flatMap(n => (n.steps || []).filter(b => b.do === 'if').flatMap(b => b.when || []))].filter(c => c.k === 'var' && c.name).map(c => c.name))];
+function openStoryPreview(g, from) {
+  if (PRV.seg !== g.id) {
+    const k = SHOOK(g.hook?.at);
+    Object.assign(PRV, { seg: g.id, vars: {}, mode: NIGHT_HOOKS.has(g.hook?.at) || k?.cat === '事件' ? 'night' : 'day', day: typeof g.day === 'number' ? g.day : Array.isArray(g.day) ? g.day[0] : 1 });
   }
-  if (alive()) box.append(h('div', { class: 'pvend' }, '— 播完了 · 全屏画面在这里只用文字示意 —')); box.scrollTop = box.scrollHeight;
+  PRV.from = from || null;
+  gamePreview({ src: '/游戏/?剧情预览=1', title: '剧情预览 · ' + (g.name || g.id), controls: () => prvControls(g), onReady: () => prvRun(g) });
+  GPV.onMsg = d => { if (d?.type === '剧情播完' && d.id === PRV.id) { PRV.status = d.end ? '播完了 · 进结局：' + endName(d.end) : '播完了'; gpvBar(); } };
+}
+function prvControls(g) {
+  const start = g.start || g.nodes[0]?.id;
+  const from = h('select', { class: 'chipsel' }, ...g.nodes.map(n => h('option', { value: n.id }, (n.id === start ? '▶ ' : '') + (n.name || n.id)))); from.value = PRV.from || start; from.onchange = () => { PRV.from = from.value; };
+  const mode = h('select', { class: 'chipsel' }, h('option', { value: 'day' }, '白天的工位'), h('option', { value: 'night' }, '夜里的工位')); mode.value = PRV.mode; mode.onchange = () => { PRV.mode = mode.value; };
+  const num = (k, min) => { const e = h('input', { type: 'number', min }); e.value = PRV[k]; e.oninput = () => { const v = parseInt(e.value); if (!isNaN(v)) PRV[k] = v; }; return e; };
+  const vars = segVars(g).map(name => { const e = suggest(h('input', { type: 'text', placeholder: '不设' }), () => [...(storyVars().get(name)?.vals || [])].map(String)); e.value = PRV.vars[name] ?? ''; e.oninput = () => { if (e.value === '') delete PRV.vars[name]; else PRV.vars[name] = parseVal(e.value); }; return h('span', {}, h('span', { class: 'lbl' }, name + ' = '), e); });
+  return [h('span', { class: 'lbl' }, '从'), from, mode, h('span', { class: 'lbl' }, '第'), num('day', 0), h('span', { class: 'lbl' }, '天 · 心'), num('hearts', 0), h('span', { class: 'lbl' }, '额度'), num('quota', 0),
+    ...(vars.length ? [h('span', { class: 'lbl' }, '· 剧情变量'), ...vars] : []),
+    h('button', { class: 'mini', onclick: () => prvRun(g) }, '▶ 重播'), PRV.status ? h('span', { class: 'gpst' }, PRV.status) : null];
+}
+function prvRun(g) {
+  PRV.status = '播放中…'; gpvBar();
+  gpvPost({ type: '剧情', id: ++PRV.id, seg: JSON.parse(JSON.stringify(g)), from: PRV.from, mode: PRV.mode, st: { day: PRV.day, hearts: PRV.hearts, quota: PRV.quota, vars: { ...PRV.vars } } });
 }
 // 迷你预览里剧情积木的样子（miniBlock 碰到剧情积木转过来）
 async function storyMini(b, add) {
