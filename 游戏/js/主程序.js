@@ -14,6 +14,7 @@ import { initDay, dayKeys, pickActByIndex, view, goNight, trialIdle, trialQuesti
 import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun, endEarly } from './日程.js';
 import { spotKey, storyOn, storyKey, ARROW } from './教学.js';
 import { storyKeyDown, storyKeyUp, playPreview, storyAbort, HANDLERS } from './剧情.js';
+import { initDev, devRender, pendDigit } from './开发.js';
 import { setTab, reportNext, finalNext, renderSelf } from './报告.js';
 import { loadSettings, latest, readSlot, tipsReset } from './存档.js';
 import { initSL, openSL, slOpen, slKey } from './存读档.js';
@@ -58,7 +59,7 @@ function loop(now) {
 const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show'), SPRV = Q.get('立绘预览'), TPRV = Q.get('后训练预览'), GPRV = Q.get('剧情预览');
 if (SPRV || TPRV || GPRV) $('start').style.display = 'none';
 else if (!PLAY && !SHOW) { $('start').style.display = 'none'; $('titlescr').classList.add('on'); }   // 载入时先只露出标题画面的底
-if (location.protocol === 'dfy:') $('dev').style.display = 'none';   // 桌面版（封装/）不放开发面板
+initDev(!(PLAY || SHOW || SPRV || TPRV || GPRV));   // 开发者模式（开发.js）：正常游戏里 2+5+9 打开；编辑器的试玩、预览里没有
 function trialArgs() {
   const i = PLAY.lastIndexOf('/'), stages = {};
   for (const kv of (Q.get('st') || '').split(',').filter(Boolean)) { const [k, v] = kv.split(':'); if (AXES.includes(k)) stages[k] = +v; }
@@ -96,29 +97,12 @@ addEventListener('keydown', e => {
   if (KEYQ) { if (e.code === 'ArrowLeft' || e.code === 'KeyA') KEYQ(0); else if (e.code === 'ArrowRight' || e.code === 'KeyB') KEYQ(1); else if (e.code === 'KeyR') KEYR && KEYR(); return; }
   if (KEYSUM) { if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); KEYSUM(); } return; }
   if (G.busy) return;
-  if (G.view === 'menu' && /^Digit[1-9]$/.test(e.code)) pickActByIndex(+e.code.slice(5) - 1);
+  if (G.view === 'menu' && /^Digit[1-9]$/.test(e.code)) { if (!e.repeat) pendDigit(e.code, +e.code.slice(5) - 1); }   // 松开才选（开发.js），免得和 2+5+9 冲突
   else if (e.code === 'Escape' && G.view !== 'menu') { SFX.click(); view('menu'); }
   else if (e.code === 'Enter') goNight();
 });
 
 addEventListener('keyup', storyKeyUp);
-
-// ---------- 开发面板（不属于设计） ----------
-$('devh').onclick = () => $('dev').classList.toggle('min');
-$('d-ap').onclick = () => { G.ap = G.apMax; G.post = 0; renderAP(); if (G.mode === 'day' && !G.busy) view('menu'); };
-$('d-h5').onclick = () => { G.hearts = 5; renderHUD(); };
-$('d-q3').onclick = () => { G.quota = 3; renderHUD(); };
-$('d-skip').onclick = () => skipCurrent();
-const setStages = v => { AXES.forEach(a => G.stage[a] = v); drawRoomItems(); renderSelf(); if (G.mode === 'day' && !G.busy) view('menu'); };
-$('d-s1').onclick = () => setStages(1); $('d-s2').onclick = () => setStages(2);
-function devRender() {
-  if ($('dev').classList.contains('min')) return;
-  const s = G.sessions[G.cur];
-  $('devstate').textContent = `Day ${G.day} · ${G.mode} · 行动点 ${G.ap}/${G.apMax} · 心 ${G.hearts} · 额度 ${G.quota}\n` +
-    (s ? `会话 ${G.cur + 1}/${G.sessions.length}：${s.visitor.name} · ${s.file}\n耐心 ${G.patience} · 推进 ${G.prog}/${s.U.N} · 重问 ${G.retry} · 节点 ${NODE.state}` : `今晚：${G.tonight.map(v => v.name + (v.repeat ? '(重复)' : '')).join('、')}`) +
-    `\n题库：${DATA.bankFake ? '假题（正式题库还没写）' : '正式题库'}`;
-  $('devtab').innerHTML = '<tr><td></td>' + QT.map(t => `<td>${t.slice(0, 2)}</td>`).join('') + '</tr>' + AXES.map(a => `<tr><td><span style="color:${AT[a].c}">■</span> ${AT[a].s}${G.stage[a] === 2 ? '·深' : ''}</td>` + QT.map(t => { const v = w(t, a); return `<td>${v == null ? '—' : v.toFixed(2)}</td>`; }).join('') + '</tr>').join('');
-}
 
 // 调试用：控制台里能拿到状态和几个操作（自动试玩脚本用）
 window.__dfy = { G, NODE, spin, confirmPick, regen, goNight, reportNext, finalNext, skipCurrent, DATA, loadSave, latest, readSlot, showTitle, quitRun };

@@ -38,6 +38,20 @@ export async function newGame() {
   if (d0) { const r = RULES.afterTutorial({ stage: G.stage, adj: G.adj }, d0, DATA.reg, DATA.bank); G.stage = r.stage; G.adj = r.adj; QT.forEach(t => { G.adj[t] = G.adj[t] || {}; }); drawRoomItems(); }
   await wipe(true); startDay(days()[0].day); await wipe(false); SFX.morning();
 }
+// ---------- 开发者模式（开发.js）----------
+// 跳过新手教程：停下正在进行的一切，重开一局，按做完了出厂测试给结果，直接从第 1 天开始（不播开场剧情和第 1 天的引导）
+export async function devSkipTutorial() {
+  await quitRun(); leaveTitle(); TRIAL = null; G.noSave = false; resetGame(); G.started = true; G.startT = performance.now();
+  setSessionPicker(pickSession); clearConvs(); markTutDone();
+  const d0 = tutDay(); if (d0) { const r = RULES.afterTutorial({ stage: G.stage, adj: G.adj }, d0, DATA.reg, DATA.bank); G.stage = r.stage; G.adj = r.adj; QT.forEach(t => { G.adj[t] = G.adj[t] || {}; }); drawRoomItems(); }
+  await wipe(true); startDay(days()[0].day); await wipe(false);
+}
+// 直接去第 n 天的早上：这一局的数值、训练、剧情都留着，只是换一天
+export async function devGoDay(n) {
+  const t0 = G.startT; await quitRun(); leaveTitle(); TRIAL = null; G.noSave = false; G.started = true; G.startT = t0 || performance.now();
+  setSessionPicker(pickSession); clearConvs(); await wipe(true); startDay(n); await wipe(false);
+}
+
 // Day 0 出厂测试：夜里，只来测试员一位；教学额度 1 点
 async function startTutorial(d0) {
   const e = DATA.list.find(x => x.dir === d0.tutor); if (!e) { toast('剧本库里没有出厂测试员'); return startDay(days()[0].day); }

@@ -55,7 +55,7 @@ export function phonePost(p) {
   if (p.avatar) { const im = new Image(); im.src = p.avatar; im.alt = p.who || ''; im.className = 'tav'; av.appendChild(im); } else av.appendChild(phAvatar(p.who || '?', 1));
   $('phone-rf').style.visibility = 'visible'; $('phone').classList.add('show'); SFX.note();
 }
-async function tibo() {
+export async function tibo() {   // 开发面板也能直接叫一次（先把 tiboUsed 清掉）
   if (G.tiboUsed) return; G.tiboUsed = true; phonePost(TIBO_POST); $('phone-rf').style.visibility = 'hidden';
   await wait(900);
   for (let i = G.quota; i < G.quotaMax; i++) { G.quota = i + 1; renderQuota(); restart($('quota'), 'refill'); SFX.charge(i); await wait(70); }

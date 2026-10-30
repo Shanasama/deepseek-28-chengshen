@@ -9,7 +9,7 @@
 // 她身上的明暗和亮边都按像素一格一格算（分档），占位图和正式立绘的每一帧都过一遍、缓存起来；叠在上面的光是柔的。
 // 不跟别的模块要通知：主循环每帧调 drawLight，自己看昼夜、钟点和开关变没变。
 import { G } from './状态.js';
-import { P, ATTR, $ } from './基础.js';
+import { P, ATTR, $, DESK_Y, DESK_DY } from './基础.js';
 import { NODE } from './转盘.js';
 import { fishImg, FISH, DUST, MON } from './工位.js';
 import { SPRITE, setFrameFilter, redrawSprite } from './立绘.js';
@@ -73,7 +73,7 @@ function apply(key) {
 const keyNow = () => !lightOn() ? 'off' : G.mode === 'night' ? 'night' : 'day' + bandOf(dayT());
 function drawVignette() {
   const x = $('vig').getContext('2d'); x.clearRect(0, 0, 600, 486);
-  const g = x.createRadialGradient(290, 300, 110, 290, 280, 400); g.addColorStop(0, 'rgba(6,8,26,0)'); g.addColorStop(1, 'rgba(6,8,26,.82)');
+  const g = x.createRadialGradient(290, 300 + DESK_DY, 110, 290, 280 + DESK_DY, 400); g.addColorStop(0, 'rgba(6,8,26,0)'); g.addColorStop(1, 'rgba(6,8,26,.82)');
   x.fillStyle = g; x.fillRect(0, 0, 600, 486);
 }
 
@@ -125,8 +125,8 @@ function drawDay(now) {
       const x0 = wx + ww * p0, x1 = wx + ww * p1, gr = m.createLinearGradient(x1, wy, x1 - run, floor);
       gr.addColorStop(0, `rgba(${col},${A * 1.9})`); gr.addColorStop(.5, `rgba(${col},${A * 1.05})`); gr.addColorStop(1, `rgba(${col},0)`);
       m.fillStyle = gr; m.beginPath(); m.moveTo(x0, top); m.lineTo(x1, top); m.lineTo(x1 - run, floor); m.lineTo(x0 - run, floor); m.closePath(); m.fill();
-      const back = (390 - top) / slant, lx0 = x0 - back, lx1 = x1 - back, sp = m.createLinearGradient(0, 382, 0, 404);   // 落到桌面上的亮斑
-      sp.addColorStop(0, `rgba(${col},${A * 1.5})`); sp.addColorStop(1, `rgba(${col},0)`); m.fillStyle = sp; m.beginPath(); m.moveTo(lx0, 386); m.lineTo(lx1, 386); m.lineTo(lx1 - 18 / slant, 404); m.lineTo(lx0 - 18 / slant, 404); m.closePath(); m.fill();
+      const D = DESK_Y, back = (D - top) / slant, lx0 = x0 - back, lx1 = x1 - back, sp = m.createLinearGradient(0, D - 8, 0, D + 14);   // 落到桌面上的亮斑
+      sp.addColorStop(0, `rgba(${col},${A * 1.5})`); sp.addColorStop(1, `rgba(${col},0)`); m.fillStyle = sp; m.beginPath(); m.moveTo(lx0, D - 4); m.lineTo(lx1, D - 4); m.lineTo(lx1 - 18 / slant, D + 14); m.lineTo(lx0 - 18 / slant, D + 14); m.closePath(); m.fill();
     }
     const hz = m.createRadialGradient(wx + ww * .3, wy + wh * .85, 10, wx + ww * .3, wy + wh * .85, 300);   // 窗边一大片散光
     hz.addColorStop(0, `rgba(${col},${A * .55})`); hz.addColorStop(1, `rgba(${col},0)`); m.fillStyle = hz; m.fillRect(0, 0, 600, 486);

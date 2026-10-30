@@ -2,7 +2,7 @@
 // 两种交法都认：Aseprite 导出的「大肥鱼.png + 大肥鱼.json」（tag = 动作名），或「动作名/01.png…」+「时长.txt」。
 // 一张都没有时 SPRITE.ok = false，工位继续用参考图占位（工位.js 的 fishImg）。
 // 测试别的素材：网址后面加 ?立绘=/游戏/素材/大肥鱼/样稿/；编辑器检查页用 useSprite 直接把帧塞进来。
-import { $ } from './基础.js';
+import { $, DESK_Y } from './基础.js';
 import { ONCE, HOLD, AVA, parseAseprite, asepriteImage, parseFolder, checkSprite, drawTemplate } from './立绘读取.js';
 export { HOLD };
 
@@ -27,7 +27,7 @@ export function useSprite(acts, warn = [], from = '') {
   ALPHA = null; if (ck.ok) layout(); return SPRITE;
 }
 // 画布贴进房间：桌面线对齐房间 DESK_Y，左边贴 x=0；有 idle 时点她的区域改成画布在桌面以上的部分
-const DESK = 390;   // = 工位.js 的 DESK_Y（不 import，免得两个模块互相引用）
+const DESK = DESK_Y;   // 基础.js 的 DESK_Y（不从 工位.js 拿，免得两个模块互相引用）
 function layout() {
   const S = SPRITE, top = DESK - S.desk * S.scale;
   for (const id of ['fishspr', 'fishguide']) { const c = $(id); c.width = S.size; c.height = S.size; Object.assign(c.style, { top: top + 'px', width: S.size * S.scale + 'px', height: S.size * S.scale + 'px' }); }

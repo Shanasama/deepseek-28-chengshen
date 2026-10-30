@@ -19,7 +19,7 @@ const fated = () => { if (!NODE.fate) return false; SFX.bad(); return true; };
 NODE.under = -1; NODE.hold = null; const HOLD = 500;
 export const setNodeHook = fn => { HOOK = fn; };
 const allowed = k => !NODE.allow || NODE.allow.has(k);
-const wheel = $('wheel'), wx = wheel.getContext('2d'), WW = 172, WH = 190, WCX = 86, WCY = 100, WR = 74;
+const wheel = $('wheel'), wx = wheel.getContext('2d'), WW = 200, WH = 222, WCX = 100, WCY = 118, WR = 88;   // 宽高和 index.html 里的 #wheel 一致
 const wimg = wx.createImageData(WW, WH);
 const PRE = { r: new Float32Array(WW * WH), a: new Float32Array(WW * WH) };
 for (let y = 0; y < WH; y++) for (let x = 0; x < WW; x++) { const dx = x + .5 - WCX, dy = y + .5 - WCY; PRE.r[y * WW + x] = Math.hypot(dx, dy); PRE.a[y * WW + x] = mod(Math.atan2(dx, -dy) * 180 / Math.PI, 360); }

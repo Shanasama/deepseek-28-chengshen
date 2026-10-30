@@ -1,6 +1,6 @@
 // 白天：大肥鱼的自由活动（v3 §3.3）。白天活动是登记出来的，日程表按天开放；加新玩法 = 在 ACTS 里加一项 + 实现它的 run。
 import { G, QT, AXES } from './状态.js';
-import { P, AT, $, sp, wt, wait, pick, shuffle, fmt, restart, pxIcon, ICON, toast, deny, deskXY, stage } from './基础.js';
+import { P, AT, $, sp, wt, wait, pick, shuffle, fmt, restart, pxIcon, ICON, toast, deny, deskXY, stage, DESK_DY } from './基础.js';
 import { SFX } from './音频.js';
 import { parts, confetti, ring, burst, floatAt, vignette, glitch, shake, flash, banner } from './特效.js';
 import { setFish, setScreen, drawRoomItems, POP, DESK_Y, MON, DEV } from './工位.js';
@@ -221,7 +221,7 @@ async function eat() {
   bubble(false); fishSay('白饭！我来了！嗷呜——'); await wt(400);
   setUrl('dafeiyu://<b>waimai</b>/order/白饭×1', true); setScreen('eat'); showBowl(true); SFX.thud(); const bp = deskXY(128, DESK_Y - 12); ring(bp.x, bp.y, P.paper, 20, 90); setFish('eat');
   for (let i = 0; i < 9; i++) {
-    SFX.munch(); const p = deskXY(120, 300); if (i % 2 === 0) floatAt(pick(['嗷呜', '吧唧', '香！', '嚼嚼', '好吃！']), p.x + Math.random() * 50 - 20, p.y + Math.random() * 20 - 10, P.gold, i === 8);
+    SFX.munch(); const p = deskXY(120, 300 + DESK_DY); if (i % 2 === 0) floatAt(pick(['嗷呜', '吧唧', '香！', '嚼嚼', '好吃！']), p.x + Math.random() * 50 - 20, p.y + Math.random() * 20 - 10, P.gold, i === 8);
     for (let k = 0; k < 5; k++) parts.push({ x: bp.x + Math.random() * 20 - 10, y: bp.y - 10, vx: Math.random() * 140 - 70, vy: -60 - Math.random() * 80, g: 420, c: k % 2 ? P.paper : P.mist, life: .4 + Math.random() * .3, s: 2 }); await wt(200);
   }
   showBowl(false); setFish('happy'); SFX.heartIn(); await dropHeart(); G.hearts = Math.min(G.heartMax, G.hearts + 1); renderHUD(); $('hearts').lastChild.classList.add('in');
@@ -234,9 +234,9 @@ async function eat() {
 function showBowl(on_) { const c = $('eat').getContext('2d'); c.clearRect(0, 0, 600, 486); if (!on_ || holds('eat')) return; const b = pxIcon(ICON.bowl, { k: P.ink, w: P.paper, B: P.cobalt }, 2); c.imageSmoothingEnabled = false; c.drawImage(b, 108, DESK_Y - 24, 40, 24); }
 
 // ---------- 开始营业 ----------
-export async function goNight() {
+export async function goNight({ ask = true } = {}) {   // ask：还有行动点时先问一句（开发面板的「马上开始营业」不问）
   if (G.busy) return;
-  if (G.ap > 0) { if (!(await confirmBox(`还有 ${G.ap} 个行动点没用`, '今天的行动点不会留到明天。确定开始营业吗？', '开始营业'))) return; }
+  if (ask && G.ap > 0) { if (!(await confirmBox(`还有 ${G.ap} 个行动点没用`, '今天的行动点不会留到明天。确定开始营业吗？', '开始营业'))) return; }
   lock(true); await youSay('开始营业吧。'); bubble(false); setFish('stretch'); SFX.stretch();
   fishSay('伸个懒腰……好！今晚的用户们，来吧！'); addLog('开始营业', 'k');
   const from = G.clock, to = 18 * 60 + 40, t0 = performance.now();
@@ -259,10 +259,10 @@ const HOTS = [
   { x: 192, y: 34, w: 148, h: 78, tip: '布告板 · 预训练「论坛」', act: 'pretrain', arg: 'colloquial' },
   { x: 192, y: 112, w: 148, h: 56, tip: '梗图 · 预训练「评论区」', act: 'pretrain', arg: 'open' },
   { x: 350, y: 128, w: 46, h: 110, tip: '衣钩 · 预训练「官网」', act: 'pretrain', arg: 'formal' },
-  { x: 462, y: 310, w: 88, h: 80, tip: '笔记本 · 预训练「技术文档」', act: 'pretrain', arg: 'logic' },
-  { x: 552, y: 350, w: 46, h: 40, tip: '书立 · 预训练「小说」', act: 'pretrain', arg: 'narrative' },
-  { x: 222, y: 268, w: 154, h: 112, tip: '显示器 · 后训练', act: 'posttrain' },
-  { x: 180, y: 360, w: 30, h: 32, tip: '马克杯 · 吃白饭', act: 'eat' },
+  { x: 462, y: 310 + DESK_DY, w: 88, h: 80, tip: '笔记本 · 预训练「技术文档」', act: 'pretrain', arg: 'logic' },
+  { x: 552, y: 350 + DESK_DY, w: 46, h: 40, tip: '书立 · 预训练「小说」', act: 'pretrain', arg: 'narrative' },
+  { x: 222, y: 268 + DESK_DY, w: 154, h: 112, tip: '显示器 · 后训练', act: 'posttrain' },
+  { x: 180, y: 360 + DESK_DY, w: 30, h: 32, tip: '马克杯 · 吃白饭', act: 'eat' },
 ];
 export function initDay() {
   HOTS.forEach(h => {

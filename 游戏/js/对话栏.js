@@ -1,6 +1,6 @@
 // 对话栏：白天是你和大肥鱼的 LINE 式聊天；夜里一位用户一个会话，大肥鱼的思考和正文是 token，从分词机飞进来。
 import { G, spd } from './状态.js';
-import { P, $, sp, wait, wt, rand, fmt, restart, pxIcon, ICON, DOWN, tokenize, toast, phAvatar, mdRender, deskXY } from './基础.js';
+import { P, $, sp, wait, wt, rand, fmt, restart, pxIcon, ICON, DOWN, tokenize, toast, phAvatar, mdRender, deskXY, DESK_DY } from './基础.js';
 import { SFX } from './音频.js';
 import { parts, ring } from './特效.js';
 import { DEV, MON, scrToken, fishAvatar, setFish, mouth, MOUTH, fishImg } from './工位.js';
@@ -112,7 +112,7 @@ function launchToken(q) {
 // 白天预训练：语料里的词从显示器飞进她脑袋
 export function flyWord(text, col) {
   const el = document.createElement('div'); el.className = 'fly word r2'; el.textContent = text; el.style.color = col; $('fxl').appendChild(el);
-  const a = deskXY(MON.x + 20 + rand(0, 110), MON.y + 20 + rand(0, 50)), b = deskXY(96 + rand(-14, 14), 246 + rand(-10, 10));
+  const a = deskXY(MON.x + 20 + rand(0, 110), MON.y + 20 + rand(0, 50)), b = deskXY(96 + rand(-14, 14), 246 + DESK_DY + rand(-10, 10));
   flights.push({ kind: 'word', el, a, b, col, c1: { x: a.x + rand(-30, 20), y: a.y - rand(80, 140) }, c2: { x: b.x + rand(10, 60), y: b.y - rand(60, 110) }, t: 0, dur: rand(.6, .9) * 1000 / spd(), trailT: 0 });
 }
 const bez = (a, b, c, d, t) => { const u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * d; };

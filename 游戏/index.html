@@ -14,7 +14,7 @@
 </head>
 <body class="day">
 <div id="stage">
-  <div id="title"><span id="tlogo"></span><b>大肥鱼</b><span class="hn r2">HARNESS</span><span class="sp"></span>
+  <div id="title"><span id="tlogo"></span><b>大肥鱼</b><span class="hn r2">HARNESS</span><span id="devtag" class="r2" title="开发者模式开着（同时按 2+5+9 关掉）" style="display:none">DEV</span><span class="sp"></span>
     <span class="wb" id="wb-min">—</span><span class="wb" id="wb-max">□</span><span class="wb x" id="wb-x">×</span></div>
 
   <!-- 最左：图标栏 + 可展开侧栏（白天放今晚来访预告，夜里放今晚的会话） -->
@@ -113,7 +113,7 @@
         <div id="bv"></div>
         <div id="nodebox">
           <div id="bhead"><span class="lbl"><i></i>下一个 token</span><span class="sp"></span><span class="cap">P(token | 前文)</span></div>
-          <div id="node"><div id="cands"></div><div id="wheelbox"><canvas id="wheel" width="172" height="190"></canvas></div></div>
+          <div id="node"><div id="cands"></div><div id="wheelbox"><canvas id="wheel" width="200" height="222"></canvas></div></div>
           <div id="hints"></div>
         </div>
         <div id="bflash"></div>
@@ -250,15 +250,7 @@
   <div id="start"><div class="card r12"><div style="font-size:24px;line-height:28px">大肥鱼 HARNESS</div><div style="color:var(--cobalt)">点击 / 按空格 开始</div><div class="t3" id="startinfo">载入中…</div></div></div>
 </div>
 
-<div id="dev" class="min"><h4 id="devh"><span>开发面板（不属于设计）</span><span>–</span></h4><div id="devbody">
-  <h5>天数与资源</h5>
-  <div><button id="d-ap">行动点回满</button><button id="d-h5">心设为 5</button><button id="d-q3">额度设为 3</button><button id="d-skip">跳过当前用户</button></div>
-  <h5>预训练阶段</h5>
-  <div><button id="d-s1">全部浅层</button><button id="d-s2">全部深层</button></div>
-  <h5>状态</h5>
-  <pre id="devstate"></pre>
-  <table id="devtab"></table>
-</div></div>
+<div id="dev" class="min" style="display:none"><h4 id="devh"><span>开发面板（不属于设计）</span><span>–</span></h4><div id="devbody"></div></div>
 
 <script src="/剧情编辑器/规则.js"></script>
 <script src="大肥鱼占位.js"></script>

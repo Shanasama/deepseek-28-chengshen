@@ -1,11 +1,12 @@
 // 工位：大肥鱼的房间。白天浅色、夜里深色两套画法；显示器、分词机、窗外、灰尘每帧画。
 import { G } from './状态.js';
-import { P, $, R, dith, rand } from './基础.js';
+import { P, $, R, dith, rand, DESK_Y, DESK_DY } from './基础.js';
 import { NODE } from './转盘.js';
 import { loadSprite, playSprite, holds, spriteAvatar, bindHit, HOLD } from './立绘.js';
 
-export const DESK_Y = 390;
-export const MON = { x: 222, y: 268, w: 154, h: 112 };
+export { DESK_Y, DESK_DY };
+const DD = DESK_DY; document.documentElement.style.setProperty('--dy', DD + 'px');   // 样式.css 里桌子那一组的位置都加 var(--dy)（标题画面的 Zz 也用）
+export const MON = { x: 222, y: 268 + DD, w: 154, h: 112 };
 const night = () => G.mode === 'night';
 
 // ---------- 墙和桌子 ----------
@@ -15,9 +16,9 @@ function drawBack() {
     const bands = [P.abyss, P.night, P.navy];
     for (let y = 0; y < 486; y++) { const t = y / 486 * 2, i = Math.min(1, Math.floor(t)), fr = t - i; for (let x = 0; x < 600; x++) R(b, fr > dith(x, y) + .12 ? bands[i + 1] : bands[i], x, y, 1, 1); }
     R(b, P.k0, 0, DESK_Y - 2, 600, 2);
-    for (let y = 190; y < DESK_Y; y++) for (let x = 110; x < 500; x++) { const d = Math.hypot((x - 299) / 1.5, y - 320) / 130; if (d < 1 && (1 - d) * .85 > dith(x, y)) R(b, P.deep, x, y, 1, 1); }
+    for (let y = 190 + DD; y < DESK_Y; y++) for (let x = 110; x < 500; x++) { const d = Math.hypot((x - 299) / 1.5, y - 320 - DD) / 130; if (d < 1 && (1 - d) * .85 > dith(x, y)) R(b, P.deep, x, y, 1, 1); }
     gl.clearRect(0, 0, 600, 486);
-    for (let y = 170; y < DESK_Y; y++) for (let x = 110; x < 490; x++) { const d = Math.hypot((x - 299) / 1.5, y - 320) / 110; if (d < 1 && (1 - d) * .85 > dith(x, y)) R(gl, d < .35 ? P.sky : P.cobalt, x, y, 1, 1); }
+    for (let y = 170 + DD; y < DESK_Y; y++) for (let x = 110; x < 490; x++) { const d = Math.hypot((x - 299) / 1.5, y - 320 - DD) / 110; if (d < 1 && (1 - d) * .85 > dith(x, y)) R(gl, d < .35 ? P.sky : P.cobalt, x, y, 1, 1); }
     R(b, P.k0, 410, 14, 182, 230); R(b, P.k4, 408, 242, 186, 5);
   } else {
     for (let y = 0; y < DESK_Y; y++) { const t = y / DESK_Y; for (let x = 0; x < 600; x++) R(b, t * .9 > dith(x, y) + .35 ? P.g4 : P.mist, x, y, 1, 1); }
@@ -48,7 +49,7 @@ const TH = {
   night: { o: P.k0, back: P.k3, line: P.k5, boxA: P.k5, boxB: P.k4, cork: P.k4, corkDot: P.k3, pin: P.k5, noteLine: P.k5, paper0: P.mist, junk: [P.t3, P.g1, P.teal], hook: P.k5, bookend: P.k5 },
   day: { o: P.ink, back: P.g4, line: P.g2, boxA: P.g2, boxB: P.g3, cork: P.peach, corkDot: P.skinS, pin: P.g2, noteLine: P.g2, paper0: P.paper, junk: [P.g3, P.g1, P.teal], hook: P.g2, bookend: P.g2 },
 };
-export const POP = { knowledge: [83, 120], colloquial: [266, 70], open: [266, 136], formal: [372, 170], logic: [506, 350], narrative: [577, 370] };
+export const POP = { knowledge: [83, 120], colloquial: [266, 70], open: [266, 136], formal: [372, 170], logic: [506, 350 + DD], narrative: [577, 370 + DD] };   // 后两样在桌上
 export function drawRoomItems() {
   const ROOM = G.stage, T = TH[G.mode], DY = DESK_Y;
   const w = $('wall').getContext('2d'), d = $('onDesk').getContext('2d'); w.clearRect(0, 0, 600, 486); d.clearRect(0, 0, 600, 486);
@@ -146,14 +147,14 @@ export function drawWindow(now, dt) {
     R(c, P.g1, 87, 0, 4, WH_); R(c, P.g1, 0, 108, WW_, 4);
   }
 }
-export const DUST = Array.from({ length: 30 }, () => ({ x: Math.random() * 600, y: Math.random() * 380, vx: rand(-3, 3), vy: rand(-4, -1), p: Math.random() * 6 }));
+export const DUST = Array.from({ length: 30 }, () => ({ x: Math.random() * 600, y: Math.random() * (DESK_Y - 10), vx: rand(-3, 3), vy: rand(-4, -1), p: Math.random() * 6 }));
 const STEAM = [];
 export function drawDust(dt, now) {
   const c = $('dust').getContext('2d'); c.clearRect(0, 0, 600, 486);
   DUST.forEach(d => {
-    d.x += d.vx * dt; d.y += d.vy * dt; if (d.y < 0) { d.y = 380; d.x = Math.random() * 600; }
+    d.x += d.vx * dt; d.y += d.vy * dt; if (d.y < 0) { d.y = DESK_Y - 10; d.x = Math.random() * 600; }
     if (Math.sin(now / 900 + d.p) <= -.3) return;
-    const col = night() ? (Math.hypot(d.x - 299, d.y - 320) < 150 ? P.cyan : P.g1) : (d.x > 300 && d.y > 200 ? P.lgold : P.g3);
+    const col = night() ? (Math.hypot(d.x - 299, d.y - 320 - DD) < 150 ? P.cyan : P.g1) : (d.x > 300 && d.y > 200 ? P.lgold : P.g3);
     R(c, col, Math.round(d.x), Math.round(d.y), 1, 1);
   });
   if (Math.random() < dt * 3) STEAM.push({ x: 193 + rand(-3, 3), y: DESK_Y - 28, life: 1.6 });
@@ -268,7 +269,7 @@ export function drawScreen(now) {
 }
 
 // ---------- 分词机：显示器算好，数据顺着线缆送过来，token 从顶部出口一个个吐出去 ----------
-export const DEV = { x: 380, y: 286, w: 76, h: 104, glow: 0, flash: 0, kick: 0, packets: [] };
+export const DEV = { x: 380, y: 286 + DD, w: 76, h: 104, glow: 0, flash: 0, kick: 0, packets: [] };
 const SEG7 = { 0: 'abcdef', 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc', 8: 'abcdefg', 9: 'abfgcd', '-': 'g' };
 const SEGR = { a: [2, 0, 4, 2], b: [6, 2, 2, 4], c: [6, 7, 2, 4], d: [2, 11, 4, 2], e: [0, 7, 2, 4], f: [0, 2, 2, 4], g: [2, 5, 4, 2] };
 function digit(c, x, y, ch, on, off, k = 1) { for (const s of 'abcdefg') { const [sx, sy, w, h] = SEGR[s]; R(c, (SEG7[ch] || '').includes(s) ? on : off, x + sx * k, y + sy * k, w * k, h * k); } }

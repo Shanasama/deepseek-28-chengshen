@@ -37,6 +37,9 @@ export function updateStageRect() {
 // 元素在舞台坐标里的位置（960×540 美术像素）
 export function sp(el) { const r = el.getBoundingClientRect(); return { x: (r.left - stageRect.left) / S, y: (r.top - stageRect.top) / S, w: r.width / S, h: r.height / S }; }
 export const deskXY = (x, y) => { const d = sp($('desk')); return { x: d.x + x, y: d.y + y }; };
+// 工位里桌子那一组（桌面、大肥鱼、显示器、分词机、桌上的东西）整体往下挪多少；墙上和窗户不动。
+// 桌子上的坐标都写成「原来的位置 + DESK_DY」，CSS 里用 var(--dy)（工位.js 载入时设）。调高低只改这一个数
+export const DESK_DY = 40, DESK_Y = 390 + DESK_DY;
 
 export const wait = ms => new Promise(r => setTimeout(r, ms));
 export const wt = ms => wait(ms / spd());          // 跟着倍速走的等待

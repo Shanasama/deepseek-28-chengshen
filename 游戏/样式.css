@@ -287,9 +287,9 @@ body.night #purl{box-shadow:inset 0 -1px 0 var(--k0)}
 #glow{opacity:0}
 body.day #glow{display:none}
 #win{left:412px!important;top:16px!important}
-#scr{left:228px!important;top:274px!important}
-#fish{position:absolute;left:6px;top:204px;transform-origin:50% 100%}
-#mouth{left:111px!important;top:336px!important;transform-origin:-5px 74px}
+#scr{left:228px!important;top:calc(274px + var(--dy,0px))!important}
+#fish{position:absolute;left:6px;top:calc(204px + var(--dy,0px));transform-origin:50% 100%}
+#mouth{left:111px!important;top:calc(336px + var(--dy,0px))!important;transform-origin:-5px 74px}
 #fishspr,#fishguide{display:none}
 /* 夜间光影（光影.js）：屋里压暗偏冷，显示器、分词机是光源不压；光晕叠加混合，暗角盖在最上面 */
 #light,#vig{display:none}#light{mix-blend-mode:plus-lighter}body.lit #light,body.lit #vig,body.litday #light{display:block}
@@ -316,7 +316,7 @@ body.lit #win{filter:brightness(.6)}body.lit #glow{filter:brightness(.8)}#room.s
 @keyframes stretch{30%{transform:scaleY(1.07) translateY(-6px)}60%{transform:scaleY(.97)}}
 @keyframes pickf{30%{transform:translateY(-4px) scale(1.03)}}
 @keyframes talkb{50%{transform:translateY(-1px)}}
-#fishhit{position:absolute;left:40px;top:210px;width:130px;height:180px;z-index:56;cursor:pointer}
+#fishhit{position:absolute;left:40px;top:calc(210px + var(--dy,0px));width:130px;height:180px;z-index:56;cursor:pointer}
 body.night #fishhit{display:none}
 #clock{left:232px!important;top:200px!important;width:56px;height:18px;display:flex;align-items:center;justify-content:center}
 body.day #clock{background:var(--ink);color:var(--lgold)}
@@ -337,9 +337,9 @@ body.night #slogan{background:#6D7594;color:#121A42;box-shadow:inset 0 0 0 1px v
 #slogan span{text-align:center}
 /* 标语跑马灯：彩虹顺着读的方向流过去，只改字色（颜色由 界面.js 逐字设置） */
 #slogan span{transition:color .1s}
-#tokdev{left:380px!important;top:286px!important;cursor:pointer}
-#cable{left:296px!important;top:378px!important}
-#scrtitle{left:242px!important;top:275px!important;width:110px;line-height:12px;white-space:nowrap;overflow:hidden}
+#tokdev{left:380px!important;top:calc(286px + var(--dy,0px))!important;cursor:pointer}
+#cable{left:296px!important;top:calc(378px + var(--dy,0px))!important}
+#scrtitle{left:242px!important;top:calc(275px + var(--dy,0px))!important;width:110px;line-height:12px;white-space:nowrap;overflow:hidden}
 body.day #scrtitle{color:var(--g1)}
 body.night #scrtitle{color:var(--ice)}
 .hot{position:absolute;z-index:57;cursor:pointer}
@@ -384,7 +384,7 @@ body.night #quota i.off{background:var(--k4)}
 /* ---------- 思考气泡：白天放「今天干点啥？」，夜里放关键节点 ---------- */
 #bubble{position:absolute;left:170px;top:8px;width:422px;height:256px;z-index:60;transform-origin:0% 100%;transform:scale(.15);opacity:0;transition:transform .38s cubic-bezier(.3,1.5,.5,1),opacity .2s;pointer-events:none}
 body.day #bubble{background:var(--paper);box-shadow:0 0 0 1px var(--cobalt),0 0 0 4px rgba(63,110,232,.14)}
-body.night #bubble{background:var(--night);box-shadow:0 0 0 1px var(--deep)}
+body.night #bubble{background:var(--night);box-shadow:0 0 0 1px var(--deep);left:150px;width:442px;height:calc(240px + var(--dy,0px))}   /* 夜里的关键节点：桌子往下挪出来的地方给转盘（子弹时间再放大 1.06，底边要停在显示器上面） */
 #bubble.show{transform:none;opacity:1;pointer-events:auto}
 #bubble.punch{animation:punch .28s cubic-bezier(.3,1.8,.5,1)}
 @keyframes punch{0%{transform:scale(1.05)}100%{transform:scale(1)}}
@@ -398,12 +398,12 @@ body.day #nodebox,body.night #bv{display:none}
 .tail.show{opacity:1;transform:none}
 .tail.t2{transition-delay:.06s}
 body.day .tail{background:var(--paper);box-shadow:inset 0 0 0 1px var(--cobalt),inset 0 0 0 2px var(--ice)}
-body.day .tail.t1{left:150px;top:228px;width:6px;height:6px}
-body.day .tail.t2{left:158px;top:210px;width:11px;height:11px}
+body.day .tail.t1{left:150px;top:calc(228px + var(--dy,0px));width:6px;height:6px}
+body.day .tail.t2{left:158px;top:calc(210px + var(--dy,0px));width:11px;height:11px}
 body.night .tail{background:var(--night);box-shadow:inset 0 0 0 1px var(--deep)}
-body.night .tail.t1{left:184px;top:280px;width:4px;height:4px}
-body.night .tail.t2{left:176px;top:268px;width:7px;height:7px}
-#puff{position:absolute;left:182px;top:210px;padding:3px 7px;background:var(--night);display:flex;gap:3px;z-index:58;opacity:0;transform:scale(.4);transform-origin:0% 100%;transition:opacity .2s,transform .3s cubic-bezier(.3,1.6,.5,1);box-shadow:0 0 0 1px var(--deep)}
+body.night .tail.t1{left:184px;top:calc(280px + var(--dy,0px));width:4px;height:4px}
+body.night .tail.t2{left:176px;top:calc(268px + var(--dy,0px));width:7px;height:7px}
+#puff{position:absolute;left:182px;top:calc(210px + var(--dy,0px));padding:3px 7px;background:var(--night);display:flex;gap:3px;z-index:58;opacity:0;transform:scale(.4);transform-origin:0% 100%;transition:opacity .2s,transform .3s cubic-bezier(.3,1.6,.5,1);box-shadow:0 0 0 1px var(--deep)}
 #puff.show{opacity:1;transform:none}
 #puff i{width:2px;height:2px;background:var(--cyan);display:block;animation:dot 1s steps(1) infinite}
 #puff i:nth-child(2){animation-delay:.33s}#puff i:nth-child(3){animation-delay:.66s}
@@ -531,7 +531,7 @@ body.night .tail.t2{left:176px;top:268px;width:7px;height:7px}
 #bubble.term .cand.hov .code,#bubble.term .cand.hit .code{display:block}
 #bubble.term .cand .pv{font-family:Consolas,monospace;font-size:11px}
 .cand .neg{color:#9AA2BD;white-space:nowrap}
-#wheelbox{width:172px;display:flex;align-items:center}
+#wheelbox{width:200px;display:flex;align-items:center}
 #wheel{cursor:pointer}
 #hints{position:absolute;left:14px;right:14px;bottom:8px;height:16px;display:flex;gap:16px;justify-content:center;color:#9AA2BD}
 #hints span{cursor:pointer;display:flex;gap:4px;align-items:center}
@@ -666,7 +666,7 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 #phone .rf{color:var(--cobalt)}
 
 /* ---------- 开发面板（不属于设计） ---------- */
-#dev{position:fixed;left:8px;top:8px;z-index:999;background:rgba(255,255,255,.96);color:#111;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.45);font:11px/1.45 system-ui,'Microsoft YaHei',sans-serif;padding:8px 10px;width:270px;max-height:calc(100vh - 16px);overflow:auto}
+#dev{position:fixed;left:8px;top:8px;z-index:999;background:rgba(255,255,255,.96);color:#111;border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,.45);font:11px/1.45 system-ui,'Microsoft YaHei',sans-serif;padding:8px 10px;width:350px;max-height:calc(100vh - 16px);overflow:auto}
 #dev.min #devbody{display:none}
 #dev h4{font-size:12px;display:flex;justify-content:space-between;cursor:pointer}
 #dev h5{font-size:11px;margin:8px 0 2px;color:#555}
@@ -675,6 +675,10 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 #dev table{border-collapse:collapse;width:100%;margin-top:4px}
 #dev td{padding:1px 3px;border-bottom:1px solid #eee;white-space:nowrap;text-align:right}
 #dev td:first-child{text-align:left}
+#dev .drow{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}#dev .drow label{display:flex;gap:3px;align-items:center}
+#dev input,#dev select{font:11px system-ui,'Microsoft YaHei',sans-serif;padding:1px 3px;border:1px solid #bbb;border-radius:3px;width:52px}#dev input[type=time]{width:72px}#dev input[type=text]{width:80px}#dev select{width:auto}
+#dev input.wcell{width:44px;text-align:right}#dev .t{color:#888}
+#devtag{margin-left:6px;padding:0 5px;background:var(--rose);color:#fff;font-size:10px;line-height:14px}
 
 /* ---------- 存读档（日系 ACT / galgame 式，美术规范 §6.9） ---------- */
 #sl{position:absolute;inset:0;z-index:96;background:#07080c;display:none;flex-direction:column;padding:14px 36px 10px;color:var(--t1);
@@ -743,7 +747,7 @@ body.night #toast{background:var(--k0);color:var(--t1);box-shadow:0 0 0 1px var(
 @keyframes tin{from{opacity:0}to{opacity:1}}
 #tbg{position:absolute;left:0;top:0;width:960px;height:540px;filter:saturate(.85) brightness(.8)}
 .tshade{position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(5,7,16,.95) 0,rgba(5,7,16,.85) 250px,rgba(5,7,16,.2) 420px,rgba(5,7,16,.05) 100%),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px);background-size:100% 100%,100% 3px}
-.zzz{position:absolute;left:400px;top:232px;color:var(--ice);font-size:24px;line-height:28px;pointer-events:none}
+.zzz{position:absolute;left:400px;top:calc(232px + var(--dy,0px) * 1.15);color:var(--ice);font-size:24px;line-height:28px;pointer-events:none}
 .zzz span{position:absolute;opacity:0;animation:zz 3s steps(12) infinite}
 .zzz span:nth-child(2){animation-delay:1s;left:14px}.zzz span:nth-child(3){animation-delay:2s;left:28px}
 @keyframes zz{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(18px,-46px) scale(1.2)}}
