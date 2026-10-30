@@ -179,7 +179,13 @@ export function regen() {
 function applyBullet(on) {
   $('dim').classList.toggle('vig', on && V.vig); $('dim').classList.toggle('beat', on); $('dim').style.opacity = on ? V.dim : 0; $('fxl').classList.toggle('bt', on);
   $('chat').style.filter = on ? `saturate(${V.sat})` : ''; $('room').style.filter = on ? `saturate(${V.sat})` : '';
-  $('bubble').style.transform = on ? `scale(${V.scale})` : ''; $('bubble').classList.toggle('show', on);
+  $('bubble').style.transform = on ? bulletZoom() : ''; $('bubble').classList.toggle('show', on);
+}
+// 子弹时间里气泡放大一点；它是从左下角放大的，右边、上边会胀出工位被切掉，按超出多少往左、往下挪回来（留 4 像素边）
+function bulletZoom() {
+  const b = $('bubble'), W = b.parentElement.clientWidth, s = V.scale, w = b.offsetWidth, h = b.offsetHeight;
+  const dx = Math.min(0, W - 4 - (b.offsetLeft + w * s)), dy = Math.max(0, 4 - (b.offsetTop + h - h * s));
+  return `translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(${s})`;
 }
 export function showPuff(on) { $('puff').classList.toggle('show', on); document.querySelectorAll('.tail').forEach(t => t.classList.toggle('show', on || NODE.state !== 'hidden')); }
 // 打开关键节点：返回被确认的那张卡。strikeId：重问时上次选的卡（先出现再划掉）
