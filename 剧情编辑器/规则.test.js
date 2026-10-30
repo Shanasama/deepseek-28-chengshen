@@ -184,6 +184,27 @@ test('后训练题库', () => {
     for (const a of ['knowledge', 'colloquial', 'narrative', 'logic', 'formal', 'open', 'open0']) assert.ok(q.a[a], `${q.id} 缺 ${a} 的回答`);
   }
   for (const t of reg.qtypes) assert.ok(bank.questions.some(q => q.qtype === t && !q.tutorial), `问题类型「${t}」一道普通题都没有`);
+  // 题库里不放反例：对口属性那段必须标「好」
+  for (const q of bank.questions) { const dk = R.duikouCfg(reg).map[q.qtype]; if (dk && q.marks) assert.equal(q.marks[dk], '好', `${q.id} 的对口属性「${dk}」那段没标「好」`); }
+});
+
+test('对口属性：按浅层判反例，深层能翻也算；没写对口卡算缺；出厂测试员不进统计', () => {
+  const r = (qtype, cards, counter) => ({ qtype, cards, ...(counter ? { counter } : {}) });
+  const know = (result, deep) => card('k', 'knowledge', result, '舒服', deep ? { deep } : {});
+  assert.equal(R.duikouOf(r('知识', [know('解决')]), reg).state, 'ok');
+  const c = R.duikouOf(r('知识', [know('糊弄', { result: '解决' })], '要论文会编；线索：附上作者和年份'), reg);
+  assert.equal(c.state, 'counter'); assert.equal(c.note, '要论文会编；线索：附上作者和年份');
+  assert.equal(R.duikouOf(r('知识', [card('l', 'logic', '解决')]), reg).state, 'missing');
+  assert.equal(R.duikouOf(r('没登记的类', [know('解决')]), reg).state, 'none');
+  const sc = rounds => ({ rounds });
+  const st = R.duikouStats([
+    { user: 'A', file: '01.json', scene: sc([r('知识', [know('解决')]), r('知识', [know('跑偏')]), r('知识', [card('l', 'logic', '解决')])]) },
+    { user: 'T', file: '01.json', tutorial: true, scene: sc([r('知识', [know('跑偏')])]) },
+  ], reg);
+  assert.equal(st['知识'].n, 3); assert.equal(st['知识'].counter.length, 1); assert.equal(st['知识'].missing.length, 1);
+  assert.equal(st['知识'].counter[0].ri, 1);
+  assert.equal(st['知识'].over, false, '1/3 不算超');
+  assert.equal(R.duikouStats([{ user: 'A', file: '01.json', scene: sc([r('知识', [know('跑偏')]), r('知识', [know('解决')])]) }], reg)['知识'].over, true, '1/2 超了');
 });
 
 // 冒烟：剧本库里每个场景、每一轮，在三种训练状态下都能算出盘面，且第一次弹出时盘上至少有一张卡
@@ -191,8 +212,14 @@ for (const dir of fs.readdirSync(ROOT, { withFileTypes: true }).filter(d => d.is
   for (const f of fs.readdirSync(path.join(ROOT, dir.name)).filter(f => f.endsWith('.json') && f !== '用户.json')) {
     test(`剧本库：${dir.name}/${f}`, () => {
       const sc = JSON.parse(fs.readFileSync(path.join(ROOT, dir.name, f), 'utf8'));
+      const tutorial = JSON.parse(fs.readFileSync(path.join(ROOT, dir.name, '用户.json'), 'utf8')).tutorial;
       sc.rounds.forEach((rd, i) => {
         assert.ok(reg.qtypes.includes(rd.qtype), `第 ${i + 1} 轮的问题类型「${rd.qtype}」不在登记表里`);
+        if (!tutorial) {   // 对口属性：每轮都写对口卡；反例轮要写理由（出厂测试员不受约束）
+          const d = R.duikouOf(rd, reg);
+          assert.notEqual(d.state, 'missing', `第 ${i + 1} 轮缺对口属性「${d.attr}」的卡`);
+          if (d.state === 'counter') assert.ok(d.note, `第 ${i + 1} 轮是反例轮，没写反例理由`);
+        }
         for (const [name, st] of [['第 1 天', DAY1], ['全浅层', SHALLOW], ['全深层', DEEP]]) {
           const b = R.board(rd, { reg, stages: st });
           assert.ok(b.on.length > 0, `第 ${i + 1} 轮在「${name}」下盘上没有卡`);

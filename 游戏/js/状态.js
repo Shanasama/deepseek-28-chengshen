@@ -1,6 +1,6 @@
 // 一局游戏的全部状态都在这一个对象里：天数、心、额度、各问题类型的权重分、今晚的会话、统计……
 // 以后存档 / 读档 / 回档就是存取这一份（第 4 步做）。别的模块只读写它，不各自藏状态。
-export const QT = ['闲聊', '知识', '捣乱', '情感倾诉', '代码求助'];
+export const QT = ['闲聊', '知识', '捣乱', '情感倾诉', '代码求助', '写作'];
 export const AXES = ['knowledge', 'colloquial', 'narrative', 'logic', 'formal', 'open'];
 export const SPEEDS = [{ m: .5, n: 'Low' }, { m: 1, n: 'Medium' }, { m: 2, n: 'High' }, { m: 3, n: 'Ultra' }];
 

@@ -52,8 +52,9 @@ async function setMod(m) {
   if (m === S.mod) return;
   await flush();
   if (m === 'story' && !S.story) { try { await loadStory(); } catch (e) { return toast('读不到剧情：' + e.message); } pushUndoNow(); }
-  S.mod = m; S.sel = null; S.openBlk = null; $('#app').classList.toggle('story', m === 'story');
-  history.replaceState(null, '', m === 'story' ? '#剧情' : location.pathname);
+  if (m === 'train') { try { await loadTrain(); } catch (e) { return toast('读不到后训练题库：' + e.message); } pushUndoNow(); }   // 后训练模块.js
+  S.mod = m; S.sel = null; S.openBlk = null; $('#app').classList.toggle('story', m !== 'night'); $('#app').classList.toggle('train', m === 'train');   // 后训练借剧情的左栏布局
+  history.replaceState(null, '', m === 'story' ? '#剧情' : m === 'train' ? '#后训练' : location.pathname);
   V.x = 0; V.y = 0; V.z = 1; applyView(); S.enter = true; renderAll(); panelIn();
 }
 function storyGo(smode, file) { S.smode = smode; if (file !== undefined) S.segFile = file; S.sel = null; S.openBlk = null; V.x = 0; V.y = 0; V.z = 1; applyView(); S.enter = true; renderAll(); panelIn(); }
@@ -106,7 +107,7 @@ function sideGroups() {
 }
 function storySide() {
   const box = $('#sside');
-  if (!box.querySelector('.sfind')) {
+  if (!box.querySelector('#sslist')) {   // 左栏和后训练模块共用 #sside，切回来要重建
     box.replaceChildren(h('div', { class: 'sstop' }), h('input', { class: 'sfind', type: 'search', placeholder: '🔍 搜剧情段的名字', oninput: e => { S.sfind = e.target.value.trim(); renderSideList(); } }), h('div', { id: 'sslist' }));
   }
   box.querySelector('.sstop').replaceChildren(h('h6', {}, '剧情'),

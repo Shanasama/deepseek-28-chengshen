@@ -84,6 +84,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .colhd .no{display:flex;justify-content:space-between;align-items:center;color:var(--t3);font-size:12px;margin-bottom:6px}
 .colhd .no b{color:var(--t1);font-weight:600;font-size:13px}
 .colhd .qt{color:var(--lgold);border:1px solid currentColor;padding:0 4px;font-size:11px}.colhd .qt.bad{color:#ff9aa1}
+.colhd .dkt{margin-left:4px;padding:0 4px;font-size:11px;background:#3a2c10;color:var(--lgold)}.colhd .dkt.bad{background:#3a1d20;color:#ff9aa1}
+.sticky.dk{margin-top:6px;background:#1d2433;border-color:#34405a;color:#c8d4ee}.sticky.dk b{color:#8a9ac0}.sticky.dk .st{color:var(--lgold)}.sticky.dk .st.ok{color:var(--mint)}.sticky.dk .st.bad{color:#ff9aa1}
 .tsadj{color:var(--t3);font-size:11px;line-height:1.5;margin-top:6px;max-width:260px}
 .bubble{background:var(--k4);padding:6px 10px;border-radius:12px 12px 12px 3px;color:var(--t1);white-space:pre-wrap;word-break:break-all;max-height:160px;overflow:hidden}
 .rh{font-size:11px;line-height:16px;padding:0 5px;background:var(--k3);color:var(--t2);white-space:nowrap}
@@ -390,6 +392,21 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 #sside .sgh button{border:1px solid var(--k4);background:transparent;color:var(--t2);padding:0 8px;font-size:12px;cursor:pointer}#sside .sgh button:hover{color:var(--t1);border-color:var(--sky)}
 #sside .sideb{padding:10px 0;display:flex;flex-direction:column}
 .sghd{display:flex;align-items:center;gap:12px;margin-bottom:14px;cursor:default}
+/* ---------- 后训练模块（后训练模块.js）：#app 同时带 story（借剧情模块的左栏布局）和 train ---------- */
+.trow{display:flex;align-items:flex-start;gap:24px}
+.tstat{font-size:12px;color:var(--t2);margin-top:4px}.tstat .bad{color:#ff9aa1}.tstat a{color:var(--sky);cursor:pointer}
+.tbar{position:relative;height:6px;background:var(--k4);margin-top:6px}.tbar i{position:absolute;left:0;top:0;bottom:0}.tbar b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--t2)}
+.card.tround .l0 b{font-weight:normal;font-size:12px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tnote{font-size:12px;line-height:18px;color:var(--t2);white-space:pre-wrap}.tnote.bad{color:#ff9aa1}
+.card.tqa .tqt{font-size:12px;line-height:18px;color:var(--t15);white-space:pre-wrap;word-break:break-all;max-height:72px;overflow:hidden}
+.card.tqa.dim{opacity:.45}
+.dkb{font-size:11px;line-height:16px;padding:0 5px;background:#3a2c10;color:var(--lgold);border:1px solid #6a5420}
+.badge.mk{color:var(--t3)}.m-好{background:#12301f!important;color:var(--mint)!important}.m-一般{background:var(--k4)!important;color:var(--t15)!important}.m-坏{background:#3a1d20!important;color:#ff9aa1!important}
+.mkrow{display:flex;gap:6px}.mkrow .mini.on{box-shadow:0 0 0 1px var(--sky)}
+.trybox{position:absolute;right:12px;bottom:44px;z-index:5;background:var(--k1);border:1px solid var(--k4);box-shadow:0 6px 24px #0008}
+.trybar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 8px;font-size:12px;white-space:nowrap}.trybar b{font-weight:normal;color:var(--t1)}.trybar .sp{flex:1}
+.tgwrap{width:461px;height:260px;overflow:hidden}.tgame{width:768px;height:432px;border:0;background:#000;transform:scale(.6);transform-origin:0 0}
+.trybox.min .tgwrap{display:none}
 .sgt{display:flex;gap:8px;align-items:center}.sgt b{font-size:16px}
 .sgraph{position:relative}
 .snode{position:absolute;width:270px;background:var(--k2);border:1px solid var(--k4);cursor:pointer;transition:border-color .15s}
@@ -484,7 +501,7 @@ button:active,.chip:active,.mini:active{transform:translateY(1px) scale(.98)}
 <div id="app">
   <header id="top">
     <div class="brand"><i></i>大肥鱼编辑器</div>
-    <div id="modsw" title="编辑器分两个模块：剧情（日程表、游戏剧情、角色）和夜间剧本（用户、场景、演出）"><a data-m="story">剧情</a><a data-m="night" class="on">夜间剧本</a></div>
+    <div id="modsw" title="编辑器分三个模块：剧情（日程表、游戏剧情、角色）、夜间剧本（用户、场景、演出）、后训练（问题类型、后训练题库）"><a data-m="story">剧情</a><a data-m="night" class="on">夜间剧本</a><a data-m="train">后训练</a></div>
     <div id="crumb"></div>
     <div id="ts"></div>
     <div id="topR">
@@ -593,7 +610,7 @@ const TIP={
 
 // ---------- 渲染：顶栏 ----------
 function renderTop(){
-  modSwitch();if(S.mod==='story')return storyTop();
+  modSwitch();if(S.mod==='train')return trainTop();if(S.mod==='story')return storyTop();
   const sc=S.scene;if(S.mode==='show'){$('#crumb').replaceChildren(h('span',{},'演出库 / '),h('b',{},showOf(S.showId)?.name||''));}else $('#crumb').replaceChildren(h('span',{},S.user.name,' / '),h('b',{},String(sc.order).padStart(2,'0')+' '+sc.title),h('span',{class:'n',title:'N = 主线轮数'},'N = '+sc.rounds.length));
   const ts=$('#ts');ts.replaceChildren(h('span',{class:'lbl',title:'模拟玩家白天把各个属性训练到了什么程度：没学过的属性，它的卡夜里不会上盘；学到深层就换成深层版、更容易转到。「第 1 天开局」还带着 Day 0 教学的后训练结果，只影响那一类问题的命中率。用来检查不同玩家遇到这一轮时的盘面'},'预览：玩家训练到什么程度 ⓘ'));
   for(const p of S.reg.trainingPresets)ts.append(h('button',{class:'chip'+(S.preset===p.id?' on':''),onclick:()=>{setPreset(p.id);}},p.name));
@@ -617,6 +634,7 @@ function setPreset(id){const p=S.reg.trainingPresets.find(x=>x.id===id);S.ts=pre
 
 // ---------- 渲染：左栏 ----------
 function renderSide(){
+  if(S.mod==='train')return trainSide();
   if(S.mod==='story')return storySide();
   renderShowSide();
   const box=$('#users');box.replaceChildren();
@@ -674,6 +692,7 @@ function cardEl(r,ri,slot,extra=''){
 }
 const plainPreview=t=>(t||'').replace(/==/g,'').replace(/\n/g,' ⏎ ');
 function renderLane(){
+  if(S.mod==='train')return trainCanvas();
   if(S.mod==='story')return storyCanvas();
   if(S.mode==='show')return renderShowCanvas();
   const lane=$('#laneIn');lane.replaceChildren();
@@ -684,7 +703,7 @@ function renderLane(){
     const sel=S.sel&&S.sel.kind==='round'&&S.sel.ri===ri;
     const col=h('div',{class:'col'+(S.enter?' enter':'')+(NEWT?.kind==='round'&&NEWT.ri===ri?' pop':''),style:S.enter?`animation-delay:${ri*90}ms`:''});
     col.append(h('div',{class:'colhd'+(sel?' sel':''),'data-ri':ri,onclick:()=>select({kind:'round',ri})},
-      h('div',{class:'no'},h('b',{},`第 ${ri+1} 轮 `,issueDot({kind:'round',ri})),h('span',{},h('span',{class:'qt'+(S.reg.qtypes?.includes(rd.qtype)?'':' bad'),title:'问题类型：后训练按问题类型分开算，命中率用这一类的加减分'},rd.qtype||'没选问题类型'),rd.style==='terminal'?' · 终端样式':'',rd.speaker?' · 说话人：'+rd.speaker.name:'')),
+      h('div',{class:'no'},h('b',{},`第 ${ri+1} 轮 `,issueDot({kind:'round',ri})),h('span',{},h('span',{class:'qt'+(S.reg.qtypes?.includes(rd.qtype)?'':' bad'),title:'问题类型：后训练按问题类型分开算，命中率用这一类的加减分'},rd.qtype||'没选问题类型'),dkTag(rd),rd.style==='terminal'?' · 终端样式':'',rd.speaker?' · 说话人：'+rd.speaker.name:'')),
       h('div',{style:'display:flex;gap:6px;align-items:flex-start'},h('div',{class:'bubble',style:'flex:1'},rd.say.text),h('span',{class:'rh',title:'打字节奏：用户在输入框里打这句话的方式，透出情绪'},'⌨ '+regName('rhythms',rd.say.rhythm))),
       h('div',{class:'vars'},h('span',{class:rd.sayAfter?.liked?'has':'',title:'上一轮点赞后的台词变体'},'点赞变体'),h('span',{class:rd.sayAfter?.disliked?'has':'',title:'上一轮点踩（解决但冒犯）后的台词变体'},'点踩变体')),
       h('div',{class:'need',title:'需求句：只给策划看'},rd.need)));
@@ -707,6 +726,7 @@ function renderLane(){
   requestAnimationFrame(drawEdges);
 }
 function drawEdges(){
+  if(S.mod==='train')return;
   if(S.mod==='story')return storyEdges();
   const lane=$('#laneIn');lane.querySelector('#edges')?.remove();if(S.mode==='show'||!S.scene)return;   // 直接进剧情模块时还没载入场景
   const L0=lane.getBoundingClientRect(),z=V.z;
@@ -743,7 +763,7 @@ function validSel(){
   if(s.kind==='issues')return;
   if(s.kind==='round'||s.kind==='card'){const rd=S.scene.rounds[s.ri];if(!rd||(s.kind==='card'&&!slotCard(rd,s.slot)))S.sel=null;}
 }
-function select(sel){if(S.mod==='story')storyRoute(sel);S.caughtTab='ok';S.sayTab='default';S.sel=sel;validSel();if(S.sel?.kind==='card'){const c=curCard();if(S.tab==='lv0'&&c.attr!=='open'||S.tab==='deep'&&!hasDeep(c.attr))S.tab='base';}renderAll();panelIn();}
+function select(sel){if(S.mod==='story')storyRoute(sel);if(S.mod==='train')trainRoute(sel);S.caughtTab='ok';S.sayTab='default';S.sel=sel;validSel();if(S.sel?.kind==='card'){const c=curCard();if(S.tab==='lv0'&&c.attr!=='open'||S.tab==='deep'&&!hasDeep(c.attr))S.tab='base';}renderAll();panelIn();}
 
 function field(label,input,hint){return h('div',{class:'fg'},h('label',{},label,hint?h('em',{},hint):null),input);}
 function txt(obj,key,{area=false,ph='',inherit=null}={}){
@@ -817,6 +837,7 @@ function renderPanel(){
   $('#app').classList.toggle('nopanel',!S.sel);if(!S.sel)return;
   P.append(h('div',{class:'pclosew'},h('button',{class:'pclose',title:'关掉右栏（Esc）',onclick:closePanel},'✕')));
   if(S.mod==='story'&&S.sel?.kind!=='issues')return storyPanel(P);
+  if(S.mod==='train'&&S.sel?.kind!=='issues')return trainPanel(P);
   if(!S.sel){P.append(h('div',{class:'form'},h('div',{class:'note'},'点泳道里的一轮或一张卡来编辑；点最左边的「上线」圆点编辑场景；点左栏的用户名编辑用户档案。')));return;}
   if(S.mode==='show'&&S.sel.kind!=='issues')return renderShowPanel(P);
   if(S.sel.kind==='issues')return renderIssuesPanel(P);
@@ -1275,6 +1296,22 @@ function renderCardChat(P){
 function diagEd(o,inh,label){
   return h('div',{class:'diag'},h('span',{class:'dlbl'},label+'：'),ed({...fieldIO(o,'diagnosis'),label:'诊断',inherit:inh('diagnosis'),ph:'点这里写大肥鱼意识到自己错在哪'}));
 }
+// 对口属性（CONTEXT.md）：每轮标题上的小标，和这一轮面板里的对口便签（反例理由写在这里）
+function dkTag(rd){
+  if(S.user?.tutorial)return null;
+  const d=RULES.duikouOf(rd,S.reg),nm=regAttr(d.attr)?.name;
+  if(d.state==='counter')return h('span',{class:'dkt'+(d.note?'':' bad'),title:`反例轮：这一类的对口属性「${nm}」浅层不解决`+(d.note?'\n理由：'+d.note:'\n还没写反例理由')},'反例');
+  if(d.state==='missing')return h('span',{class:'dkt bad',title:`${rd.qtype}类每轮都要写对口属性「${nm}」的卡`},'缺对口卡');
+  return null;
+}
+function dkSticky(rd){
+  const d=RULES.duikouOf(rd,S.reg),nm=regAttr(d.attr)?.name;
+  if(S.user?.tutorial||!d.attr)return h('div',{class:'sticky dk'},h('b',{},'对口属性 · 只给写剧本的人看'),S.user?.tutorial?'出厂测试员不受对口规则约束':'这个问题类型还没登记对口属性');
+  const st=d.state==='ok'?h('span',{class:'st ok'},`「${nm}」浅层是解决 ✓`):d.state==='missing'?h('span',{class:'st bad'},`缺「${nm}」的卡：${rd.qtype}类每轮都要写，可以是解决，也可以是反例`):h('span',{class:'st'},`「${nm}」浅层是${d.card.result}，这一轮是反例轮`);
+  const box=h('div',{class:'sticky dk'},h('b',{},`对口属性 · ${rd.qtype}类 → ${nm} · 只给写剧本的人看`),st);
+  if(d.state==='counter'||d.note)box.append(ed({...fieldIO(rd,'counter'),label:'反例理由',ph:'对口属性为什么在这一轮不行；用户台词里哪句是线索'}));
+  return box;
+}
 function renderRoundChat(P){
   const rd=curRound(),ri=S.sel.ri,n=S.scene.rounds.length;
   P.append(h('div',{class:'hd'},h('div',{class:'ttl'},`第 ${ri+1} 轮`),h('div',{class:'sub'},'主线 · '+S.scene.title+' · 下面是这一轮开头玩家看到的样子'),h('div',{class:'tabs'},h('button',{class:'on'},'这一轮'))));
@@ -1288,6 +1325,7 @@ function renderRoundChat(P){
   const qt=chip('问题类型',rd,'qtype',(S.reg.qtypes||[]).map(t=>[t,t]),{onchange:renderAll});if(!rd.qtype){qt.prepend(h('option',{value:'',disabled:true},'问题类型 · 请选'));qt.value='';}
   qt.title='问题类型：玩家白天按问题类型做后训练，夜里这一轮的命中率就用这一类的加减分。预告不显示问题类型';
   F.append(h('div',{class:'chips'},qt,chip('样式',rd,'style',[['normal','普通'],['terminal','终端（代码轮）']],{onchange:renderAll}),sp));
+  F.append(dkSticky(rd));
   const sa=rd.sayAfter||(rd.sayAfter={liked:null,disliked:null});
   const tab=ri>0?(S.sayTab||'default'):'default';
   F.append(h('div',{class:'clbl'},'① 用户开口'));
@@ -1356,6 +1394,7 @@ const DETECT={低:.1,中:.4,高:.8};
 const hanLen=s=>(s||'').replace(/[\s\p{P}\p{S}…]/gu,'').length;
 function validate(){
   if(S.mod==='story')return validateStory();
+  if(S.mod==='train')return validateTrain();
   const out=[],R=S.reg,has=(k,id)=>R[k].some(x=>x.id===id),u=S.user,sc=S.scene;
   const add=(lv,msg,target)=>{if(!out.some(o=>o.msg===msg))out.push({lv,msg,target});};
   const U={kind:'user'},SC={kind:'scene'};
@@ -1364,6 +1403,8 @@ function validate(){
   if(!(sc.farewell?.solved?.text||u.farewell?.solved?.text))add('warn','没写「解决离开」的告别台词',SC);
   if(!(sc.farewell?.offline?.text||u.farewell?.offline?.text))add('warn','没写「下线恶评」',SC);
   if(!sc.rounds.length)add('err','主线一轮都没有',SC);
+  const DKC=RULES.duikouCfg(R),nCounter=u.tutorial?0:sc.rounds.filter(rd=>RULES.duikouOf(rd,R).state==='counter').length;
+  if(nCounter>DKC.perScene)add('warn',`这一场有 ${nCounter} 轮反例，推荐每场最多 ${DKC.perScene} 轮（只是推荐值）`,SC);
   const TXTB=new Set(['notice','error','system','userSay','aiSay','leak']);
   const checkFx=(list,where,T)=>{for(const b of list||[]){
     const d=R.blocks.find(x=>x.id===b.do);if(!d){add('err',where+'：积木「'+(b.do||b.kind)+'」不在积木库里',T);continue;}
@@ -1374,19 +1415,19 @@ function validate(){
     if(b.do==='together'){if(!b.steps?.length)add('warn',where+'：「同时进行」里面是空的',T);checkFx(b.steps,where,T);}
   }};
   checkFx(sc.opening,'场景开场',SC);
-  // 后训练题库（全局的，哪个场景打开都查一遍）
+  // 后训练题库的检查在「后训练」模块（后训练模块.js 的 validateTrain）；这里只管读没读到
   if(!S.bank)add('warn','后训练题库：读不到 剧本/_后训练题库.json，游戏里会用假题',SC);
-  else{const ids=new Set();for(const q of S.bank.questions||[]){const n='后训练题库「'+(q.id||q.q)+'」';
-    if(ids.has(q.id))add('err',n+'：题目 id 重复',SC);ids.add(q.id);
-    if(!(R.qtypes||[]).includes(q.qtype))add('err',n+'：问题类型「'+q.qtype+'」不在登记表里',SC);
-    for(const a of['knowledge','colloquial','narrative','logic','formal','open'])if(!q.a?.[a])add('err',n+'：缺「'+(regAttr(a)?.name||a)+'」的回答',SC);
-    if(!q.a?.open0)add('warn',n+'：缺开放多样性 0 级的乱码版（游戏里会临时生成乱码）',SC);}
-    for(const t of R.qtypes||[]){const k=(S.bank.questions||[]).filter(q=>q.qtype===t&&!q.tutorial).length;if(!k)add('err','后训练题库：「'+t+'」类一道普通题都没有',SC);else if(k<3)add('info','后训练题库：「'+t+'」类只有 '+k+' 道普通题，一次后训练要 3 道',SC);}}
   for(const sh of S.lib.shows){if(!sh.steps.length)add('info','演出库：「'+sh.name+'」里还没有积木',SC);checkFx(sh.steps,'演出库「'+sh.name+'」',SC);}
   sc.rounds.forEach((rd,ri)=>{
     const R0=`第 ${ri+1} 轮`,T={kind:'round',ri};
     if(!rd.qtype)add('err',R0+'：没选问题类型（后训练按问题类型算，命中率要用）',T);
     else if(!(R.qtypes||[]).includes(rd.qtype))add('err',R0+'：问题类型「'+rd.qtype+'」不在登记表里',T);
+    const dk=RULES.duikouOf(rd,R),DKN=regAttr(dk.attr)?.name;
+    if(!u.tutorial&&dk.attr){
+      if(dk.state==='missing')add('err',R0+`：缺对口属性「${DKN}」的卡（${rd.qtype}类每轮都要写，可以是解决，也可以是反例）`,T);
+      else if(dk.state==='counter'&&!dk.note)add('err',R0+`：对口属性「${DKN}」浅层不解决，这是反例轮，要写反例理由（为什么不行、台词里哪句是线索）`,T);
+      else if(dk.state==='ok'&&dk.note)add('warn',R0+`：写了反例理由，但对口属性「${DKN}」浅层已经是解决，理由过时了`,T);
+    }
     if(!rd.say?.text)add('err',R0+'：用户台词是空的',T);
     if(!rd.think)add('warn',R0+'：思考链前半是空的',T);
     if(!rd.retryLead)add('warn',R0+'：没写重问引子（重问时接在诊断后面）',T);
@@ -1434,7 +1475,7 @@ function validate(){
   });
   return out;
 }
-const issueKey=t=>t.seg&&t.kind==='node'?`n${t.seg}/${t.node}`:t.kind==='seg'?'s'+t.seg:t.kind==='day'?'d'+t.day:t.kind==='char'?'ch'+t.id:t.kind==='card'?`c${t.ri}:${t.slot}`:t.kind==='round'?`r${t.ri}`:t.kind;
+const issueKey=t=>t.kind==='tq'?'q'+t.q:t.kind==='tqa'?`qa${t.q}:${t.a}`:t.kind==='qt'?'qt'+t.t:t.seg&&t.kind==='node'?`n${t.seg}/${t.node}`:t.kind==='seg'?'s'+t.seg:t.kind==='day'?'d'+t.day:t.kind==='char'?'ch'+t.id:t.kind==='card'?`c${t.ri}:${t.slot}`:t.kind==='round'?`r${t.ri}`:t.kind;
 function issuesFor(t){const k=issueKey(t);return ISSUES.filter(i=>issueKey(i.target)===k);}
 function issueDot(t){
   const list=issuesFor(t).filter(i=>i.lv!=='info');if(!list.length)return null;
@@ -1459,6 +1500,7 @@ function renderIssuesPanel(P){
 // 把画布移到选中的轮 / 卡上
 function focusTarget(t){
   if(S.mod==='story')return storyFocus(t);
+  if(S.mod==='train')return trainFocus(t);
   const el=t.kind==='card'?$(`.card[data-ri="${t.ri}"][data-slot="${t.slot}"]`):t.kind==='round'?$(`.colhd[data-ri="${t.ri}"]`):t.kind==='scene'?$('.term.start'):null;
   if(!el)return;const lane=$('#lane').getBoundingClientRect(),r=el.getBoundingClientRect();
   V.x+=lane.left+lane.width/2-(r.left+r.right)/2;V.y+=lane.top+120-r.top;applyView();
@@ -1686,7 +1728,7 @@ function zoomAt(nz,cx,cy){nz=Math.min(2,Math.max(.3,nz));V.x=cx-(cx-V.x)*nz/V.z;
 
 // ---------- 说明页 ----------
 function openHelp(){
-  if(S.mod==='story')return storyHelp();storyHelpRestore();
+  if(S.mod==='story')return storyHelp();if(S.mod==='train')return trainHelp();storyHelpRestore();
   const box=$('#anatCard');const rd=S.scene.rounds[0];const b=board(rd);
   const r=b.rows.find(x=>!x.off&&x.v.result==='跑偏')||b.rows.find(x=>!x.off);
   const el=cardEl(r,0,-1);el.onclick=null;el.style.cursor='default';
@@ -1713,7 +1755,7 @@ const SAVED={};            // 剧本内路径 → 最近一次和磁盘一致的
 let saveT=null,DRAG=null;
 const userPath=()=>`${S.dir}/用户.json`,scenePath=()=>`${S.dir}/${S.file}`;
 const LIBP='_演出库.json';
-const docs=()=>[...(S.scene?[[userPath(),S.user],[scenePath(),S.scene]]:[]),...(S.lib?[[LIBP,S.lib]]:[]),...storyDocs()];
+const docs=()=>[...(S.scene?[[userPath(),S.user],[scenePath(),S.scene]]:[]),...(S.lib?[[LIBP,S.lib]]:[]),...storyDocs(),...trainDocs()];
 const dirty=()=>docs().some(([p,o])=>ser(o)!==SAVED[p]);
 function setStatus(t,k){const e=$('#save');e.textContent=t;e.className='st '+k;}
 function scheduleSave(){setStatus('未保存','wait');clearTimeout(saveT);saveT=setTimeout(flush,500);}
@@ -1732,20 +1774,20 @@ addEventListener('beforeunload',e=>{if(saveT||dirty()){flush();e.preventDefault(
 
 // ---------- 撤销 / 重做：打字时 0.4 秒内的改动算一步 ----------
 let UNDO=[],UI=0,undoT=null;
-const snap=()=>({u:ser(S.user),s:ser(S.scene),l:ser(S.lib),st:storySnap()});
+const snap=()=>({u:ser(S.user),s:ser(S.scene),l:ser(S.lib),st:storySnap(),tr:trainSnap()});
 function updUndo(){$('#undoB').disabled=UI<=0&&!undoT;$('#redoB').disabled=UI>=UNDO.length-1;}
 function resetUndo(){UNDO=[snap()];UI=0;updUndo();}
 function pushUndo(){clearTimeout(undoT);undoT=setTimeout(pushUndoNow,400);updUndo();}
 function pushUndoNow(){
   clearTimeout(undoT);undoT=null;const s=snap(),c=UNDO[UI];
-  if(!c||c.u!==s.u||c.s!==s.s||c.l!==s.l||c.st!==s.st){UNDO.splice(UI+1);UNDO.push(s);if(UNDO.length>200)UNDO.shift();UI=UNDO.length-1;}
+  if(!c||c.u!==s.u||c.s!==s.s||c.l!==s.l||c.st!==s.st||c.tr!==s.tr){UNDO.splice(UI+1);UNDO.push(s);if(UNDO.length>200)UNDO.shift();UI=UNDO.length-1;}
   updUndo();
 }
 function setDocs(u,sc){S.user=u;S.list.find(x=>x.dir===S.dir).user=u;S.scene=sc;validSel();}
 function undo(d){
   pushUndoNow();const j=UI+d;
   if(j<0||j>=UNDO.length)return toast(d<0?'没有可以撤销的了':'没有可以重做的了');
-  UI=j;S.lib=JSON.parse(UNDO[j].l);storyRestore(UNDO[j].st);S.openBlk=null;setDocs(JSON.parse(UNDO[j].u),JSON.parse(UNDO[j].s));renderAll();scheduleSave();updUndo();toast(d<0?'已撤销':'已重做');
+  UI=j;S.lib=JSON.parse(UNDO[j].l);storyRestore(UNDO[j].st);trainRestore(UNDO[j].tr);S.openBlk=null;setDocs(JSON.parse(UNDO[j].u),JSON.parse(UNDO[j].s));renderAll();scheduleSave();updUndo();toast(d<0?'已撤销':'已重做');
 }
 $('#undoB').onclick=()=>undo(-1);$('#redoB').onclick=()=>undo(1);
 const editing=t=>t.closest('input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),textarea,[contenteditable]');
@@ -1775,12 +1817,13 @@ try{
   new EventSource('/api/events').onmessage=async e=>{
     const p=JSON.parse(e.data).path;if(p.endsWith('.tmp'))return;
     clearTimeout(listT);listT=setTimeout(refreshList,300);
-    if(p==='_登记表.json'){S.reg=await (await fetch('/剧本/_登记表.json?t='+Date.now())).json();renderAll();return toast('登记表已更新');}
+    if(p==='_登记表.json'){const t=await (await fetch('/剧本/_登记表.json?t='+Date.now())).text();if(S.train){const n=ser(JSON.parse(t));if(n===SAVED[REGP])return;if(ser(S.reg)!==SAVED[REGP])return toast('登记表在外部被改了，但这里有没保存的改动，以这里为准');SAVED[REGP]=n;}S.reg=JSON.parse(t);if(S.train)pushUndoNow();renderAll();return toast('登记表已更新');}
     if(p.startsWith('_剧情/')){clearTimeout(S.stT);S.stT=setTimeout(storyExternal,300);return;}
+    if(S.train&&!p.startsWith('_')){clearTimeout(S.trT);S.trT=setTimeout(async()=>{await loadTrain();if(S.mod==='train')renderAll();},400);}   // 后训练模块的对口统计跟着剧本走
     if(p==='_日程表.json'){
       if(S.story){let t;try{t=ser(JSON.parse(await (await fetch('/剧本/_日程表.json?t='+Date.now())).text()));}catch{return;}if(t===SAVED[SCHEDP])return;if(ser(S.sched)!==SAVED[SCHEDP])return toast('日程表在外部被改了，但这里有没保存的改动，以这里为准');}
       await loadSide();if(S.story){SAVED[SCHEDP]=ser(S.sched);pushUndoNow();}if(S.preset)setPreset(S.preset);else renderAll();return toast('日程表已更新');}
-    if(p==='_后训练题库.json'){await loadSide();renderAll();return toast('后训练题库已更新');}
+    if(p==='_后训练题库.json'){if(S.train){let t;try{t=ser(JSON.parse(await (await fetch('/剧本/'+BANKP+'?t='+Date.now())).text()));}catch{return;}if(t===SAVED[BANKP])return;if(ser(S.bank)!==SAVED[BANKP])return toast('后训练题库在外部被改了，但这里有没保存的改动，以这里为准');S.bank=JSON.parse(t);SAVED[BANKP]=t;pushUndoNow();}else await loadSide();renderAll();return toast('后训练题库已更新');}
     const doc=docs().find(([q])=>q===p);if(!doc)return;
     let t;try{t=ser(JSON.parse(await (await fetch(`/剧本/${p}?t=${Date.now()}`)).text()));}catch{return;}
     if(t===SAVED[p])return;
@@ -1868,7 +1911,7 @@ async function loadSide(){
   applyView();setPreset('day1');
   const u=S.list[0];if(!u)return toast('剧本/ 下还没有用户，点左下角新建');
   await openScene(u.dir,u.scenes[0].file);
-  const story=decodeURIComponent(location.hash)==='#剧情';if(story)await setMod('story');
+  const hash=decodeURIComponent(location.hash),story=hash==='#剧情'||hash==='#后训练';if(hash==='#剧情')await setMod('story');if(hash==='#后训练')await setMod('train');
   let done=false;try{done=!!localStorage.getItem('tourDone');}catch{}
   if(!done&&!story)setTimeout(tourStart,700);
 })();
@@ -1877,5 +1920,6 @@ addEventListener('resize',()=>requestAnimationFrame(drawEdges));
 <script src="/游戏/大肥鱼占位.js"></script>
 <script src="/剧情编辑器/剧情模块.js"></script>
 <script src="/剧情编辑器/立绘检查.js"></script>
+<script src="/剧情编辑器/后训练模块.js"></script>
 </body>
 </html>

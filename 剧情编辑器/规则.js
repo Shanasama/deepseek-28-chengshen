@@ -147,6 +147,36 @@
     return { stage, adj };
   }
 
+  // ---------- 对口属性（CONTEXT.md「对口属性」「反例轮」） ----------
+  // 登记表.duikou：map 每个问题类型的对口属性；perScene、ratio 是推荐上限（只提醒）
+  const DK = { map: {}, perScene: 1, ratio: 0.34 };
+  const duikouCfg = reg => ({ ...DK, ...((reg && reg.duikou) || {}) });
+  // 一轮的对口检查。state：ok 对口卡浅层是解决 / counter 反例轮（浅层不解决，深层能翻也算）/ missing 没写对口卡 / none 这一类没登记对口属性。
+  // note 是这一轮写的反例理由（round.counter）
+  function duikouOf(round, reg) {
+    const attr = duikouCfg(reg).map[round.qtype] || null, note = round.counter || '';
+    if (!attr) return { attr, card: null, state: 'none', note };
+    const card = (round.cards || []).find(c => c.attr === attr) || null;
+    return { attr, card, state: !card ? 'missing' : card.result === '解决' ? 'ok' : 'counter', note };
+  }
+  // 全库按问题类型统计。list = [{ user, file, scene, tutorial }]；出厂测试员（tutorial）不算。
+  // 返回 { 问题类型: { attr, n 轮数, counter: [条目], missing: [条目], over 反例超过推荐比例 } }，条目 = { user, file, ri, id, note }
+  function duikouStats(list, reg) {
+    const cfg = duikouCfg(reg), out = {};
+    for (const t of reg.qtypes || []) out[t] = { attr: cfg.map[t] || null, n: 0, counter: [], missing: [], over: false };
+    for (const { user, file, scene, tutorial } of list || []) {
+      if (tutorial) continue;
+      (scene.rounds || []).forEach((rd, ri) => {
+        const s = out[rd.qtype]; if (!s) return;
+        const d = duikouOf(rd, reg), e = { user, file, ri, id: rd.id, note: d.note };
+        s.n++;
+        if (d.state === 'counter') s.counter.push(e); else if (d.state === 'missing') s.missing.push(e);
+      });
+    }
+    for (const s of Object.values(out)) s.over = s.n > 0 && s.counter.length > s.n * cfg.ratio;
+    return out;
+  }
+
   // ---------- 游戏剧情（游戏剧情_设计.md §3、§5） ----------
   // st 是这一局的状态：{ day, hearts, quota, ap, rollbacks, stage: {属性: 0/1/2}, vars: {剧情变量}, ach: [这一局拿到的成就], played: [这一局播过的剧情段] }
   const CMP = { '==': (a, b) => a === b, '!=': (a, b) => a !== b, '>=': (a, b) => a >= b, '<=': (a, b) => a <= b, '>': (a, b) => a > b, '<': (a, b) => a < b };
@@ -185,5 +215,5 @@
     return pool[Math.floor(rnd() * pool.length)];
   }
 
-  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, afterTutorial, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT, storyCond, storyPick, pickLine };
+  return { stageOf, trained, variant, weight, attrWeight, ptParams, postTrain, afterLearn, afterTutorial, softmax, condOK, board, judge, progresses, costsPatience, detectChance, HURT, duikouCfg, duikouOf, duikouStats, storyCond, storyPick, pickLine };
 });

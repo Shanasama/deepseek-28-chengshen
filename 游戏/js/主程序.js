@@ -10,7 +10,7 @@ import { emitUpdate, flightsUpdate, refreshFishAvatars, chatTab } from './对话
 import { NODE, nodeTick, spin, confirmPick, regen } from './转盘.js';
 import { radarTick } from './六维图.js';
 import { initShell, drawer, renderAP, renderHUD, closeMenus, on, setMode } from './界面.js';
-import { initDay, dayKeys, pickActByIndex, view, goNight } from './白天.js';
+import { initDay, dayKeys, pickActByIndex, view, goNight, trialIdle, trialQuestion } from './白天.js';
 import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun, endEarly } from './日程.js';
 import { spotKey, storyOn, storyKey, ARROW } from './教学.js';
 import { storyKeyDown, storyKeyUp } from './剧情.js';
@@ -55,8 +55,8 @@ function loop(now) {
 
 // ---------- 开始 ----------
 // 剧情编辑器打开时会带参数：?play=用户/场景.json（单场试玩）或 ?show=演出编号（只播一段共享演出）
-const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show'), SPRV = Q.get('立绘预览');
-if (SPRV) $('start').style.display = 'none';
+const Q = new URLSearchParams(location.search), PLAY = Q.get('play'), SHOW = Q.get('show'), SPRV = Q.get('立绘预览'), TPRV = Q.get('后训练预览');
+if (SPRV || TPRV) $('start').style.display = 'none';
 else if (!PLAY && !SHOW) { $('start').style.display = 'none'; $('titlescr').classList.add('on'); }   // 载入时先只露出标题画面的底
 if (location.protocol === 'dfy:') $('dev').style.display = 'none';   // 桌面版（封装/）不放开发面板
 function trialArgs() {
@@ -141,6 +141,20 @@ function spritePreview() {
   parent.postMessage({ type: '立绘就绪' }, location.origin);
 }
 
+// 编辑器「后训练」模块把游戏放在 iframe 里（?后训练预览=1）：白天的工位，气泡里做编辑器送来的那道题。
+// 消息：试做 {q 题目, pair [属性, 属性], stages 预训练阶段（可省，默认全浅层）}；不存档，每次试做都从同一个盘面开始
+function trainPreview() {
+  G.noSave = true; $('dev').style.display = 'none'; setMode('day'); setFish('idle');
+  const base = Object.fromEntries(AXES.map(a => [a, 1]));
+  addEventListener('message', e => {
+    if (e.origin !== location.origin) return; const m = e.data || {};
+    if (m.type !== '试做' || G.busy) return;
+    Object.assign(G.stage, base, m.stages || {}); G.adj = Object.fromEntries(QT.map(t => [t, {}])); G.quota = 10;
+    trialQuestion(m.q, m.pair);
+  });
+  trialIdle(); parent.postMessage({ type: '后训练就绪' }, location.origin);
+}
+
 // ---------- 载入 ----------
 (async () => {
   try {
@@ -149,6 +163,7 @@ function spritePreview() {
     $('startinfo').textContent = PLAY ? `单场试玩：${PLAY.replace('/', ' / ')} · 训练状态来自剧情编辑器` : `共享演出预览：${SHOW}`;
     $('startinfo2').textContent = `dafeiyu-v3 · 剧本库 ${DATA.list.length} 个用户、${n} 个普通场景 · 存档在本机`;
     if (SPRV) spritePreview();
+    else if (TPRV) trainPreview();
     else if (!PLAY && !SHOW) { $('start').style.display = 'none'; showTitle(); }
   } catch (e) { console.error(e); $('startinfo').textContent = '读不到剧本库：' + e.message + '（请用 node 剧情编辑器/serve.js 打开）'; }
 })();

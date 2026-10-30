@@ -65,8 +65,22 @@
     "知识",
     "捣乱",
     "情感倾诉",
-    "代码求助"
+    "代码求助",
+    "写作"
   ],
+  "duikou": {
+    "note": "对口属性（CONTEXT.md）：map 是每个问题类型的对口属性，每一轮都要写这张卡；浅层不解决的轮是反例轮，要在轮上写 counter（理由 + 台词里的线索）。perScene 每个场景最多几轮反例、ratio 每类反例最多占几成，都只是推荐值，超了编辑器只提醒。",
+    "map": {
+      "闲聊": "colloquial",
+      "知识": "knowledge",
+      "捣乱": "colloquial",
+      "情感倾诉": "narrative",
+      "代码求助": "logic",
+      "写作": "formal"
+    },
+    "perScene": 1,
+    "ratio": 0.34
+  },
   "postTrain": {
     "note": "后训练（v3 §4，v3.7 按问题类型分开算）。gain 选中的属性加分、loss 落选的属性扣分，只改这道题的问题类型；floor 权重分保底；perBatch 一次后训练做几道题；rerollCost 换一对花几点控盘额度；spill 溢出到其他问题类型的比例（0 = 不溢出）；diminish 收益递减（同一类里越加越难加）。日程表的 postTrain 可以覆盖这里的任何一项。",
     "gain": 0.7,

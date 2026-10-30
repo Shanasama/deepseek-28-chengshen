@@ -464,6 +464,7 @@ body.night .tail.t2{left:176px;top:268px;width:7px;height:7px}
 .tc .nm{font-size:24px;line-height:28px;white-space:nowrap}
 .tc.long .nm{font-size:12px;line-height:28px}
 .tc .n{color:var(--g2)}
+.tgrid.two .tc{height:94px;padding:4px;gap:1px}.tgrid.two .tc canvas{width:44px;height:44px}.tgrid.two .tc .nm{font-size:18px;line-height:22px}.tgrid.two .tc.long .nm{font-size:12px;line-height:22px}   /* 问题类型超过 5 类：排两排，格子压扁 */
 .qwrap{display:flex;gap:8px;margin-top:6px}
 .qleft{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .qq{background:var(--mist);padding:5px 8px;min-height:38px}

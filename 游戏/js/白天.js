@@ -65,7 +65,7 @@ export function view(v, arg) {
     setTimeout(() => tipOnce('pre', 'bubble', '预训练：挑一类网站去读。读了哪类，夜里转盘上就多哪类卡；读第二次学到深层，卡会换成更好的版本。'), 300);
   }
   if (v === 'ptype') {
-    paint(header('后训练 · 练哪一类问题？', `1 行动点 · 连做 ${pt().perBatch} 题`, true) + '<div class="tgrid">' + QT.map(t =>
+    paint(header('后训练 · 练哪一类问题？', `1 行动点 · 连做 ${pt().perBatch} 题`, true) + `<div class="tgrid${QT.length > 5 ? ' two' : ''}" style="grid-template-columns:repeat(${QT.length > 5 ? Math.ceil(QT.length / 2) : QT.length},1fr)">` + QT.map(t =>
       `<div class="tc r8${t.length > 2 ? ' long' : ''}" data-t="${t}"><div class="nm">${t}</div><canvas width="64" height="64"></canvas><div class="n">练过 ${G.done[t] || 0} 题</div></div>`).join('') + '</div>');
     bv.querySelectorAll('.tc').forEach(el => { radarStatic(el.querySelector('canvas'), el.dataset.t); el.onclick = () => { if (G.busy) return; hitFx(el, P.cobalt); postTrain(el.dataset.t); }; });
     setTimeout(() => tipOnce('post', 'bubble', '后训练：挑一类问题来练，每道题两个回答选一个。在同一类问题上越常选它，夜里这类问题的转盘上它越容易被转到。'), 300);
@@ -199,6 +199,18 @@ export async function tutorialQuestion(q) {
   await summary(t, before, ch, 1);
   await fishSay('出厂测试全部通过！今天开始正式营业。');
   setUrl(HOME(), true); setScreen('idle'); lock(false); renderSelf(); view('menu');
+}
+
+// ---------- 编辑器「后训练」模块的试做（?后训练预览=1）：编辑器送来一道题和一对属性，做完看六维图，不存档 ----------
+export function trialIdle() { bubble(true); paint(header('后训练 · 试做', '编辑器预览') + '<div class="t3" style="margin-top:10px;color:var(--g2)">在编辑器里选好一对回答，点「试做这道题」。</div>'); }
+export async function trialQuestion(q, pair) {
+  if (G.busy) return; lock(true); bubble(true); const t = q.qtype;
+  setUrl(`dafeiyu://rlhf/<b>${t}</b>?preview`, true); setScreen('rlhf');
+  const before = Object.fromEntries(AXES.map(a => [a, w(t, a)]));
+  await askOne(t, q, 0, 1, pair);
+  const ch = AXES.filter(a => before[a] != null && Math.abs(w(t, a) - before[a]) > .001);
+  await summary(t, before, ch, 1);
+  setUrl(HOME(), true); setScreen('idle'); lock(false); trialIdle();
 }
 
 // ---------- 吃白饭 ----------
