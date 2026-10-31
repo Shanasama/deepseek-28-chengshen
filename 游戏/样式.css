@@ -388,7 +388,7 @@ body.night #bubble::before{content:'';position:absolute;inset:0;pointer-events:n
   background:repeating-linear-gradient(180deg,rgba(143,211,255,.045) 0 1px,transparent 1px 3px),conic-gradient(rgba(201,236,255,.06) 25%,transparent 0 50%,rgba(201,236,255,.06) 0 75%,transparent 0);background-size:auto,2px 2px}
 /* 飘字层：前文和候选的字在底下慢慢往上飘（转盘.js 的 drawThink） */
 #bthink{position:absolute;left:0;top:0;pointer-events:none;display:none}
-body.night #bubble:not(.term) .cand:not(.hov):not(.hit):not(.lit):not(.burning){background:rgba(27,37,96,.62)}   /* 候选行半透明，底下的飘字隐约透上来 */
+body.night #bubble .cand:not(.hov):not(.hit):not(.lit):not(.burning){background:rgba(27,37,96,.62)}   /* 候选行半透明，底下的飘字隐约透上来 */
 body.night #bthink{display:block}
 /* 出场：从她头顶那个角一格一格像素展开 */
 body.night #bubble.show{animation:bunfold .34s steps(7),bglow 2.4s ease-in-out .34s infinite}
@@ -396,9 +396,7 @@ body.night #bubble.show{animation:bunfold .34s steps(7),bglow 2.4s ease-in-out .
 #bubble.show{transform:none;opacity:1;pointer-events:auto}
 #bubble.punch{animation:punch .28s cubic-bezier(.3,1.8,.5,1)}
 @keyframes punch{0%{transform:scale(1.05)}100%{transform:scale(1)}}
-/* 终端样式的轮次：纯黑终端，不要毛玻璃和飘字（body.night 要写上，不然压不过上面夜里的底子） */
-#bubble.term,body.night #bubble.term{background:#05070F;box-shadow:0 0 0 1px var(--k5);animation:none}
-body.night #bubble.term::before,#bubble.term #bthink{display:none}
+/* 终端样式的轮次（#bubble.term）气泡底子和别的轮一样，只有候选写成 Bash(…) 卡（见 .cand .code）；yuan：纯黑终端底配蓝候选行太突兀 */
 body.night #bubble.punch{animation:punch .28s cubic-bezier(.3,1.8,.5,1)}   /* 写在出场动画后面，命中时的弹一下才压得住 */
 /* 白天的浮窗：左上角是拖动条，下面是 #bv；打开 / 关闭都从标注台（--dx / --dy）缩放飞出、飞回去 */
 #dwin{position:absolute;left:170px;top:8px;width:422px;height:272px;z-index:60;transform:translate(var(--ox,0px),var(--oy,0px)) scale(.12);opacity:0;transition:transform .34s cubic-bezier(.3,1.4,.5,1),opacity .22s;pointer-events:none}

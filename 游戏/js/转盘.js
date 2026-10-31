@@ -222,7 +222,7 @@ export function openNode(blank, cs, strikeId, term) {
     NODE.blank = blank; NODE.onPick = res; NODE.hit = -1; NODE.hover = -1; NODE.theta = Math.random() * 360; NODE.assemble = 0; NODE.busy = false;
     // 概率从 0 滚上来（候选条和百分比一起涨；各扇区按同一个速度涨，转盘比例一直是对的）
     NODE.cards = cs; retarget(); NODE.cards.forEach(c => { c.p = 0; c.burn = 0; c.burnt = false; }); NODE.rollT = performance.now(); $('bubble').classList.toggle('term', !!term);
-    NODE.state = 'opening'; G.nodeOn = true; G.musSlow = true; G.tsTarget = V.bullet; SFX.slow(); setFish('think'); showPuff(false); applyBullet(true); buildCands(); thinkReset(); if (!term) glitch(1); addTrace(`关键节点：${cs.length} 个候选`, 'k');
+    NODE.state = 'opening'; G.nodeOn = true; G.musSlow = true; G.tsTarget = V.bullet; SFX.slow(); setFish('think'); showPuff(false); applyBullet(true); buildCands(); thinkReset(); glitch(1); addTrace(`关键节点：${cs.length} 个候选`, 'k');
     setTimeout(() => {
       const t0 = performance.now(); NODE.state = 'ready'; NODE.lock = t0 + 500;
       (function grow() { NODE.assemble = Math.min(1, (performance.now() - t0) / 420); if (NODE.assemble < 1) requestAnimationFrame(grow); })(); hints(); HOOK && HOOK('ready');
@@ -271,7 +271,7 @@ function spawnGlyph(y) {
   GLY.push({ ch, col, a, size, x: rand(8, think.width - 24), y: y ?? rand(10, think.height), vy: rand(-14, -6), ph: rand(0, 6.28), life: 0, max: rand(5, 9) });   // 在哪都可能冒出来，淡入、往上飘一段、淡出
 }
 function drawThink(now, dt) {
-  if (!think.width || $('bubble').classList.contains('term')) return;
+  if (!think.width) return;
   spawnAcc += dt; while (spawnAcc > .14) { spawnAcc -= .14; if (GLY.length < 40) spawnGlyph(); }
   tx.clearRect(0, 0, think.width, think.height); tx.textBaseline = 'top';
   for (let i = GLY.length - 1; i >= 0; i--) {
