@@ -10,7 +10,7 @@ import { emitUpdate, flightsUpdate, refreshFishAvatars, chatTab } from './对话
 import { NODE, nodeTick, spin, confirmPick, regen } from './转盘.js';
 import { radarTick } from './六维图.js';
 import { initShell, drawer, renderAP, renderHUD, closeMenus, on, setMode } from './界面.js';
-import { initDay, dayKeys, pickActByIndex, view, goNight, trialIdle, trialQuestion } from './白天.js';
+import { initDay, dayKeys, pickActByIndex, view, bubble, goNight, trialIdle, trialQuestion } from './白天.js';
 import { newGame, skipCurrent, startTrial, startShowPreview, replayShow, loadSave, quitRun, endEarly } from './日程.js';
 import { spotKey, storyOn, storyKey, ARROW } from './教学.js';
 import { storyKeyDown, storyKeyUp, playPreview, storyAbort, HANDLERS } from './剧情.js';
@@ -93,12 +93,13 @@ addEventListener('keydown', e => {
     else if (e.code === 'KeyR') regen();
     return;
   }
-  const { KEYQ, KEYR, KEYSUM } = dayKeys();
-  if (KEYQ) { if (e.code === 'ArrowLeft' || e.code === 'KeyA') KEYQ(0); else if (e.code === 'ArrowRight' || e.code === 'KeyB') KEYQ(1); else if (e.code === 'KeyR') KEYR && KEYR(); return; }
+  const { KEYQ, KEYR, KEYSUM, KEYSKIP } = dayKeys();
+  if (KEYQ) { if (e.code === 'ArrowLeft' || e.code === 'KeyA') KEYQ(0); else if (e.code === 'ArrowRight' || e.code === 'KeyB') KEYQ(1); else if (e.code === 'KeyR') KEYR && KEYR(); else if (e.code === 'Escape') KEYSKIP && KEYSKIP(); return; }
   if (KEYSUM) { if (e.code === 'Enter' || e.code === 'Space') { e.preventDefault(); KEYSUM(); } return; }
   if (G.busy) return;
   if (G.view === 'menu' && /^Digit[1-9]$/.test(e.code)) { if (!e.repeat) pendDigit(e.code, +e.code.slice(5) - 1); }   // 松开才选（开发.js），免得和 2+5+9 冲突
   else if (e.code === 'Escape' && G.view !== 'menu') { SFX.click(); view('menu'); }
+  else if (e.code === 'Escape') bubble(false);   // 菜单页按 Esc 收起浮窗
   else if (e.code === 'Enter') goNight();
 });
 
@@ -162,9 +163,7 @@ function storyPreview() {
 (async () => {
   try {
     await loadAll(); ready = true;
-    const n = DATA.list.filter(e => !e.user.boss && !e.user.tutorial).reduce((s, e) => s + e.scenes.length, 0);
     $('startinfo').textContent = PLAY ? `单场试玩：${PLAY.replace('/', ' / ')} · 训练状态来自剧情编辑器` : `共享演出预览：${SHOW}`;
-    $('startinfo2').textContent = `dafeiyu-v3 · 剧本库 ${DATA.list.length} 个用户、${n} 个普通场景 · 存档在本机`;
     if (SPRV) spritePreview();
     else if (TPRV) trainPreview();
     else if (GPRV) storyPreview();

@@ -21,8 +21,11 @@ export const setNodeHook = fn => { HOOK = fn; };
 const allowed = k => !NODE.allow || NODE.allow.has(k);
 const wheel = $('wheel'), wx = wheel.getContext('2d'), WW = 200, WH = 222, WCX = 100, WCY = 118, WR = 88;   // 宽高和 index.html 里的 #wheel 一致
 const wimg = wx.createImageData(WW, WH);
-const PRE = { r: new Float32Array(WW * WH), a: new Float32Array(WW * WH) };
-for (let y = 0; y < WH; y++) for (let x = 0; x < WW; x++) { const dx = x + .5 - WCX, dy = y + .5 - WCY; PRE.r[y * WW + x] = Math.hypot(dx, dy); PRE.a[y * WW + x] = mod(Math.atan2(dx, -dy) * 180 / Math.PI, 360); }
+const PRE = { r: new Float32Array(WW * WH), a: new Float32Array(WW * WH), n: new Float32Array(WW * WH) };
+const BLK = []; for (let k = 0; k < (WW >> 1) * (WH >> 1); k++) BLK.push(Math.random());   // 烧穿用的噪声：2×2 一块，像素感
+for (let y = 0; y < WH; y++) for (let x = 0; x < WW; x++) { const dx = x + .5 - WCX, dy = y + .5 - WCY, i = y * WW + x; PRE.r[i] = Math.hypot(dx, dy); PRE.a[i] = mod(Math.atan2(dx, -dy) * 180 / Math.PI, 360); PRE.n[i] = BLK[(y >> 1) * (WW >> 1) + (x >> 1)] * .65 + (1 - PRE.r[i] / WR) * .35; }   // 从外圈往里烧
+const BURN = 520;   // 抹除 / 剔除时扇区烧穿要多久（毫秒）
+const burnK = (c, now) => c.burn ? Math.min(1, (now - c.burn) / BURN) : 0;
 const rgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 const RGB = {}; Object.values(P).forEach(v => RGB[v] = rgb(v));
 
@@ -60,15 +63,24 @@ function drawWheel(now) {
       else if (r < Rr + 2 && !big) { d[o] = 0; d[o + 1] = 0; d[o + 2] = 0; d[o + 3] = 120; } else d[o + 3] = 0; continue;
     }
     let c;
+    const card = NODE.cards[k];
+    // 烧穿：噪声小于进度的先烧成洞，洞边一圈焦黑，再外一圈是火星（金 / 红闪），没烧到的地方也被熏红
+    const bk = card.burnt ? 2 : card.burn ? burnK(card, now) * 1.25 : 0;   // burnt：烧完了，概率还没让完之前一直是个洞
+    if (bk) {
+      const n = PRE.n[i];
+      if (n < bk - .16) { d[o + 3] = 0; continue; }
+      if (n < bk - .08) { d[o] = 26; d[o + 1] = 12; d[o + 2] = 16; d[o + 3] = 255; continue; }
+      if (n < bk) { const e = (n * 97 + now * .02) % 3 < 1 ? RGB[P.paper] : (n * 53 | 0) % 2 ? RGB[P.lgold] : RGB[P.red]; d[o] = e[0]; d[o + 1] = e[1]; d[o + 2] = e[2]; d[o + 3] = 255; continue; }
+    }
     const nearB = Math.min(Math.abs(w - angs[k][0]), Math.abs(angs[k][1] - w)) * Math.PI / 180 * r < .7;
     if (nearB) c = RGB[P.night];
     else {
-      const card = NODE.cards[k];
       if (card.attr === 'egg') c = eggOn ? RGB[P.purple] : RGB[P.lpurple];
       else if (ATTR[card.attr].noise) { const x = i % WW, y = (i / WW) | 0; c = ((x >> 1) + (y >> 1)) % 2 ? cols[k] : RGB[P.deep]; }
       else c = cols[k];
       if (lit) c = [c[0] + (255 - c[0]) * .45 | 0, c[1] + (255 - c[1]) * .45 | 0, c[2] + (255 - c[2]) * .45 | 0];   // 指针扫过：亮一下
       if (held) { const h = holdK(now), R0 = RGB[P.red]; c = [c[0] + (R0[0] - c[0]) * h | 0, c[1] + (R0[1] - c[1]) * h | 0, c[2] + (R0[2] - c[2]) * h | 0]; }
+      if (bk) { const h = Math.min(.7, .4 + bk * .4), R0 = RGB[P.red]; c = [c[0] + (R0[0] - c[0]) * h | 0, c[1] + (R0[1] - c[1]) * h | 0, c[2] + (R0[2] - c[2]) * h | 0]; }
       if (k === NODE.hit && flash) c = RGB[P.paper];
       else if (r > Rr - 3) c = [c[0] * .78 | 0, c[1] * .78 | 0, c[2] * .78 | 0];
       else if (r > Rr - 5 && ((i % WW) + ((i / WW) | 0)) % 2 === 0) c = [Math.min(255, c[0] * 1.12) | 0, Math.min(255, c[1] * 1.12) | 0, Math.min(255, c[2] * 1.12) | 0];
@@ -127,7 +139,23 @@ function erase(i) {
   if (NODE.state !== 'ready' || performance.now() < NODE.lock || NODE.busy || !allowed('erase')) return; if (fated()) return;
   const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1 || NODE.cards[i].dead) return;
   NODE.cards[i].dead = true; NODE.hover = -1; hints(); NODE.busy = true; addTrace(`抹除「${NODE.cards[i].tok}」，额度 -1`);
-  spendQuota(sectorPoint(i), () => { NODE.busy = false; sectorBurst(i, false); SFX.erase(); glitch(1); NODE.cards[i].row.classList.add('dead'); retarget(); hints(); });
+  spendQuota(sectorPoint(i), () => burnOut(i, () => { NODE.busy = false; hints(); }));
+}
+// 烧穿一块：扇区从外圈往里烧成洞、冒火星，候选那一行跟着烧；烧完才把概率让出去，别的扇区慢慢涨开把洞填满（百分比跟着滚）
+function burnOut(i, after) {
+  const c = NODE.cards[i]; c.burn = performance.now(); SFX.erase(); glitch(1); c.row.classList.add('burning');
+  setTimeout(() => {
+    c.burn = 0; c.burnt = true; c.row.classList.remove('burning'); c.row.classList.add('dead');
+    sectorBurst(i, false); SFX.flick(); retarget(); after && after();
+  }, BURN);
+}
+// 烧的时候扇区里往上冒火星
+function embers(i) {
+  const angs = angles(false), p = sp(wheel), c = NODE.cards[i], k = burnK(c, performance.now());
+  for (let j = 0; j < 4; j++) {
+    const a = (rand(angs[i][0], angs[i][1]) + NODE.theta) * Math.PI / 180, r = rand(WR * (1 - k), WR);
+    parts.push({ x: p.x + WCX + Math.sin(a) * r, y: p.y + WCY - Math.cos(a) * r, vx: rand(-25, 25), vy: rand(-90, -30), g: -40, c: [P.lgold, P.red, P.gold, P.paper][j], life: rand(.3, .7), s: Math.random() < .5 ? 2 : 1 });
+  }
 }
 function sample() {
   if (NODE.rig) { const k = NODE.cards.findIndex(c => c.attr === NODE.rig && !c.dead); NODE.rig = null; if (k >= 0) return k; }   // 教学：这一转定好了停在哪
@@ -172,8 +200,8 @@ export function regen() {
   if (NODE.state !== 'stopped' || NODE.busy || !allowed('regen')) return; if (fated()) return; const alive = NODE.cards.filter(c => !c.dead).length; if (G.quota <= 0) { SFX.bad(); return; } if (alive <= 1) return;
   const i = NODE.hit; NODE.state = 'busy'; hints(); addTrace(`剔除「${NODE.cards[i].tok}」并重转，额度 -1`);
   spendQuota(sectorPoint(i), () => {
-    sectorBurst(i, true); SFX.flick(); glitch(1); NODE.cards[i].dead = true; NODE.cards[i].row.classList.add('dead'); NODE.hit = -1; retarget();
-    NODE.state = 'ready'; hints(); setTimeout(() => { if (NODE.state === 'ready') { NODE.lock = 0; spin(true); } }, 300);
+    NODE.cards[i].dead = true; NODE.hit = -1;
+    burnOut(i, () => { NODE.state = 'ready'; hints(); setTimeout(() => { if (NODE.state === 'ready') { NODE.lock = 0; spin(true); } }, 300); });
   });
 }
 function applyBullet(on) {
@@ -192,8 +220,9 @@ export function showPuff(on) { $('puff').classList.toggle('show', on); document.
 export function openNode(blank, cs, strikeId, term) {
   return new Promise(res => {
     NODE.blank = blank; NODE.onPick = res; NODE.hit = -1; NODE.hover = -1; NODE.theta = Math.random() * 360; NODE.assemble = 0; NODE.busy = false;
-    NODE.cards = cs; retarget(); NODE.cards.forEach(c => c.p = c.pt); $('bubble').classList.toggle('term', !!term);
-    NODE.state = 'opening'; G.nodeOn = true; G.musSlow = true; G.tsTarget = V.bullet; SFX.slow(); setFish('think'); showPuff(false); applyBullet(true); buildCands(); addTrace(`关键节点：${cs.length} 个候选`, 'k');
+    // 概率从 0 滚上来（候选条和百分比一起涨；各扇区按同一个速度涨，转盘比例一直是对的）
+    NODE.cards = cs; retarget(); NODE.cards.forEach(c => { c.p = 0; c.burn = 0; c.burnt = false; }); NODE.rollT = performance.now(); $('bubble').classList.toggle('term', !!term);
+    NODE.state = 'opening'; G.nodeOn = true; G.musSlow = true; G.tsTarget = V.bullet; SFX.slow(); setFish('think'); showPuff(false); applyBullet(true); buildCands(); thinkReset(); if (!term) glitch(1); addTrace(`关键节点：${cs.length} 个候选`, 'k');
     setTimeout(() => {
       const t0 = performance.now(); NODE.state = 'ready'; NODE.lock = t0 + 500;
       (function grow() { NODE.assemble = Math.min(1, (performance.now() - t0) / 420); if (NODE.assemble < 1) requestAnimationFrame(grow); })(); hints(); HOOK && HOOK('ready');
@@ -204,20 +233,54 @@ export function openNode(blank, cs, strikeId, term) {
 export function closeNode() { NODE.fate = null; NODE.state = 'hidden'; G.nodeOn = false; G.musSlow = false; G.tsTarget = 1; SFX.resume(); applyBullet(false); document.querySelectorAll('.tail').forEach(t => t.classList.remove('show')); }
 export function confirmPick() {
   if (NODE.state !== 'stopped' || NODE.busy || !allowed('confirm')) return; NODE.state = 'resolving'; const c = NODE.cards[NODE.hit]; SFX.confirm(); hints(); addTrace(`确认「${c.tok}」`, 'k');
-  const from = sp(c.row.querySelector('.tok')), col = ATTR[c.attr].c;
-  const el = document.createElement('div'); el.className = 'fly r2'; el.textContent = c.tok; el.style.background = col; el.style.color = P.k0; $('fxtop').appendChild(el);
-  const t0 = performance.now(), dur = 620, blank = NODE.blank;
-  const bz = (a, b, cc, d, t) => { const u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * cc + t * t * t * d; };
-  (function step(now) {
-    const t = Math.min(1, (now - t0) / dur), e = t * t * (3 - 2 * t), to = sp(blank);
-    const x = bz(from.x, from.x - 40, to.x + 140, to.x, e), y = bz(from.y, from.y - 120, to.y - 100, to.y, e), s = 1.8 - .8 * t;
-    el.style.transform = `translate(${Math.round(x)}px,${Math.round(y)}px) scale(${s.toFixed(2)})`;
-    for (let k = 0; k < 2; k++) parts.push({ x: x + rand(0, 20), y: y + rand(4, 12), vx: rand(-20, 20), vy: rand(-20, 20), g: 0, c: Math.random() < .3 ? P.paper : col, life: .4, s: Math.random() < .5 ? 2 : 1 });
-    if (t < 1) return requestAnimationFrame(step);
-    el.remove(); blank.textContent = c.tok; blank.className = 'picked r2'; blank.style.background = col; setScreen(APPS[c.screen] ? c.screen : (ATTR_APP[c.attr] || 'notepad'));
-    const p = sp(blank); ring(p.x + p.w / 2, p.y + 8, col, 30, 190); for (let k = 0; k < 16; k++) { const a = rand(0, Math.PI * 2), v = rand(40, 160); parts.push({ x: p.x + p.w / 2, y: p.y + 8, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 260, c: Math.random() < .3 ? P.paper : col, life: rand(.3, .6), s: Math.random() < .4 ? 2 : 1 }); }
-    SFX.slam(); restart(stage, 'shake'); closeNode(); NODE.onPick(c);
-  })(t0);
+  const col = ATTR[c.attr].c, k = Math.sqrt(spd()), SHRINK = 300 / k, tok = c.row.querySelector('.tok');
+  // 左边选中的这一行往左收，只剩方案词，缩成一个 token，再一路飞进对话栏
+  c.row.style.setProperty('--tw', tok.offsetLeft + tok.offsetWidth + 6 + 'px'); c.row.style.animationDuration = SHRINK + 'ms'; c.row.classList.add('shrink'); SFX.windup();
+  const fly = () => {
+    const from = sp(tok); c.row.style.visibility = 'hidden'; ring(from.x + from.w / 2, from.y + 8, col, 20, 110); SFX.pop(3);
+    const el = document.createElement('div'); el.className = 'fly r2'; el.textContent = c.tok; el.style.background = col; el.style.color = P.k0; el.style.boxShadow = `0 0 10px ${col}`; $('fxtop').appendChild(el);
+    const t0 = performance.now(), dur = 1100 / k, blank = NODE.blank;   // 一倍速飞 1.1 秒，看得清它从哪飞到哪
+    const bz = (a, b, cc, d, t) => { const u = 1 - t; return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * cc + t * t * t * d; };
+    (function step(now) {
+      const t = Math.min(1, (now - t0) / dur), e = t * t * (3 - 2 * t), to = sp(blank);
+      const x = bz(from.x, from.x - 40, to.x + 140, to.x, e), y = bz(from.y, from.y - 120, to.y - 100, to.y, e), s = 1 + .8 * Math.sin(Math.min(1, t * 1.6) * Math.PI) * (1 - t * .5);   // 先鼓起来再落回原大小
+      el.style.transform = `translate(${Math.round(x)}px,${Math.round(y)}px) scale(${s.toFixed(2)})`;
+      for (let j = 0; j < 4; j++) parts.push({ x: x + rand(0, 20), y: y + rand(4, 12), vx: rand(-30, 30), vy: rand(-30, 30), g: 0, c: Math.random() < .3 ? P.paper : col, life: rand(.3, .55), s: Math.random() < .5 ? 2 : 1 });
+      if (t < 1) return requestAnimationFrame(step);
+      el.remove(); blank.textContent = c.tok; blank.className = 'picked r2'; blank.style.background = col; setScreen(APPS[c.screen] ? c.screen : (ATTR_APP[c.attr] || 'notepad'));
+      const p = sp(blank); ring(p.x + p.w / 2, p.y + 8, col, 30, 190); for (let j = 0; j < 16; j++) { const a = rand(0, Math.PI * 2), v = rand(40, 160); parts.push({ x: p.x + p.w / 2, y: p.y + 8, vx: Math.cos(a) * v, vy: Math.sin(a) * v, g: 260, c: Math.random() < .3 ? P.paper : col, life: rand(.3, .6), s: Math.random() < .4 ? 2 : 1 }); }
+      SFX.slam(); restart(stage, 'shake'); closeNode(); NODE.onPick(c);
+    })(t0);
+  };
+  setTimeout(fly, SHRINK);
+}
+// ---------- 气泡底下的飘字：前文里的字和候选的 token 慢慢往上飘；候选越可能越亮、越大 ----------
+const think = $('bthink'), tx = think.getContext('2d');
+let GLY = [], SRC = '', FONT = '', spawnAcc = 0;
+function thinkReset() {
+  const b = $('bubble'); think.width = b.offsetWidth; think.height = b.offsetHeight; GLY = [];
+  SRC = ((NODE.blank && NODE.blank.parentElement && NODE.blank.parentElement.textContent) || '').replace(/\s+/g, '').slice(-60);
+  FONT = getComputedStyle(document.body).fontFamily;
+  for (let k = 0; k < 22; k++) spawnGlyph(rand(0, think.height));   // 一弹出来就满屏有字，不是从底下慢慢冒
+}
+function spawnGlyph(y) {
+  const alive = NODE.cards.filter(c => !c.dead && c.attr !== 'egg'), tokTurn = alive.length && (Math.random() < .3 || !SRC);
+  let ch, col, a, size;
+  if (tokTurn) { let r = Math.random(), c = alive[alive.length - 1]; for (const x of alive) { r -= x.pt; if (r <= 0) { c = x; break; } } ch = c.tok; col = ATTR[c.attr].c; a = .08 + c.pt * .22; size = 12 + Math.round(c.pt * 8); }
+  else { ch = SRC[(Math.random() * SRC.length) | 0]; col = P.ice; a = rand(.05, .11); size = 12; }
+  GLY.push({ ch, col, a, size, x: rand(8, think.width - 24), y: y ?? rand(10, think.height), vy: rand(-14, -6), ph: rand(0, 6.28), life: 0, max: rand(5, 9) });   // 在哪都可能冒出来，淡入、往上飘一段、淡出
+}
+function drawThink(now, dt) {
+  if (!think.width || $('bubble').classList.contains('term')) return;
+  spawnAcc += dt; while (spawnAcc > .14) { spawnAcc -= .14; if (GLY.length < 40) spawnGlyph(); }
+  tx.clearRect(0, 0, think.width, think.height); tx.textBaseline = 'top';
+  for (let i = GLY.length - 1; i >= 0; i--) {
+    const g = GLY[i]; g.life += dt; g.y += g.vy * dt; if (g.y < -24 || g.life > g.max) { GLY.splice(i, 1); continue; }
+    const fade = Math.min(1, g.life / .8, (g.max - g.life) / 1.2, (g.y + 24) / 40);
+    tx.globalAlpha = Math.max(0, g.a * fade); tx.fillStyle = g.col; tx.font = `${g.size}px ${FONT}`;
+    tx.fillText(g.ch, Math.round(g.x + Math.sin(now / 900 + g.ph) * 3), Math.round(g.y));
+  }
+  tx.globalAlpha = 1;
 }
 // 主循环每帧调
 export function nodeTick(now, dt) {
@@ -225,7 +288,8 @@ export function nodeTick(now, dt) {
   if (NODE.hold && (NODE.state !== 'ready' || NODE.cards[NODE.hold.i]?.dead)) NODE.hold = null;
   if (NODE.hold && holdK(now) >= 1) { const i = NODE.hold.i; NODE.hold = null; erase(i); }
   if (NODE.state !== 'hidden') {
-    NODE.cards.forEach(c => { if (NODE.state !== 'spinning') c.p += (c.pt - c.p) * Math.min(1, dt * 10); }); NODE.kick = Math.max(0, NODE.kick - dt * 20); drawWheel(now); updateCands();
+    const rate = now - NODE.rollT < 900 ? 4 : 10;   // 刚弹出来时慢一点，看得见数字往上滚
+    NODE.cards.forEach((c, i) => { if (NODE.state !== 'spinning') c.p += (c.pt - c.p) * Math.min(1, dt * rate); if (c.burn) embers(i); }); NODE.kick = Math.max(0, NODE.kick - dt * 20); drawWheel(now); updateCands(); drawThink(now, dt);
     $('hints').classList.toggle('lock', now < NODE.lock);
   }
 }

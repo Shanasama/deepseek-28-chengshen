@@ -63,7 +63,7 @@
         <span id="send" class="r12"></span>
       </div>
     </div></div>
-    <div id="pops"><div class="menu r4" id="m-act"></div>
+    <div id="pops">
       <div id="spdpop" class="r8">
         <div class="sh"><span id="spdic2"></span><b id="spdname">Medium</b><span class="t3">›</span><span class="sp"></span><span class="ic r2" id="spdreset" title="恢复默认"></span></div>
         <div class="sm">大肥鱼 · 说话、思考与输出速度</div>
@@ -103,16 +103,21 @@
         <canvas id="cable" width="96" height="14"></canvas>
         <canvas id="tokdev" width="76" height="104" title="token 分词机"></canvas>
         <canvas id="light" width="600" height="486"></canvas><canvas id="vig" width="600" height="486"></canvas><canvas id="fishguide" width="120" height="120"></canvas><div id="hots"></div>
-        <div id="fishhit" title="点她：收起 / 打开思考气泡"></div>
+        <div id="fishhit" title="摸摸她"></div>
       </div>
       <div id="hud" class="r4"><div id="hearts"></div><i class="div"></i><span class="t3" id="qlbl">额度</span><div id="quota"></div><span id="qtxt"></span></div>
       <div id="prog" class="r4"><div class="r"><span id="progt">正在读取</span><span class="sp"></span><span id="progn">0</span></div><div class="bar r2"><i id="progb"></i></div></div>
       <div id="puff" class="r4"><i></i><i></i><i></i></div>
       <i class="tail t1 r2"></i><i class="tail t2 r2"></i>
-      <div id="bubble" class="r12">
+      <!-- 白天：浮窗（今天干点啥 / 预训练 / 后训练），从标注台里飞出来，可以拖；夜间不显示 -->
+      <div id="dwin">
+        <div id="dbar"><span class="dt">白天活动</span><span class="sp"></span><span id="dx">×</span></div>
         <div id="bv"></div>
+      </div>
+      <div id="bubble" class="r12">
+        <canvas id="bthink"></canvas>
         <div id="nodebox">
-          <div id="bhead"><span class="lbl"><i></i>下一个 token</span><span class="sp"></span><span class="cap">P(token | 前文)</span></div>
+          <div id="bhead"><span class="lbl"><i></i>下一个词元(token)</span><span class="sp"></span><span class="cap">P(token | 前文)</span></div>
           <div id="node"><div id="cands"></div><div id="wheelbox"><canvas id="wheel" width="200" height="222"></canvas></div></div>
           <div id="hints"></div>
         </div>
@@ -237,7 +242,6 @@
       <div class="thint t3">↑ ↓ 选择 · Enter 确认 · 鼠标也可以</div>
     </div>
     <div id="tauthor" class="t2">作者:贽殿遮那</div>
-    <div class="tver t3" id="startinfo2">dafeiyu-v3 · 本机存档</div>
     <div id="tach" class="tpanel r8"><div class="ph"><b>成就</b><span class="t3" id="tachwho"></span><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div><div class="badges" id="tbadges"></div></div>
     <div id="tset" class="tpanel r8"><div class="ph"><b>设置</b><span class="sp"></span><span class="pclose btn r2">返回 Esc</span></div>
       <div class="sets">

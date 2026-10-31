@@ -36,14 +36,47 @@ const enabled = () => { const ids = dayToday().activities, ov = G.story.acts || 
 const canAct = a => G.ap < 1 ? '行动点用完了' : a.why();
 
 // ---------- 思考气泡 ----------
-export function bubble(show) { $('bubble').classList.toggle('show', show); document.querySelectorAll('.tail').forEach(t => t.classList.toggle('show', show)); if (show) SFX.blip(); }
+// 白天的菜单和训练都在浮窗里（dwin）；夜间的关键节点还是思考气泡
+export function bubble(show) {
+  if (G.mode === 'day' || !show) winOpen(show && G.mode === 'day');
+  if (G.mode === 'day') return;
+  $('bubble').classList.toggle('show', show); document.querySelectorAll('.tail').forEach(t => t.classList.toggle('show', show)); if (show) SFX.blip();
+}
+// 浮窗：挂在游戏窗口（#stage）上，可以拖到整个游戏窗口里；默认在大肥鱼右边、房间顶上，不压住她和显示器；位置本局记住，不进存档
+const WIN = { x: 0, y: 0, set: false }, dwin = $('dwin'), dbar = $('dbar');
+$('stage').appendChild(dwin);
+const monitorHot = () => HOTS.find(h => h.act === 'menu');
+let flyT = 0;
+function winOpen(show) {
+  if (show === dwin.classList.contains('show')) return;
+  const d = sp($('desk')), m = monitorHot(), cx = d.x + m.x + m.w / 2, cy = d.y + m.y + m.h / 2;   // 从标注台飞出，也飞回标注台（舞台坐标）
+  if (!WIN.set) { WIN.x = d.x + 170; WIN.y = d.y + 8; WIN.set = true; }
+  dwin.style.left = WIN.x + 'px'; dwin.style.top = WIN.y + 'px';
+  dwin.style.setProperty('--ox', cx - WIN.x - dwin.offsetWidth / 2 + 'px');   // 不叫 --dy：全局的 --dy 是桌子下移量（工位.js）
+  dwin.style.setProperty('--oy', cy - WIN.y - dwin.offsetHeight / 2 + 'px');
+  void dwin.offsetWidth;   // 先按新位置算好「缩在标注台上」的样子再切换，第一次打开也从标注台飞出
+  dwin.classList.toggle('show', show); if (show) SFX.blip();
+  // 飞的这一下窗口不接点击（点击穿过去落到标注台上，连点就是来回开合）：缩小的窗口正叠在显示器上，不然会点进里面的卡片。类名别用 fly（对话栏飞字已占用，带 nowrap）
+  dwin.classList.add('winfly'); clearTimeout(flyT); flyT = setTimeout(() => dwin.classList.remove('winfly'), 360);
+}
+let drag = null;
+dbar.addEventListener('pointerdown', e => { if (e.target === $('dx')) return; drag = { px: e.clientX, py: e.clientY, x: WIN.x, y: WIN.y, on: false }; });
+addEventListener('pointermove', e => {   // 移动和松开挂在 window 上，鼠标拖出标题条也能接着拖
+  if (!drag) return; if (!drag.on) { if (Math.hypot(e.clientX - drag.px, e.clientY - drag.py) < 4) return; drag.on = true; }   // 挪过 4 px 才算拖，单击不动
+  const st = $('stage'), k = st.offsetWidth / st.getBoundingClientRect().width;   // 屏幕像素换成游戏窗口里的像素（舞台被缩放过）
+  WIN.x = Math.max(0, Math.min(st.offsetWidth - dwin.offsetWidth, drag.x + (e.clientX - drag.px) * k));
+  WIN.y = Math.max(16, Math.min(st.offsetHeight - dwin.offsetHeight, drag.y + (e.clientY - drag.py) * k));   // 16：不能拖到游戏自己的标题条底下
+  dwin.style.left = WIN.x + 'px'; dwin.style.top = WIN.y + 'px';
+});
+addEventListener('pointerup', () => { drag = null; });
+$('dx').onclick = e => { e.stopPropagation(); if (G.busy) return toast('训练中不能关'); SFX.click(); bubble(false); };
 function paint(html) {
   bv.innerHTML = html; restart(bv, 'swap');
   bv.querySelectorAll('.act,.cb,.tc,.srow').forEach((e, i) => setTimeout(() => { e.classList.add('in'); if (e.classList.contains('srow')) SFX.step(i); }, 40 + i * 60));
   bv.querySelectorAll('.act:not(.dis),.cb:not(.full),.tc').forEach(e => e.addEventListener('mouseenter', () => SFX.hover()));
 }
 const header = (lbl, cap, back) => `<div class="bh"><span class="lbl"><i></i>${lbl}</span><span class="sp"></span><span class="cap">${cap || ''}</span>${back ? '<span class="back r2" data-back>← 返回 Esc</span>' : ''}</div>`;
-function hitFx(el, col) { if (!el) return; restart(el, 'hit'); restart($('bflash'), 'on'); restart($('bubble'), 'punch'); const p = sp(el); burst(p.x + p.w / 2, p.y + p.h / 2, col || P.lgold, 26, 200); ring(p.x + p.w / 2, p.y + p.h / 2, col || P.gold, 24, 150); SFX.select(); setFish('pick'); }
+function hitFx(el, col) { if (!el) return; restart(el, 'hit'); restart($('bflash'), 'on'); restart($('dwin'), 'punch'); const p = sp(el); burst(p.x + p.w / 2, p.y + p.h / 2, col || P.lgold, 26, 200); ring(p.x + p.w / 2, p.y + p.h / 2, col || P.gold, 24, 150); SFX.select(); setFish('pick'); }
 export function view(v, arg) {
   G.view = v;
   if (v === 'menu') {
@@ -62,13 +95,13 @@ export function view(v, arg) {
         <div class="site">${A.site}</div><div class="nx">${full ? '已经学满了' : `读完 → <b>${st ? '深层' : '浅层'}「${A.lv[st]}」</b>`}</div></div>`; }).join('') + '</div>');
     bv.querySelectorAll('.cb').forEach(el => { el.onclick = () => { const a = el.dataset.a; if (G.busy) return; if (G.stage[a] >= 2) return deny('这类语料已经学满了', el); hitFx(el, AT[a].c); pretrain(a); }; });
     if (arg) { const el = bv.querySelector(`[data-a="${arg}"]`); if (el) setTimeout(() => restart(el, 'flash'), 250); }
-    setTimeout(() => tipOnce('pre', 'bubble', '预训练：挑一类网站去读。读了哪类，夜里转盘上就多哪类卡；读第二次学到深层，卡会换成更好的版本。'), 300);
+    setTimeout(() => tipOnce('pre', 'dwin','预训练：挑一类网站去读。读了哪类，夜里转盘上就多哪类卡；读第二次学到深层，卡会换成更好的版本。'), 300);
   }
   if (v === 'ptype') {
     paint(header('后训练 · 练哪一类问题？', `1 行动点 · 连做 ${pt().perBatch} 题`, true) + `<div class="tgrid${QT.length > 5 ? ' two' : ''}" style="grid-template-columns:repeat(${QT.length > 5 ? Math.ceil(QT.length / 2) : QT.length},1fr)">` + QT.map(t =>
       `<div class="tc r8${t.length > 2 ? ' long' : ''}" data-t="${t}"><div class="nm">${t}</div><canvas width="64" height="64"></canvas><div class="n">练过 ${G.done[t] || 0} 题</div></div>`).join('') + '</div>');
     bv.querySelectorAll('.tc').forEach(el => { radarStatic(el.querySelector('canvas'), el.dataset.t); el.onclick = () => { if (G.busy) return; hitFx(el, P.cobalt); postTrain(el.dataset.t); }; });
-    setTimeout(() => tipOnce('post', 'bubble', '后训练：挑一类问题来练，每道题两个回答选一个。在同一类问题上越常选它，夜里这类问题的转盘上它越容易被转到。'), 300);
+    setTimeout(() => tipOnce('post', 'dwin','后训练：挑一类问题来练，每道题两个回答选一个。在同一类问题上越常选它，夜里这类问题的转盘上它越容易被转到。'), 300);
   }
   bv.querySelectorAll('[data-back]').forEach(b => b.onclick = () => { SFX.click(); view('menu'); });
 }
@@ -104,8 +137,8 @@ async function pretrain(a) {
 }
 
 // ---------- 后训练（按问题类型分开算） ----------
-let KEYQ = null, KEYR = null, KEYSUM = null, RQ = null;
-export const dayKeys = () => ({ KEYQ, KEYR, KEYSUM });
+let KEYQ = null, KEYR = null, KEYSUM = null, KEYSKIP = null, RQ = null;
+export const dayKeys = () => ({ KEYQ, KEYR, KEYSUM, KEYSKIP });
 async function postTrain(t) {
   if (G.busy) return; if (G.ap < 1) return deny('行动点用完了'); if (G.post >= G.postMax) return deny('今天练够了');
   lock(true); spendAP(deskXY(380, 150)); G.post++; renderAP();
@@ -114,8 +147,8 @@ async function postTrain(t) {
   fishSay('来吧，出题！我会认真挑的。');
   setUrl(`dafeiyu://rlhf/<b>${t}</b>`, true); setScreen('rlhf');
   const before = Object.fromEntries(AXES.map(a => [a, w(t, a)]));
-  const qs = pickQuestions(t, pt().perBatch);
-  for (let i = 0; i < qs.length; i++) await askOne(t, qs[i], i, qs.length);
+  const qs = pickQuestions(t, pt().perBatch), batch = { free: 1 };   // 每批第一次换一对免费
+  for (let i = 0; i < qs.length; i++) await askOne(t, qs[i], i, qs.length, undefined, batch);
   G.done[t] = (G.done[t] || 0) + qs.length;
   const ch = AXES.filter(a => before[a] != null && Math.abs(w(t, a) - before[a]) > .001);
   addLog(`后训练完成 · ${t}类 ${qs.length} 题：` + (ch.map(a => `${AT[a].s}${w(t, a) > before[a] ? '↑' : '↓'}`).join(' ') || '没变化'), 'g');
@@ -124,12 +157,12 @@ async function postTrain(t) {
   await fishSay(up ? `记住了！今晚再遇到${t}类的问题，我会更容易想到「${AT[up].n}」的说法。` : `${t}类问题……好像没练出什么来。`);
   await advanceClock(120); setUrl(HOME(), true); setScreen('idle'); await hook('afterAct', { act: 'posttrain' }); lock(false); renderSelf(); view('menu');
 }
-function askOne(t, q, i, n, fixed) {
+function askOne(t, q, i, n, fixed, batch = { free: 0 }) {
   return new Promise(done => {
     let pair = fixed ? fixed.slice() : pickPair();
     paint(header(`后训练 · ${t}类`, `第 ${i + 1}/${n} 题`)
       + `<div class="qwrap"><div class="qleft"><div class="qq r4"><div class="who">用户问：</div></div><div class="ans"></div>
-        <div style="display:flex"><span id="reroll" class="r2"><i class="qc r2"></i>换一对 · ${pt().rerollCost} 额度 <span class="key r2">R</span></span></div></div>
+        <div style="display:flex;gap:8px"><span id="reroll" class="r2"><i class="qc r2"></i><span id="rlbl"></span> <span class="key r2">R</span></span><span id="skip" class="r2">跳过本题 · −1 <span class="key r2">Esc</span></span></div></div>
         <div class="qright" id="qr"><canvas width="128" height="128"></canvas><div class="cap"><div>${t}类 · 六维图</div><div class="dots3">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'on' : ''}"></i>`).join('')}</div></div></div></div>`);
     bv.querySelector('.qq').append(q.q);
     const qr = $('qr'); RQ = mkRadar(qr.querySelector('canvas'), 128, t); radarLabels(qr, RQ, 4, 12);
@@ -138,23 +171,39 @@ function askOne(t, q, i, n, fixed) {
     const fill = () => {
       const box = bv.querySelector('.ans'); box.innerHTML = pair.map((a, k) => `<div class="an r4${isNoise(a) ? ' noise' : ''}" style="--ac:${AT[a].c}"><span class="tag r2">${tagName(a)}</span><div class="tx"></div><span class="k">${k ? '→ 或 B' : '← 或 A'}</span><i class="wf"></i></div>`).join('');
       box.querySelectorAll('.an').forEach((el, k) => { el.querySelector('.tx').textContent = answer(pair[k]); el.onclick = () => choose(k); el.onmouseenter = () => SFX.hover(); setTimeout(() => { el.classList.add('in'); SFX.step(k + 2); }, 60 + k * 90); });
-      $('reroll').classList.toggle('dis', G.quota < pt().rerollCost);
+      const free = batch.free > 0;
+      $('rlbl').textContent = '换一对 · ' + (free ? '免费' : '−' + pt().rerollCost);
+      $('reroll').classList.toggle('dis', !free && G.quota < pt().rerollCost);
     };
-    // 花控盘额度换一对回答：同一道题，重抽两个属性
+    // 换一对：每批第一次免费，之后花控盘额度；同一道题，重抽两个属性
     const reroll = () => {
-      if (chosen || busy) return; if (G.quota < pt().rerollCost) { deny('额度用完了', $('reroll')); return; }
+      if (chosen || busy) return; const free = batch.free > 0;
+      if (!free && G.quota < pt().rerollCost) { deny('额度用完了', $('reroll')); return; }
       busy = true; const box = bv.querySelector('.ans'), pb = sp(box);
-      spendQuota({ x: pb.x + pb.w / 2, y: pb.y + 20 }, () => {
+      const swap = () => {
         bv.querySelectorAll('.an').forEach(e => e.classList.add('out')); glitch(); SFX.shuffle(); burst(pb.x + pb.w / 2, pb.y + pb.h / 2, P.sky, 30, 180);
-        addLog(`换了一对回答 · 额度 −${pt().rerollCost}`, 'q');
+        addLog(free ? '换了一对回答 · 免费' : `换了一对回答 · 额度 −${pt().rerollCost}`, 'q');
         setTimeout(() => { pair = pickPair(pair); fill(); busy = false; }, 220);
-      }, pt().rerollCost);
+      };
+      if (free) { batch.free--; return swap(); }
+      spendQuota({ x: pb.x + pb.w / 2, y: pb.y + 20 }, swap, pt().rerollCost);
+    };
+    // 跳过本题：消耗 1 点额度，这一题不训练，但仍计入这一批的题数
+    const skip = () => {
+      if (chosen || busy) return; if (G.quota < 1) { deny('额度用完了', $('skip')); return; }
+      chosen = true; busy = true; KEYQ = null; KEYR = null; KEYSKIP = null; bv.classList.add('lock');
+      const p = sp($('skip'));
+      spendQuota({ x: p.x + p.w / 2, y: p.y }, () => {
+        bv.querySelectorAll('.an').forEach(e => e.classList.add('out'));
+        addLog(`跳过第 ${i + 1} 题 · 额度 −1`, 'q');
+        setTimeout(() => { bv.classList.remove('lock'); done(); }, 300);
+      }, 1);
     };
     const choose = k => {
-      if (chosen || busy) return; chosen = true; KEYQ = null; KEYR = null; bv.classList.add('lock');
+      if (chosen || busy) return; chosen = true; KEYQ = null; KEYR = null; KEYSKIP = null; bv.classList.add('lock');
       const win = pair[k], lose = pair[1 - k], els = bv.querySelectorAll('.an'); els[k].classList.add('win'); els[1 - k].classList.add('lose');
       const { dWin: dw, dLose: dl } = trainOne(t, win, lose);
-      SFX.pick(); setTimeout(SFX.toss, 120); shake(true); restart($('bubble'), 'punch'); const pe = sp(els[k]); burst(pe.x + pe.w / 2, pe.y + pe.h / 2, AT[win].c, 40, 260); ring(pe.x + pe.w / 2, pe.y + pe.h / 2, AT[win].c, 30, 190);
+      SFX.pick(); setTimeout(SFX.toss, 120); shake(true); restart($('dwin'), 'punch'); const pe = sp(els[k]); burst(pe.x + pe.w / 2, pe.y + pe.h / 2, AT[win].c, 40, 260); ring(pe.x + pe.w / 2, pe.y + pe.h / 2, AT[win].c, 30, 190);
       const pl = sp(els[1 - k]); for (let j = 0; j < 18; j++) parts.push({ x: pl.x + Math.random() * pl.w, y: pl.y + Math.random() * pl.h, vx: (Math.random() - .5) * 120, vy: Math.random() * 120 - 40, g: 400, c: j % 3 ? P.g3 : P.red, life: .4 + Math.random() * .4, s: 2 });
       floatAt('+' + dw.toFixed(2), pe.x + pe.w / 2 - 20, pe.y - 8, P.good, true);
       setTimeout(() => {
@@ -165,7 +214,8 @@ function askOne(t, q, i, n, fixed) {
       }, 300);
       setTimeout(() => { bv.classList.remove('lock'); done(); }, 1500 / Math.max(1, [.5, 1, 2, 3][G.spd] * .7));
     };
-    fill(); $('reroll').onclick = reroll; KEYQ = choose; KEYR = fixed ? null : reroll; if (fixed) $('reroll').style.display = 'none';
+    fill(); $('reroll').onclick = reroll; $('skip').onclick = skip; KEYQ = choose; KEYR = fixed ? null : reroll; KEYSKIP = fixed ? null : skip;
+    if (fixed) { $('reroll').style.display = 'none'; $('skip').style.display = 'none'; }
   });
 }
 function summary(t, before, ch, nq) {
@@ -178,7 +228,7 @@ function summary(t, before, ch, nq) {
       + `<div class="qright" id="qr"><canvas width="128" height="128"></canvas><div class="cap">虚线 = 今天开始时</div></div></div>`
       + `<div class="bf"><span class="sp"></span><span class="btn2 r2" id="sumok">好的 <span class="key r2">Enter</span></span></div>`);
     const qr = $('qr'); RQ = mkRadar(qr.querySelector('canvas'), 128, t); radarLabels(qr, RQ, 4, 12);
-    banner(`训练完成 · ${t}类`, `${nq || pt().perBatch} 题`, P.mint); SFX.levelup(); vignette(); const bp = sp($('bubble')); confetti(bp.x + bp.w / 2, bp.y + 40, 50);
+    banner(`训练完成 · ${t}类`, `${nq || pt().perBatch} 题`, P.mint); SFX.levelup(); vignette(); const bp = sp($('dwin')); confetti(bp.x + bp.w / 2, bp.y + 40, 50);
     bv.querySelectorAll('.srow[data-a]').forEach((r, i) => { const a = r.dataset.a, from = before[a], to = w(t, a), el = r.querySelector('.nv'); const t0 = performance.now() + 200 + i * 160;
       (function step(now) { const k = Math.max(0, Math.min(1, (now - t0) / 500)); el.textContent = (from + (to - from) * k).toFixed(2); if (k < 1) requestAnimationFrame(step); else { const p = sp(el); ring(p.x + 12, p.y + 8, to > from ? P.mint : P.red, 12, 70); } })(performance.now()); });
     const fin = () => { KEYSUM = null; SFX.click(); done(); }; $('sumok').onclick = fin; KEYSUM = fin;
@@ -192,7 +242,7 @@ export async function tutorialQuestion(q) {
   setUrl(`dafeiyu://rlhf/<b>${t}</b>?tutorial`, true); setScreen('rlhf');
   const before = Object.fromEntries(AXES.map(a => [a, w(t, a)]));
   const p = askOne(t, q, 0, 1, q.pair);
-  await spot('bubble', `这就是「后训练」：同一个问题，两个回答选一个。选中的说法，以后在${t}类问题上更容易被转到；落选的会被压下去。`);
+  await spot('dwin', `这就是「后训练」：同一个问题，两个回答选一个。选中的说法，以后在${t}类问题上更容易被转到；落选的会被压下去。`);
   await p; G.done[t] = (G.done[t] || 0) + 1;
   const ch = AXES.filter(a => before[a] != null && Math.abs(w(t, a) - before[a]) > .001);
   addLog(`出厂测试 · 最后一题（${t}类）：` + (ch.map(a => `${AT[a].s}${w(t, a) > before[a] ? '↑' : '↓'}`).join(' ') || '没变化'), 'g');
@@ -246,13 +296,12 @@ export async function goNight({ ask = true } = {}) {   // ask：还有行动点�
 }
 
 // ---------- 输入框的快捷菜单、房间里能点的东西 ----------
+// 摸头时她头上飘的台词，随机一句；空着就只有爱心和动作（台词还没定，以后往这里加）
+const PET_LINES = [];
+// 输入框的「+」：和点显示器一样，打开浮窗停在菜单页
 export function openMenu() {
   if (G.mode !== 'day') return; if (G.busy) return toast('她正忙着呢');
-  const acts = enabled(), m = $('m-act');
-  m.innerHTML = '<div class="mh">让大肥鱼……</div>' + acts.map((a, i) => { const why = canAct(a); return `<div class="it r2${why ? ' dis' : ''}" data-i="${i}"><span class="kk r2">${i + 1}</span>${a.say}<span class="t3">${why || '1 行动点'}</span></div>`; }).join('')
-    + `<div class="it r2" data-go="1"><span class="kk r2">↵</span>开始营业<span class="t3">进入夜间</span></div>`;
-  $('spdpop').classList.remove('show'); m.classList.add('show'); SFX.blip();
-  m.querySelectorAll('.it').forEach(it => { it.onmouseenter = () => SFX.hover(); it.onclick = e => { e.stopPropagation(); m.classList.remove('show'); if (it.dataset.go) { SFX.click(); return goNight(); } const a = acts[+it.dataset.i], why = canAct(a); if (why) return deny(why); SFX.select(); bubble(true); a.run(); }; });
+  $('spdpop').classList.remove('show'); bubble(true); view('menu');
 }
 const HOTS = [
   { x: 14, y: 36, w: 138, h: 150, tip: '书架 · 预训练「百科」', act: 'pretrain', arg: 'knowledge' },
@@ -261,7 +310,7 @@ const HOTS = [
   { x: 350, y: 128, w: 46, h: 110, tip: '衣钩 · 预训练「官网」', act: 'pretrain', arg: 'formal' },
   { x: 462, y: 310 + DESK_DY, w: 88, h: 80, tip: '笔记本 · 预训练「技术文档」', act: 'pretrain', arg: 'logic' },
   { x: 552, y: 350 + DESK_DY, w: 46, h: 40, tip: '书立 · 预训练「小说」', act: 'pretrain', arg: 'narrative' },
-  { x: 222, y: 268 + DESK_DY, w: 154, h: 112, tip: '显示器 · 后训练', act: 'posttrain' },
+  { x: 222, y: 268 + DESK_DY, w: 154, h: 112, tip: '标注台 · 白天活动', act: 'menu' },
   { x: 180, y: 360 + DESK_DY, w: 30, h: 32, tip: '马克杯 · 吃白饭', act: 'eat' },
 ];
 export function initDay() {
@@ -270,13 +319,17 @@ export function initDay() {
     d.innerHTML = `<span class="tip r2">${h.tip}</span>`; d.onmouseenter = () => SFX.hover();
     d.onclick = e => {
       e.stopPropagation(); if (G.busy || G.mode !== 'day' || performance.now() - G.startT < 500) return;
+      const p = sp(d), fx = () => { ring(p.x + p.w / 2, p.y + p.h / 2, P.cobalt, 18, 90); SFX.select(); };
+      // 标注台：开着就收起，关着就打开停在菜单页；不看行动点和开放与否（行动点用完了也要能点「开始营业」）
+      if (h.act === 'menu') { if (dwin.classList.contains('show')) return bubble(false); fx(); bubble(true); return view('menu'); }
       const a = enabled().find(x => x.id === h.act); if (!a) return deny('今天不开放'); const why = canAct(a); if (why) return deny(why);
-      const p = sp(d); ring(p.x + p.w / 2, p.y + p.h / 2, P.cobalt, 18, 90); SFX.select(); bubble(true);
+      fx(); bubble(true);
       if (h.act === 'pretrain') view('pre', h.arg); else a.run();
     };
     $('hots').appendChild(d);
   });
-  $('fishhit').addEventListener('click', e => { e.stopPropagation(); if (G.busy || G.mode !== 'day') return; SFX.click(); const s = !$('bubble').classList.contains('show'); bubble(s); if (s) view('menu'); const p = sp($('fishhit')); ring(p.x + 65, p.y + 30, P.cobalt, 14, 70); setFish('pick'); if (!s) toast('她在发呆'); });
+  // 摸头：白天点大肥鱼，不花行动点、不计统计、不进轨迹，只她一个反应；训练中不理
+  $('fishhit').addEventListener('click', e => { e.stopPropagation(); if (G.busy || G.mode !== 'day') return; SFX.click(); const p = sp($('fishhit')); burst(p.x + 65, p.y + 40, P.rose, 14, 120); if (PET_LINES.length) floatAt(pick(PET_LINES), p.x + 60, p.y + 10, P.ink, true); setFish('pick'); });
   on('composer', openMenu); on('t-act', openMenu);
   $('tokdev').addEventListener('click', () => { SFX.chunk(); DEV.kick = 1; DEV.flash = 1; DEV.glow = 1; toast(G.mode === 'day' ? '分词机：白天在读语料，晚上才吐 token' : `分词机：本轮已吐出 ${G.tok} 个 token`); });
 }

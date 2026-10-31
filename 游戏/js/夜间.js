@@ -159,6 +159,8 @@ export async function runSession(sess) {
       if (egg?.abnormal && ctx.first) pre = egg.abnormal;
       G.phase = 'think'; const ai = addAI(); G.tok = 0; setFish('type'); showPuff(true); setScreen('console');
       await new Promise(res => emit(stripMd(pre) || '……', ai.thCaret, { onLaunch: res })); if (!alive()) return 'abort';
+      // 前面的字全落进思考块再弹关键节点：子弹时间里在飞的字几乎停住，会一直悬在对话栏上
+      await new Promise(res => (function chk() { if (!G.outBusy || !alive()) res(); else requestAnimationFrame(chk); })()); if (!alive()) return 'abort';
       const blank = document.createElement('span'); blank.className = 'blank'; blank.textContent = '＿＿'; ai.thCaret.before(blank); scrollChat();
       NODE.fate = fateFor(ri + 1, ctx.first);   // 剧情杀（游戏剧情_设计.md §6）
       const c = await openNode(blank, cs, ctx.last, rd.style === 'terminal'); if (!alive()) return 'abort';

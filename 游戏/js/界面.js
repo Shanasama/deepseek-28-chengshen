@@ -155,7 +155,7 @@ function setTier(t) { const prev = G.spd; G.spd = t; if (t !== prev) { saveSetti
 
 // ---------- 按钮装配 ----------
 export const on = (id, fn) => $(id).addEventListener('click', e => { e.stopPropagation(); SFX.click(); fn(e); });
-export function closeMenus() { $('m-act').classList.remove('show'); $('spdpop').classList.remove('show'); }
+export function closeMenus() { $('spdpop').classList.remove('show'); }
 export function initShell() {
   const ic = (id, k, col, s = 1) => { const e = $(id); [...e.childNodes].filter(n => n.tagName === 'CANVAS').forEach(n => n.remove()); e.prepend(pxIcon(ICON[k], { k: col, B: P.cobalt, w: P.paper, I: P.ice }, s)); };
   $('tlogo').appendChild(pxIcon(ICON.whale, { k: P.k0, B: P.cobalt, w: P.paper, I: P.ice }));
@@ -194,10 +194,30 @@ export function initShell() {
   trk.addEventListener('pointermove', e => { if (sDrag) move(e); });
   trk.addEventListener('pointerup', () => { if (!sDrag) return; sDrag = false; sPos = G.spd / 3; renderSpd(true); SFX.click(); });
   on('spdreset', () => { setTier(1); sPos = 1 / 3; renderSpd(true); toast('倍速已恢复 Medium'); });
-  on('spdchip', () => { $('m-act').classList.remove('show'); $('spdpop').classList.toggle('show'); renderSpd(true); });
+  on('spdchip', () => { $('spdpop').classList.toggle('show'); renderSpd(true); });
   $('spdpop').addEventListener('click', e => e.stopPropagation());
-  document.addEventListener('click', e => { if (!e.target.closest('.menu')) $('m-act').classList.remove('show'); if (!e.target.closest('#spdpop')) $('spdpop').classList.remove('show'); });
+  document.addEventListener('click', e => { if (!e.target.closest('#spdpop')) $('spdpop').classList.remove('show'); });
   sPos = G.spd / 3; renderSpd(true);
+  dragScroll($('chat'), '.conv,#trace');
+}
+// 聊天记录 / 轨迹：按住鼠标上下拖着滑（滚动条是藏起来的），松手带一点惯性；拖过 4 px 才算拖，拖完那一下的点击吞掉
+function dragScroll(box, sel) {
+  let d = null, endT = 0, raf = 0;
+  box.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return; const sc = e.target.closest(sel); if (!sc) return;
+    cancelAnimationFrame(raf); d = { sc, y: e.clientY, top: sc.scrollTop, on: false, v: 0, ly: e.clientY, lt: performance.now() };
+  });
+  addEventListener('pointermove', e => {
+    if (!d) return; const dy = e.clientY - d.y; if (!d.on) { if (Math.abs(dy) < 4) return; d.on = true; box.classList.add('grabbing'); }
+    const k = stage.offsetWidth / stage.getBoundingClientRect().width, now = performance.now();   // 屏幕像素换成游戏里的像素（舞台被缩放过）
+    d.sc.scrollTop = d.top - dy * k; d.v = -(e.clientY - d.ly) * k / Math.max(1, now - d.lt); d.ly = e.clientY; d.lt = now;
+  });
+  addEventListener('pointerup', () => {
+    if (!d) return; const { sc, on } = d; let v = performance.now() - d.lt > 80 ? 0 : d.v; d = null; if (!on) return;
+    box.classList.remove('grabbing'); endT = performance.now();
+    let t = performance.now(); (function glide(now) { const dt = now - t; t = now; v *= Math.pow(.994, dt); if (Math.abs(v) < .02) return; sc.scrollTop += v * dt; raf = requestAnimationFrame(glide); })(t);
+  });
+  box.addEventListener('click', e => { if (performance.now() - endT < 60) { e.stopPropagation(); e.preventDefault(); } }, true);
 }
 // 墙上的标语：点一下横着跑马灯（一行一行读，不知所云），再点一下竖着跑（一列一列读出真意），再点一下停
 const SLOGAN = { 1: { order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], say: '横着读：不挑战 · 怕战胜 · 困困困 · 难难难' }, 2: { order: [0, 3, 6, 9, 1, 4, 7, 10, 2, 5, 8, 11], say: '竖着读：不怕困难 · 挑战困难 · 战胜困难' } };

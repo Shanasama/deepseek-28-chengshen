@@ -132,7 +132,7 @@ export async function day1Guide() {
   drawer(true); await wait(380);
   await spot('vlist', '今晚这几位会来。线索藏在简介里：猜猜他们会问什么，白天就练什么。');
   drawer(false); await wait(260);
-  await spot('bubble', `今天有 ${G.ap} 个行动点，想干啥干啥：每件事花 1 点。`);
+  await spot('dwin', `今天有 ${G.ap} 个行动点，想干啥干啥：每件事花 1 点。`);
   if ($('gobtn')) await spot('gobtn', '准备好了，就点这里开始营业。');
 }
 
